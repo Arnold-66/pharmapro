@@ -62,3 +62,7 @@ Subscription expiry notification sent for tenant baylor - 0 days left
 Subscription notification sent to arnoldokulloopio@gmail.com for tenant baylor
 Subscription expiry email sent to 1 recipients
 Subscription expiry notification sent for tenant baylor - 0 days left
+/home/opioarnold/pharma/accounts/views.py:907: UnorderedObjectListWarning: Pagination may yield inconsistent results with an unordered object_list: <class 'accounts.models.User'> QuerySet.
+  paginator = Paginator(users, 10)
+/home/opioarnold/pharma/accounts/views.py:907: UnorderedObjectListWarning: Pagination may yield inconsistent results with an unordered object_list: <class 'accounts.models.User'> QuerySet.
+  paginator = Paginator(users, 10)

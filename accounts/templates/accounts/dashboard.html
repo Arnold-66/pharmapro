@@ -1,4 +1,4 @@
-<!-- accounts/templates/accounts/dashboard.html -->
+<!-- templates/tenants/dashboard.html -->
 {% extends 'accounts/base.html' %}
 {% load static %}
 
@@ -64,33 +64,6 @@
             padding: 0.2rem 0.4rem !important;
         }
         
-        .page-header .btn {
-            width: 100% !important;
-            font-size: 0.75rem !important;
-            padding: 0.3rem 0.6rem !important;
-        }
-        
-        /* ===== STATS CARDS - 2 PER ROW ===== */
-        .row.g-4.mb-4 {
-            --bs-gutter-x: 0 !important;
-            --bs-gutter-y: 0.25rem !important;
-            margin-right: 0 !important;
-            margin-left: 0 !important;
-        }
-        
-        .row.g-4.mb-4 > .col-xl-3.col-md-6 {
-            flex: 0 0 50% !important;
-            max-width: 50% !important;
-            padding-right: 0.125rem !important;
-            padding-left: 0.125rem !important;
-        }
-        
-        .stat-card {
-            border-radius: 4px !important;
-            margin-bottom: 0 !important;
-            height: 100% !important;
-        }
-        
         .stat-card .card-body {
             padding: 0.5rem 0.5rem !important;
             display: flex !important;
@@ -103,165 +76,50 @@
             height: 32px !important;
             min-width: 32px !important;
             min-height: 32px !important;
-            padding: 0 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            border-radius: 50% !important;
-            flex-shrink: 0 !important;
         }
         
         .stat-card .stat-icon i {
             font-size: 0.9rem !important;
         }
         
-        .stat-card .stat-content {
-            flex: 1 !important;
-            min-width: 0 !important;
-            overflow: visible !important;
-        }
-        
         .stat-card .stat-content h6 {
             font-size: 0.55rem !important;
-            margin-bottom: 0.05rem !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.3px !important;
-            color: #6c757d !important;
-            font-weight: 600 !important;
-            white-space: normal !important;
-            word-wrap: break-word !important;
-            line-height: 1.2 !important;
         }
         
         .stat-card .stat-content h3 {
             font-size: 0.85rem !important;
-            margin-bottom: 0 !important;
-            font-weight: 700 !important;
-            line-height: 1.2 !important;
-            word-wrap: break-word !important;
         }
         
-        /* ===== ALERT ===== */
-        .alert {
-            padding: 0.5rem 0.5rem !important;
-            margin: 0 0.125rem 0.25rem 0.125rem !important;
-            font-size: 0.75rem !important;
-        }
-        
-        .alert ul {
-            padding-left: 1.2rem !important;
-            margin-top: 0.25rem !important;
-            margin-bottom: 0 !important;
-        }
-        
-        .alert ul li {
-            font-size: 0.7rem !important;
-        }
-        
-        .btn-close {
-            padding: 0.5rem !important;
-            font-size: 0.6rem !important;
-        }
-        
-        /* ===== TABLE ===== */
-        .table-responsive {
-            overflow-x: auto;
-        }
-        
-        .table td, .table th {
-            font-size: 0.75rem !important;
-            padding: 0.4rem 0.3rem !important;
-            white-space: nowrap;
-        }
-        
-        .table .badge {
-            font-size: 0.6rem !important;
-            padding: 0.2rem 0.35rem !important;
-        }
-        
-        /* ===== CHART - IMPROVED MOBILE ===== */
-        .card.mt-4 {
-            margin-top: 0.25rem !important;
-        }
-        
-        .chart-container {
-            position: relative;
-            width: 100%;
-            height: 200px !important;
-            min-height: 200px !important;
-        }
-        
-        canvas#salesChart {
-            width: 100% !important;
-            height: 100% !important;
-            max-height: 200px !important;
-        }
-        
-        /* ===== ALERT ITEMS MOBILE ===== */
         .alert-item {
             flex-direction: column !important;
             align-items: flex-start !important;
             gap: 0.5rem !important;
         }
         
-        .alert-item .alert-icon {
-            width: 28px !important;
-            height: 28px !important;
-        }
-        
-        .alert-item .alert-icon i {
-            font-size: 0.8rem !important;
-        }
-        
-        .alert-item .alert-content h6 {
-            font-size: 0.75rem !important;
-        }
-        
-        .alert-item .alert-content p {
-            font-size: 0.7rem !important;
-        }
-        
-        .alert-item .alert-content small {
-            font-size: 0.6rem !important;
-        }
-        
-        .alert-item .btn {
+        .alert-item .alert-actions {
             align-self: flex-end !important;
         }
-    }
-    
-    @media (max-width: 400px) {
-        .stat-card .card-body {
-            padding: 0.25rem 0.25rem !important;
-            gap: 0.3rem !important;
-        }
         
-        .stat-card .stat-icon {
-            width: 26px !important;
-            height: 26px !important;
-            min-width: 26px !important;
-            min-height: 26px !important;
-        }
-        
-        .stat-card .stat-icon i {
+        .table td, .table th {
             font-size: 0.7rem !important;
-        }
-        
-        .stat-card .stat-content h6 {
-            font-size: 0.45rem !important;
-        }
-        
-        .stat-card .stat-content h3 {
-            font-size: 0.75rem !important;
+            padding: 0.3rem 0.25rem !important;
         }
         
         .chart-container {
-            height: 150px !important;
-            min-height: 150px !important;
+            height: 180px !important;
+            min-height: 180px !important;
         }
         
-        canvas#salesChart {
-            max-height: 150px !important;
+        canvas {
+            max-height: 180px !important;
+        }
+        
+        .filter-controls .col-md-3 {
+            margin-bottom: 0.5rem !important;
+        }
+        
+        .filter-status .badge {
+            font-size: 0.65rem !important;
         }
     }
     
@@ -274,11 +132,6 @@
         .row {
             --bs-gutter-x: 0.5rem !important;
         }
-        
-        .row > [class*="col-"] {
-            padding-right: 0.25rem !important;
-            padding-left: 0.25rem !important;
-        }
     }
     
     @media (min-width: 993px) {
@@ -287,8 +140,8 @@
         }
         
         .chart-container {
-            height: 300px !important;
-            min-height: 300px !important;
+            height: 280px !important;
+            min-height: 280px !important;
         }
     }
     
@@ -300,7 +153,7 @@
     
     .card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.1) !important;
     }
     
     .card-header {
@@ -308,24 +161,18 @@
         border-bottom: 2px solid #f0f0f0;
     }
     
-    /* ===== STAT CARD STYLES ===== */
+    /* ===== STAT CARDS ===== */
     .stat-card {
         border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        transition: transform 0.2s;
         overflow: hidden;
-    }
-    
-    .stat-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
     }
     
     .stat-card .card-body {
         display: flex !important;
         align-items: center !important;
         gap: 1rem !important;
-        padding: 0.5rem !important;
+        padding: 0.75rem !important;
     }
     
     .stat-card .stat-icon {
@@ -351,7 +198,7 @@
         font-size: 0.7rem;
         font-weight: 600;
         color: #6c757d;
-        margin-bottom: 0.15rem;
+        margin-bottom: 0.1rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
@@ -361,6 +208,11 @@
         font-weight: 700;
         margin-bottom: 0;
         line-height: 1.2;
+    }
+    
+    .stat-card .stat-content small {
+        font-size: 0.7rem;
+        color: #6c757d;
     }
     
     /* ===== COLOR VARIATIONS ===== */
@@ -405,6 +257,11 @@
         display: flex !important;
         align-items: center !important;
         gap: 1rem !important;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .alert-item:last-child {
+        border-bottom: none;
     }
     
     .alert-item:hover {
@@ -482,8 +339,8 @@
     .chart-container {
         position: relative;
         width: 100%;
-        height: 300px;
-        min-height: 300px;
+        height: 280px;
+        min-height: 280px;
     }
     
     .chart-container canvas {
@@ -511,16 +368,56 @@
         background-color: #28a745;
         color: white;
     }
+    
+    .badge-online {
+        background-color: #28a745;
+        color: white;
+    }
+    
+    /* ===== FILTER CONTROLS ===== */
+    .filter-controls .form-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .filter-controls .form-control,
+    .filter-controls .form-select {
+        font-size: 0.85rem;
+    }
+    
+    .filter-status .badge {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.6rem;
+    }
+    
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+        padding: 2rem;
+        text-align: center;
+        color: #6c757d;
+    }
+    
+    .empty-state i {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        opacity: 0.3;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid px-4">
     <!-- ===== PAGE HEADER ===== -->
-    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4" style="padding: 0 0.5rem;">
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h3 mb-0 text-gray-800 fw-bold">{{ tenant.name }} Dashboard</h1>
             <p class="text-muted small mb-0 mt-1">Welcome back, {{ user.get_full_name|default:user.username }}!</p>
+            {% if is_staff %}
+            <span class="badge bg-info mt-1">
+                <i class="fas fa-user me-1"></i> Viewing your sales only
+            </span>
+            {% endif %}
         </div>
         <div class="mt-2 mt-sm-0">
             <span class="badge bg-primary">{{ tenant.plan|title }} Plan</span>
@@ -530,7 +427,63 @@
         </div>
     </div>
 
-    <!-- ===== STATISTICS CARDS ===== -->
+    <!-- ===== FILTER CONTROLS ===== -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end filter-controls" id="filterForm">
+                <div class="col-md-3">
+                    <label class="form-label">Date Range</label>
+                    <input type="date" name="date_from" class="form-control" value="{{ date_from|default:'' }}" id="dateFrom">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">To</label>
+                    <input type="date" name="date_to" class="form-control" value="{{ date_to|default:'' }}" id="dateTo">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Quick Filters</label>
+                    <select name="quick_filter" class="form-select" id="quickFilter">
+                        <option value="">Custom Range</option>
+                        <option value="today" {% if quick_filter == 'today' %}selected{% endif %}>Today</option>
+                        <option value="yesterday" {% if quick_filter == 'yesterday' %}selected{% endif %}>Yesterday</option>
+                        <option value="week" {% if quick_filter == 'week' %}selected{% endif %}>This Week</option>
+                        <option value="month" {% if quick_filter == 'month' %}selected{% endif %}>This Month</option>
+                        <option value="quarter" {% if quick_filter == 'quarter' %}selected{% endif %}>This Quarter</option>
+                        <option value="year" {% if quick_filter == 'year' %}selected{% endif %}>This Year</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter me-2"></i>Apply Filter
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Filter Status Display -->
+            {% if filter_display != 'All Time' %}
+            <div class="mt-3 filter-status">
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge bg-info">
+                        <i class="fas fa-filter me-1"></i> 
+                        <strong>Filter:</strong> {{ filter_display }}
+                    </span>
+                    <span class="badge bg-secondary">
+                        <i class="fas fa-file-invoice me-1"></i> 
+                        {{ recent_pos|length }} POs
+                    </span>
+                    <span class="badge bg-secondary">
+                        <i class="fas fa-shopping-cart me-1"></i> 
+                        {{ filtered_sales_count }} sales
+                    </span>
+                    <a href="{% url 'accounts:tenant_dashboard' tenant.slug %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-times"></i> Clear Filter
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ===== SECTION 1: STATISTICS CARDS ===== -->
     <div class="row g-4 mb-4">
         <div class="col-xl-3 col-md-6 col-6">
             <div class="card stat-card shadow-sm h-100">
@@ -541,6 +494,7 @@
                     <div class="stat-content">
                         <h6>Products</h6>
                         <h3 class="text-primary-dark">{{ total_products }}</h3>
+                        <small>Total in inventory</small>
                     </div>
                 </div>
             </div>
@@ -552,12 +506,14 @@
                         <i class="fas fa-shopping-cart text-success"></i>
                     </div>
                     <div class="stat-content">
-                        <h6>Sales</h6>
+                        <h6>{% if is_staff %}My Sales{% else %}Sales{% endif %}</h6>
                         <h3 class="text-success-dark">{{ total_sales }}</h3>
+                        <small>{% if is_staff %}Your transactions{% else %}Total transactions{% endif %}</small>
                     </div>
                 </div>
             </div>
         </div>
+        {% if not is_staff %}
         <div class="col-xl-3 col-md-6 col-6">
             <div class="card stat-card shadow-sm h-100">
                 <div class="card-body">
@@ -567,10 +523,12 @@
                     <div class="stat-content">
                         <h6>Users</h6>
                         <h3 class="text-info">{{ total_users }}</h3>
+                        <small><i class="fas fa-circle text-success small"></i> {{ online_users }} online</small>
                     </div>
                 </div>
             </div>
         </div>
+        {% endif %}
         <div class="col-xl-3 col-md-6 col-6">
             <div class="card stat-card shadow-sm h-100">
                 <div class="card-body">
@@ -578,216 +536,316 @@
                         <i class="fas fa-dollar-sign text-warning"></i>
                     </div>
                     <div class="stat-content">
-                        <h6>Today's Sales</h6>
+                        <h6>{% if is_staff %}My Sales{% else %}Filtered Sales{% endif %}</h6>
                         <h3 class="text-warning">UGX {{ today_sales|floatformat:0 }}</h3>
+                        <small>{{ today_count }} transactions</small>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ===== LOW STOCK ALERT ===== -->
+    <!-- ===== SECTION 2: ALERTS ===== -->
+    <!-- Low Stock Alert -->
     {% if low_stock_products %}
-    <div class="alert alert-warning alert-dismissible fade show" role="alert" style="margin: 0 0.125rem 0.25rem 0.125rem;">
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        <strong>Low Stock Alert:</strong> The following products need reordering.
-        <ul class="mb-0 mt-2">
-            {% for product in low_stock_products %}
-            <li>{{ product.name }} - Stock: {{ product.quantity|floatformat:0 }} (Reorder at: {{ product.reorder_point|floatformat:0 }})</li>
-            {% endfor %}
-        </ul>
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <div class="d-flex align-items-start">
+            <i class="fas fa-exclamation-triangle me-2 mt-1"></i>
+            <div>
+                <strong>Low Stock Alert:</strong> The following products need reordering.
+                <ul class="mb-0 mt-2">
+                    {% for product in low_stock_products %}
+                    <li>{{ product.name }} - Stock: {{ product.quantity|floatformat:0 }} (Reorder at: {{ product.reorder_point|floatformat:0 }})</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
     {% endif %}
 
-    <!-- ===== EXPIRING PRODUCTS ALERT ===== -->
+    <!-- Expiring Products Alert -->
     {% if expiring_products %}
-    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin: 0 0.125rem 0.25rem 0.125rem;">
-        <i class="fas fa-clock me-2"></i>
-        <strong>Products Expiring Soon:</strong> The following products are expiring within 30 days.
-        <ul class="mb-0 mt-2">
-            {% for product in expiring_products %}
-            <li>{{ product.name }} - Expires: {{ product.expiry_date }} ({{ product.expiry_date|timeuntil }})</li>
-            {% endfor %}
-        </ul>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <div class="d-flex align-items-start">
+            <i class="fas fa-clock me-2 mt-1"></i>
+            <div>
+                <strong>Products Expiring Soon:</strong> The following products are expiring within 30 days.
+                <ul class="mb-0 mt-2">
+                    {% for product in expiring_products %}
+                    <li>{{ product.name }} - Expires: {{ product.expiry_date }} ({{ product.expiry_date|timeuntil }})</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
     {% endif %}
 
+    <!-- Active Alerts Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-bell me-2 text-warning"></i>Active Alerts</h5>
+            <div class="d-flex gap-2">
+                <span class="badge bg-danger">{{ active_alerts_count|default:0 }} Active</span>
+                <a href="{% url 'inventory:alerts' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            {% if unresolved_alerts %}
+                {% for alert in unresolved_alerts %}
+                <div class="alert-item d-flex align-items-center gap-3 
+                    {% if alert.severity == 'critical' %}critical
+                    {% elif alert.severity == 'warning' %}warning
+                    {% else %}info{% endif %}">
+                    <div class="alert-icon 
+                        {% if alert.severity == 'critical' %}bg-danger-soft
+                        {% elif alert.severity == 'warning' %}bg-warning-soft
+                        {% else %}bg-info-soft{% endif %}">
+                        <i class="fas 
+                            {% if alert.alert_type == 'low_stock' %}fa-exclamation-triangle
+                            {% elif alert.alert_type == 'out_of_stock' %}fa-times-circle
+                            {% elif alert.alert_type == 'expiring' %}fa-clock
+                            {% else %}fa-bell{% endif %} 
+                            {% if alert.severity == 'critical' %}text-danger
+                            {% elif alert.severity == 'warning' %}text-warning
+                            {% else %}text-info{% endif %}">
+                        </i>
+                    </div>
+                    <div class="alert-content">
+                        <h6 class="{% if not alert.is_read %}fw-bold{% endif %}">
+                            {{ alert.get_alert_type_display }}
+                            <span class="badge 
+                                {% if alert.severity == 'critical' %}badge-critical
+                                {% elif alert.severity == 'warning' %}badge-warning
+                                {% else %}badge-info{% endif %} ms-1">
+                                {{ alert.get_severity_display }}
+                            </span>
+                            {% if not alert.is_read %}
+                            <span class="badge bg-primary ms-1">New</span>
+                            {% endif %}
+                        </h6>
+                        <p>{{ alert.message|truncatechars:80 }}</p>
+                        <small>
+                            <i class="fas fa-clock me-1"></i>{{ alert.created_at|timesince }} ago
+                            {% if alert.product %}
+                            · <a href="{% url 'inventory:product_detail' alert.product.id %}" class="text-primary">View Product</a>
+                            {% endif %}
+                        </small>
+                    </div>
+                    <div class="alert-actions">
+                        <button class="btn btn-sm btn-outline-success" 
+                                onclick="resolveAlert('{{ alert.id }}')" title="Mark as resolved">
+                            <i class="fas fa-check"></i> <span class="d-none d-sm-inline">Resolve</span>
+                        </button>
+                        {% if not alert.is_read %}
+                            <button class="btn btn-sm btn-outline-primary" 
+                                    onclick="markAlertRead('{{ alert.id }}')" title="Mark as read">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-check-circle text-success"></i>
+                    <p class="mb-0">No unresolved alerts! Everything is looking good.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
 
-    <!-- ===== ALERTS SECTION ===== -->
-    <div class="row mb-4">
-        <div class="col-md-7">
+    <!-- ===== SECTION 3: CHARTS ===== -->
+    <div class="row g-4 mb-4">
+        <!-- Monthly Sales Chart -->
+        <div class="col-xl-8 col-lg-7">
             <div class="card shadow-sm h-100">
                 <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-bell me-2 text-warning"></i>Active Alerts</h5>
-                    <div class="d-flex gap-2">
-                        <span class="badge bg-danger">{{ active_alerts_count|default:0 }} Active</span>
-                        <a href="{% url 'inventory:alerts' %}" class="btn btn-sm btn-outline-primary">View All</a>
-                    </div>
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2 text-primary"></i>
+                        {% if is_staff %}My Monthly Sales{% else %}Monthly Sales{% endif %}
+                    </h5>
+                    <span class="badge bg-secondary">{{ monthly_sales|length }} months</span>
                 </div>
-                <div class="card-body p-0">
-                    {% if unresolved_alerts %}
-                        {% for alert in unresolved_alerts %}
-                        <div class="alert-item d-flex align-items-center gap-3 
-                            {% if alert.severity == 'critical' %}critical
-                            {% elif alert.severity == 'warning' %}warning
-                            {% else %}info{% endif %}"
-                             style="border-bottom: 1px solid #f0f0f0;">
-                            <div class="alert-icon 
-                                {% if alert.severity == 'critical' %}bg-danger-soft
-                                {% elif alert.severity == 'warning' %}bg-warning-soft
-                                {% else %}bg-info-soft{% endif %}">
-                                <i class="fas 
-                                    {% if alert.alert_type == 'low_stock' %}fa-exclamation-triangle
-                                    {% elif alert.alert_type == 'out_of_stock' %}fa-times-circle
-                                    {% elif alert.alert_type == 'expiring' %}fa-clock
-                                    {% else %}fa-bell{% endif %} 
-                                    {% if alert.severity == 'critical' %}text-danger
-                                    {% elif alert.severity == 'warning' %}text-warning
-                                    {% else %}text-info{% endif %}">
-                                </i>
-                            </div>
-                            <div class="alert-content">
-                                <h6 class="{% if not alert.is_read %}fw-bold{% endif %}">
-                                    {{ alert.get_alert_type_display }}
-                                    <span class="badge 
-                                        {% if alert.severity == 'critical' %}badge-critical
-                                        {% elif alert.severity == 'warning' %}badge-warning
-                                        {% else %}badge-info{% endif %} ms-1" style="font-size: 0.6rem;">
-                                        {{ alert.get_severity_display }}
-                                    </span>
-                                    {% if not alert.is_read %}
-                                    <span class="badge bg-primary ms-1" style="font-size: 0.6rem;">New</span>
-                                    {% endif %}
-                                </h6>
-                                <p>{{ alert.message|truncatechars:80 }}</p>
-                                <small>
-                                    <i class="fas fa-clock me-1"></i>{{ alert.created_at|timesince }} ago
-                                    {% if alert.product %}
-                                    · <a href="{% url 'inventory:product_detail' alert.product.id %}" class="text-primary">View Product</a>
-                                    {% endif %}
-                                </small>
-                            </div>
-                            <!-- <div class="alert-actions">
-                                <button class="btn btn-sm btn-outline-success" 
-                                        onclick="resolveAlert('{{ alert.id }}')" title="Mark as resolved">
-                                    <i class="fas fa-check"></i> Resolve
-                                </button>
-                                {% if not alert.is_read %}
-                                    <button class="btn btn-sm btn-outline-primary" 
-                                            onclick="markAlertRead('{{ alert.id }}')" title="Mark as read">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                {% endif %}
-                            </div> -->
+                <div class="card-body">
+                    {% if monthly_sales %}
+                        <div class="chart-container">
+                            <canvas id="salesChart"></canvas>
                         </div>
-                        {% endfor %}
-                        {% if unresolved_alerts|length == 0 %}
-                        <div class="text-center py-4 text-muted">
-                            <i class="fas fa-check-circle fa-3x mb-2 d-block text-success"></i>
-                            <p class="mb-0">No unresolved alerts! Everything is looking good.</p>
-                        </div>
-                        {% endif %}
                     {% else %}
-                    <div class="text-center py-4 text-muted">
-                        <i class="fas fa-check-circle fa-3x mb-2 d-block text-success"></i>
-                        <p class="mb-0">No unresolved alerts! Everything is looking good.</p>
-                    </div>
+                        <div class="empty-state">
+                            <i class="fas fa-chart-bar"></i>
+                            <p class="mb-0">No sales data available for chart.</p>
+                            <small>Sales data will appear here once you start making sales.</small>
+                        </div>
                     {% endif %}
                 </div>
             </div>
         </div>
-        
 
-        
-        <!-- ===== INVENTORY STATUS ===== -->
-        <div class="col-md-5">
+        <!-- Product Status Pie Chart -->
+        <div class="col-xl-4 col-lg-5">
             <div class="card shadow-sm h-100">
                 <div class="card-header bg-transparent">
-                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2 text-primary"></i>Inventory Status</h5>
+                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2 text-success"></i>Product Status</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row g-2">
-                        <div class="col-6">
-                            <div class="text-center p-2 bg-light rounded">
-                                <h4 class="text-success mb-0">{{ total_products }}</h4>
-                                <small class="text-muted">Total Products</small>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-center p-2 bg-light rounded">
-                                <h4 class="text-warning mb-0">{{ low_stock|default:0 }}</h4>
-                                <small class="text-muted">Low Stock</small>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-center p-2 bg-light rounded">
-                                <h4 class="text-danger mb-0">{{ out_of_stock|default:0 }}</h4>
-                                <small class="text-muted">Out of Stock</small>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="text-center p-2 bg-light rounded">
-                                <h4 class="text-info mb-0">{{ total_categories|default:0 }}</h4>
-                                <small class="text-muted">Categories</small>
-                            </div>
-                        </div>
-                    </div>
-                    
                     {% if status_distribution %}
-                    <hr>
-                    <div class="mt-2">
-                        <small class="text-muted d-block mb-2">Product Status Distribution</small>
-                        {% for status in status_distribution %}
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="badge {% if status.status == 'active' %}bg-success{% elif status.status == 'inactive' %}bg-secondary{% elif status.status == 'discontinued' %}bg-danger{% else %}bg-warning{% endif %}">
-                                {{ status.status|title }}
-                            </span>
-                            <span class="fw-bold">{{ status.count }}</span>
+                        <div class="chart-container">
+                            <canvas id="statusPieChart"></canvas>
                         </div>
-                        {% endfor %}
-                    </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-chart-pie"></i>
+                            <p class="mb-0">No product data available.</p>
+                            <small>Add products to see status distribution.</small>
+                        </div>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ===== RECENT SALES ===== -->
-    <div class="card shadow-sm">
+    <!-- ===== SECTION 4: SECOND ROW OF CHARTS ===== -->
+    <div class="row g-4 mb-4">
+        <!-- Top Products Chart -->
+        <div class="col-xl-4 col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0"><i class="fas fa-trophy me-2 text-warning"></i>Top 5 Products</h5>
+                    <small class="text-muted">({{ filter_display|default:'All Time' }})</small>
+                </div>
+                <div class="card-body">
+                    {% if top_products %}
+                        <div class="chart-container">
+                            <canvas id="topProductsPieChart"></canvas>
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-box"></i>
+                            <p class="mb-0">No product sales data available.</p>
+                            <small>Products will appear here once sales are made.</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Purchase Orders Status -->
+        <div class="col-xl-4 col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-invoice me-2 text-info"></i>
+                        {% if is_staff %}My Purchase Orders{% else %}Purchase Orders{% endif %}
+                    </h5>
+                    <small class="text-muted">({{ filter_display|default:'All Time' }})</small>
+                </div>
+                <div class="card-body">
+                    {% if po_status_distribution %}
+                        <div class="chart-container">
+                            <canvas id="poStatusPieChart"></canvas>
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-file-invoice"></i>
+                            <p class="mb-0">No purchase orders available.</p>
+                            <small>Create purchase orders to see distribution.</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Status Chart -->
+        <div class="col-xl-4 col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">
+                        <i class="fas fa-credit-card me-2 text-success"></i>
+                        {% if is_staff %}My Payment Status{% else %}Payment Status{% endif %}
+                    </h5>
+                    <small class="text-muted">({{ filter_display|default:'All Time' }})</small>
+                </div>
+                <div class="card-body">
+                    {% if sales_by_status %}
+                        <div class="chart-container">
+                            <canvas id="paymentStatusPieChart"></canvas>
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-credit-card"></i>
+                            <p class="mb-0">No payment data available.</p>
+                            <small>Payment status will appear once sales are made.</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SECTION 5: RECENT PURCHASE ORDERS ===== -->
+    <div class="card shadow-sm mb-4">
         <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Sales</h5>
-            <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+            <h5 class="mb-0">
+                <i class="fas fa-file-invoice me-2 text-primary"></i>
+                {% if is_staff %}My Recent Purchase Orders{% else %}Recent Purchase Orders{% endif %}
+            </h5>
+            <a href="{% url 'suppliers:purchase_order_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover mb-0">
                     <thead class="bg-light">
                         <tr>
-                            <th>Sale ID</th>
+                            <th>PO Number</th>
+                            <th>Supplier</th>
                             <th>Date</th>
                             <th>Total</th>
                             <th>Status</th>
+                            {% if not is_staff %}
+                            <th>Created By</th>
+                            {% endif %}
                         </tr>
                     </thead>
                     <tbody>
-                        {% for sale in recent_sales %}
+                        {% for po in recent_pos %}
                         <tr>
-                            <td>#{{ sale.id|slice:":8" }}</td>
-                            <td>{{ sale.sale_date|date:'M d, Y H:i' }}</td>
-                            <td>UGX {{ sale.total_amount|floatformat:0 }}</td>
                             <td>
-                                <span class="badge bg-{% if sale.status == 'completed' %}success{% elif sale.status == 'pending' %}warning{% else %}secondary{% endif %}">
-                                    {{ sale.get_status_display|default:'Completed' }}
+                                <a href="{% url 'suppliers:purchase_order_detail' po.id %}" class="text-decoration-none fw-semibold">
+                                    {{ po.po_number }}
+                                </a>
+                            </td>
+                            <td>{{ po.supplier.name }}</td>
+                            <td>{{ po.created_at|date:'M d, Y' }}</td>
+                            <td>UGX {{ po.total_amount|floatformat:0 }}</td>
+                            <td>
+                                <span class="badge bg-{% if po.status == 'approved' %}success{% elif po.status == 'pending' %}warning{% elif po.status == 'draft' %}secondary{% elif po.status == 'ordered' %}info{% elif po.status == 'received' %}primary{% else %}danger{% endif %}">
+                                    {{ po.get_status_display }}
                                 </span>
                             </td>
+                            {% if not is_staff %}
+                            <td>
+                                <small>
+                                    {% if po.created_by %}
+                                        {{ po.created_by.get_full_name|default:po.created_by.username }}
+                                    {% else %}
+                                        <span class="text-muted">System</span>
+                                    {% endif %}
+                                </small>
+                            </td>
+                            {% endif %}
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="4" class="text-center py-4 text-muted">
-                                <i class="fas fa-shopping-cart fa-2x mb-2 d-block"></i>
-                                No sales recorded yet.
+                            <td colspan="{% if not is_staff %}6{% else %}5{% endif %}" class="text-center py-4 text-muted">
+                                <i class="fas fa-file-invoice fa-2x mb-2 d-block"></i>
+                                {% if is_staff %}
+                                    You haven't created any purchase orders yet.
+                                {% else %}
+                                    No purchase orders yet.
+                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}
@@ -797,183 +855,562 @@
         </div>
     </div>
 
-    <!-- ===== MONTHLY SALES CHART ===== -->
-    <div class="card shadow-sm mt-4">
-        <div class="card-header bg-transparent">
-            <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Monthly Sales (UGX)</h5>
+    <!-- ===== SECTION 6: RECENT SALES ===== -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2 text-warning"></i>
+                    {% if filter_display != 'All Time' %}
+                        {% if is_staff %}My Sales for {{ filter_display }}{% else %}Sales for {{ filter_display }}{% endif %}
+                    {% else %}
+                        {% if is_staff %}My Recent Sales{% else %}Recent Sales{% endif %}
+                    {% endif %}
+                </h5>
+                {% if is_staff %}
+                <small class="text-muted">
+                    <i class="fas fa-user me-1"></i> Showing only your sales
+                </small>
+                {% endif %}
+            </div>
+            <a href="{% url 'sales:sale_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
         </div>
-        <div class="card-body">
-            <div class="chart-container">
-                <canvas id="salesChart"></canvas>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Invoice</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            {% if not is_staff %}
+                            <th>Created By</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in recent_sales %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'sales:sale_detail' sale.id %}" class="text-decoration-none fw-semibold">
+                                    {{ sale.invoice_number }}
+                                </a>
+                            </td>
+                            <td>{{ sale.customer_name|default:'Walk-in Customer' }}</td>
+                            <td>{{ sale.sale_date|date:'M d, Y H:i' }}</td>
+                            <td>UGX {{ sale.total_amount|floatformat:0 }}</td>
+                            <td>
+                                <span class="badge bg-{% if sale.payment_status == 'paid' %}success{% elif sale.payment_status == 'partial' %}warning{% else %}secondary{% endif %}">
+                                    {{ sale.get_payment_status_display }}
+                                </span>
+                            </td>
+                            {% if not is_staff %}
+                            <td>
+                                <small>
+                                    {% if sale.created_by %}
+                                        {{ sale.created_by.get_full_name|default:sale.created_by.username }}
+                                    {% else %}
+                                        <span class="text-muted">System</span>
+                                    {% endif %}
+                                </small>
+                            </td>
+                            {% endif %}
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="{% if not is_staff %}6{% else %}5{% endif %}" class="text-center py-4 text-muted">
+                                <i class="fas fa-shopping-cart fa-2x mb-2 d-block"></i>
+                                {% if filter_display != 'All Time' %}
+                                    {% if is_staff %}No sales found for {{ filter_display }}.{% else %}No sales found for {{ filter_display }}.{% endif %}
+                                {% else %}
+                                    {% if is_staff %}You haven't made any sales yet.{% else %}No sales recorded yet.{% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
+        {% if filtered_sales_count > 10 %}
+        <div class="card-footer bg-transparent text-center">
+            <small class="text-muted">
+                Showing 10 of {{ filtered_sales_count }} sales
+                <a href="{% url 'sales:sale_list' %}" class="ms-2">View all</a>
+            </small>
+        </div>
+        {% endif %}
     </div>
 </div>
 
+<!-- ===== SCRIPTS ===== -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // ===== SALES CHART =====
-        const monthlySales = {{ monthly_sales|safe }};
-        const labels = monthlySales.map(item => new Date(item.month).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
-        const values = monthlySales.map(item => parseFloat(item.total) || 0);
+document.addEventListener('DOMContentLoaded', function() {
+    // ===== QUICK FILTER HANDLER =====
+    var quickFilter = document.getElementById('quickFilter');
+    if (quickFilter) {
+        quickFilter.addEventListener('change', function() {
+            var val = this.value;
+            var now = new Date();
+            var dateFrom = '';
+            var dateTo = '';
+            
+            if (val === 'today') {
+                dateFrom = formatDate(now);
+                dateTo = formatDate(now);
+            } else if (val === 'yesterday') {
+                var yesterday = new Date(now);
+                yesterday.setDate(yesterday.getDate() - 1);
+                dateFrom = formatDate(yesterday);
+                dateTo = formatDate(yesterday);
+            } else if (val === 'week') {
+                var start = new Date(now);
+                start.setDate(start.getDate() - start.getDay());
+                dateFrom = formatDate(start);
+                dateTo = formatDate(now);
+            } else if (val === 'month') {
+                var start = new Date(now.getFullYear(), now.getMonth(), 1);
+                dateFrom = formatDate(start);
+                dateTo = formatDate(now);
+            } else if (val === 'quarter') {
+                var quarter = Math.floor(now.getMonth() / 3);
+                var start = new Date(now.getFullYear(), quarter * 3, 1);
+                dateFrom = formatDate(start);
+                dateTo = formatDate(now);
+            } else if (val === 'year') {
+                var start = new Date(now.getFullYear(), 0, 1);
+                dateFrom = formatDate(start);
+                dateTo = formatDate(now);
+            }
+            
+            document.getElementById('dateFrom').value = dateFrom;
+            document.getElementById('dateTo').value = dateTo;
+            
+            if (val) {
+                document.getElementById('filterForm').submit();
+            }
+        });
+    }
 
-        const ctx = document.getElementById('salesChart').getContext('2d');
-        
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Monthly Sales (UGX)',
-                    data: values,
-                    backgroundColor: 'rgba(45, 122, 155, 0.7)',
-                    borderColor: 'rgba(45, 122, 155, 1)',
-                    borderWidth: 2,
-                    borderRadius: 4,
-                    maxBarThickness: 60
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        labels: {
-                            font: {
-                                size: window.innerWidth < 768 ? 10 : 12
+    function formatDate(date) {
+        return date.toISOString().split('T')[0];
+    }
+
+    // ============================================
+    // MONTHLY SALES CHART
+    // ============================================
+    {% if monthly_sales %}
+        try {
+            var monthlySales = {{ monthly_sales|safe }};
+            if (monthlySales && monthlySales.length > 0) {
+                var labels = monthlySales.map(function(item) {
+                    var date = new Date(item.month);
+                    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                });
+                var values = monthlySales.map(function(item) {
+                    return parseFloat(item.total) || 0;
+                });
+
+                var ctx = document.getElementById('salesChart');
+                if (ctx) {
+                    new Chart(ctx.getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Monthly Sales (UGX)',
+                                data: values,
+                                backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                                borderColor: 'rgba(52, 152, 219, 1)',
+                                borderWidth: 2,
+                                borderRadius: 4,
+                                maxBarThickness: 60
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top',
+                                    labels: {
+                                        font: { size: window.innerWidth < 768 ? 10 : 12 },
+                                        boxWidth: window.innerWidth < 768 ? 10 : 20,
+                                        padding: window.innerWidth < 768 ? 5 : 10
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return 'UGX ' + context.parsed.y.toLocaleString();
+                                        }
+                                    }
+                                }
                             },
-                            boxWidth: window.innerWidth < 768 ? 10 : 20,
-                            padding: window.innerWidth < 768 ? 5 : 10
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return 'UGX ' + context.parsed.y.toLocaleString();
+                            scales: {
+                                x: {
+                                    grid: { display: false },
+                                    ticks: {
+                                        maxRotation: window.innerWidth < 768 ? 45 : 0,
+                                        minRotation: window.innerWidth < 768 ? 45 : 0,
+                                        font: { size: window.innerWidth < 768 ? 8 : 11 },
+                                        autoSkip: true,
+                                        maxTicksLimit: window.innerWidth < 768 ? 6 : 12
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                                    ticks: {
+                                        callback: function(value) {
+                                            if (value >= 1000000) {
+                                                return 'UGX ' + (value / 1000000).toFixed(1) + 'M';
+                                            } else if (value >= 1000) {
+                                                return 'UGX ' + (value / 1000).toFixed(1) + 'K';
+                                            }
+                                            return 'UGX ' + value.toFixed(0);
+                                        },
+                                        font: { size: window.innerWidth < 768 ? 8 : 11 },
+                                        maxTicksLimit: window.innerWidth < 768 ? 5 : 8
+                                    }
+                                }
                             }
                         }
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            maxRotation: window.innerWidth < 768 ? 45 : 0,
-                            minRotation: window.innerWidth < 768 ? 45 : 0,
-                            font: {
-                                size: window.innerWidth < 768 ? 8 : 11
-                            },
-                            autoSkip: true,
-                            maxTicksLimit: window.innerWidth < 768 ? 6 : 12
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                if (value >= 1000000) {
-                                    return 'UGX ' + (value / 1000000).toFixed(1) + 'M';
-                                } else if (value >= 1000) {
-                                    return 'UGX ' + (value / 1000).toFixed(1) + 'K';
-                                }
-                                return 'UGX ' + value.toFixed(0);
-                            },
-                            font: {
-                                size: window.innerWidth < 768 ? 8 : 11
-                            },
-                            maxTicksLimit: window.innerWidth < 768 ? 5 : 8
-                        }
-                    }
-                },
-                layout: {
-                    padding: {
-                        top: 10,
-                        bottom: 10,
-                        left: 5,
-                        right: 5
-                    }
+                    });
                 }
             }
-        });
+        } catch(e) {
+            console.log('Monthly Sales Chart Error:', e);
+        }
+    {% endif %}
+
+    // ============================================
+    // PRODUCT STATUS PIE CHART
+    // ============================================
+    {% if status_distribution %}
+        try {
+            var statusData = {{ status_distribution|safe }};
+            if (statusData && statusData.length > 0) {
+                var statusLabels = statusData.map(function(item) {
+                    return item.status.charAt(0).toUpperCase() + item.status.slice(1);
+                });
+                var statusValues = statusData.map(function(item) {
+                    return item.count;
+                });
+                var statusColors = {
+                    'active': '#28a745',
+                    'inactive': '#6c757d',
+                    'out_of_stock': '#dc3545',
+                    'discontinued': '#fd7e14'
+                };
+                var colors = statusData.map(function(item) {
+                    return statusColors[item.status] || '#6c757d';
+                });
+
+                var ctx = document.getElementById('statusPieChart');
+                if (ctx) {
+                    new Chart(ctx.getContext('2d'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: statusLabels,
+                            datasets: [{
+                                data: statusValues,
+                                backgroundColor: colors,
+                                borderWidth: 2,
+                                borderColor: '#ffffff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'right',
+                                    labels: {
+                                        font: { size: window.innerWidth < 768 ? 9 : 11 },
+                                        boxWidth: window.innerWidth < 768 ? 10 : 15,
+                                        padding: window.innerWidth < 768 ? 5 : 10,
+                                        usePointStyle: true,
+                                        pointStyle: 'circle'
+                                    }
+                                }
+                            },
+                            cutout: window.innerWidth < 768 ? '60%' : '55%'
+                        }
+                    });
+                }
+            }
+        } catch(e) {
+            console.log('Product Status Pie Chart Error:', e);
+        }
+    {% endif %}
+
+    // ============================================
+    // TOP PRODUCTS PIE CHART
+    // ============================================
+    {% if top_products %}
+        try {
+            var topProducts = {{ top_products|safe }};
+            if (topProducts && topProducts.length > 0) {
+                var productLabels = topProducts.map(function(item) {
+                    return item.product__name;
+                });
+                var productValues = topProducts.map(function(item) {
+                    return parseFloat(item.total_sold) || 0;
+                });
+
+                var ctx = document.getElementById('topProductsPieChart');
+                if (ctx) {
+                    new Chart(ctx.getContext('2d'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: productLabels,
+                            datasets: [{
+                                data: productValues,
+                                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'],
+                                borderWidth: 2,
+                                borderColor: '#ffffff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'right',
+                                    labels: {
+                                        font: { size: window.innerWidth < 768 ? 9 : 11 },
+                                        boxWidth: window.innerWidth < 768 ? 10 : 15,
+                                        padding: window.innerWidth < 768 ? 5 : 10,
+                                        usePointStyle: true,
+                                        pointStyle: 'circle'
+                                    }
+                                }
+                            },
+                            cutout: window.innerWidth < 768 ? '60%' : '55%'
+                        }
+                    });
+                }
+            }
+        } catch(e) {
+            console.log('Top Products Pie Chart Error:', e);
+        }
+    {% endif %}
+
+    // ============================================
+    // PURCHASE ORDERS STATUS PIE CHART
+    // ============================================
+    {% if po_status_distribution %}
+        try {
+            var poStatusData = {{ po_status_distribution|safe }};
+            if (poStatusData && poStatusData.length > 0) {
+                var poLabels = poStatusData.map(function(item) {
+                    return item.status.charAt(0).toUpperCase() + item.status.slice(1);
+                });
+                var poValues = poStatusData.map(function(item) {
+                    return item.count;
+                });
+                var poColors = {
+                    'draft': '#6c757d',
+                    'pending': '#f6c23e',
+                    'approved': '#1cc88a',
+                    'ordered': '#36b9cc',
+                    'received': '#4e73df',
+                    'partial': '#fd7e14',
+                    'cancelled': '#e74a3b'
+                };
+                var poColorsArray = poStatusData.map(function(item) {
+                    return poColors[item.status] || '#6c757d';
+                });
+
+                var ctx = document.getElementById('poStatusPieChart');
+                if (ctx) {
+                    new Chart(ctx.getContext('2d'), {
+                        type: 'pie',
+                        data: {
+                            labels: poLabels,
+                            datasets: [{
+                                data: poValues,
+                                backgroundColor: poColorsArray,
+                                borderWidth: 2,
+                                borderColor: '#ffffff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'right',
+                                    labels: {
+                                        font: { size: window.innerWidth < 768 ? 9 : 11 },
+                                        boxWidth: window.innerWidth < 768 ? 10 : 15,
+                                        padding: window.innerWidth < 768 ? 5 : 10,
+                                        usePointStyle: true,
+                                        pointStyle: 'circle'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        } catch(e) {
+            console.log('PO Status Pie Chart Error:', e);
+        }
+    {% endif %}
+
+    // ============================================
+    // PAYMENT STATUS PIE CHART
+    // ============================================
+    {% if sales_by_status %}
+        try {
+            var paymentData = {{ sales_by_status|safe }};
+            if (paymentData && paymentData.length > 0) {
+                var paymentLabels = paymentData.map(function(item) {
+                    return item.payment_status.charAt(0).toUpperCase() + item.payment_status.slice(1);
+                });
+                var paymentValues = paymentData.map(function(item) {
+                    return item.count;
+                });
+                var paymentColors = {
+                    'paid': '#1cc88a',
+                    'partial': '#f6c23e',
+                    'unpaid': '#e74a3b',
+                    'refunded': '#6c757d'
+                };
+                var paymentColorsArray = paymentData.map(function(item) {
+                    return paymentColors[item.payment_status] || '#6c757d';
+                });
+
+                var ctx = document.getElementById('paymentStatusPieChart');
+                if (ctx) {
+                    new Chart(ctx.getContext('2d'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: paymentLabels,
+                            datasets: [{
+                                data: paymentValues,
+                                backgroundColor: paymentColorsArray,
+                                borderWidth: 2,
+                                borderColor: '#ffffff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'right',
+                                    labels: {
+                                        font: { size: window.innerWidth < 768 ? 9 : 11 },
+                                        boxWidth: window.innerWidth < 768 ? 10 : 15,
+                                        padding: window.innerWidth < 768 ? 5 : 10,
+                                        usePointStyle: true,
+                                        pointStyle: 'circle'
+                                    }
+                                }
+                            },
+                            cutout: window.innerWidth < 768 ? '60%' : '55%'
+                        }
+                    });
+                }
+            }
+        } catch(e) {
+            console.log('Payment Status Pie Chart Error:', e);
+        }
+    {% endif %}
+
+    // ============================================
+    // HANDLE RESIZE FOR ALL CHARTS
+    // ============================================
+    function handleResize() {
+        const charts = ['salesChart', 'statusPieChart', 'topProductsPieChart', 'poStatusPieChart', 'paymentStatusPieChart'];
+        const isMobile = window.innerWidth < 768;
         
-        // Handle resize for better mobile experience
-        function handleResize() {
-            const chart = Chart.getChart('salesChart');
+        charts.forEach(function(chartId) {
+            const chart = Chart.getChart(chartId);
             if (chart) {
-                const isMobile = window.innerWidth < 768;
-                chart.options.plugins.legend.labels.font.size = isMobile ? 10 : 12;
-                chart.options.plugins.legend.labels.boxWidth = isMobile ? 10 : 20;
-                chart.options.plugins.legend.labels.padding = isMobile ? 5 : 10;
-                chart.options.scales.x.ticks.maxRotation = isMobile ? 45 : 0;
-                chart.options.scales.x.ticks.minRotation = isMobile ? 45 : 0;
-                chart.options.scales.x.ticks.font.size = isMobile ? 8 : 11;
-                chart.options.scales.y.ticks.font.size = isMobile ? 8 : 11;
-                chart.options.scales.x.ticks.maxTicksLimit = isMobile ? 6 : 12;
-                chart.options.scales.y.ticks.maxTicksLimit = isMobile ? 5 : 8;
+                if (chartId === 'salesChart') {
+                    chart.options.plugins.legend.labels.font.size = isMobile ? 10 : 12;
+                    chart.options.plugins.legend.labels.boxWidth = isMobile ? 10 : 20;
+                    chart.options.plugins.legend.labels.padding = isMobile ? 5 : 10;
+                    chart.options.scales.x.ticks.maxRotation = isMobile ? 45 : 0;
+                    chart.options.scales.x.ticks.minRotation = isMobile ? 45 : 0;
+                    chart.options.scales.x.ticks.font.size = isMobile ? 8 : 11;
+                    chart.options.scales.y.ticks.font.size = isMobile ? 8 : 11;
+                    chart.options.scales.x.ticks.maxTicksLimit = isMobile ? 6 : 12;
+                    chart.options.scales.y.ticks.maxTicksLimit = isMobile ? 5 : 8;
+                } else {
+                    chart.options.plugins.legend.labels.font.size = isMobile ? 9 : 11;
+                    chart.options.plugins.legend.labels.boxWidth = isMobile ? 10 : 15;
+                    chart.options.plugins.legend.labels.padding = isMobile ? 5 : 10;
+                    if (chart.config.type === 'doughnut') {
+                        chart.options.cutout = isMobile ? '60%' : '55%';
+                    }
+                }
                 chart.update();
             }
+        });
+    }
+    
+    window.addEventListener('resize', handleResize);
+});
+
+// ============================================
+// ALERT FUNCTIONS
+// ============================================
+function markAlertRead(alertId) {
+    if (!alertId) return;
+    
+    fetch(`/inventory/alerts/${alertId}/mark-read/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'X-Requested-With': 'XMLHttpRequest'
         }
-        
-        window.addEventListener('resize', handleResize);
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error marking alert as read: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error marking alert as read');
     });
+}
 
-    // ===== MARK ALERT AS READ =====
-    function markAlertRead(alertId) {
-        if (!alertId) return;
-        
-        fetch(`/inventory/alerts/${alertId}/mark-read/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Error marking alert as read: ' + (data.error || 'Unknown error'));
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error marking alert as read');
-        });
-    }
-
-    // ===== RESOLVE ALERT =====
-    function resolveAlert(alertId) {
-        if (!alertId) return;
-        if (!confirm('Mark this alert as resolved? This will remove it from the active alerts list.')) return;
-        
-        fetch(`/inventory/alerts/${alertId}/mark-resolved/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Error resolving alert: ' + (data.error || 'Unknown error'));
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error resolving alert');
-        });
-    }
+function resolveAlert(alertId) {
+    if (!alertId) return;
+    if (!confirm('Mark this alert as resolved? This will remove it from the active alerts list.')) return;
+    
+    fetch(`/inventory/alerts/${alertId}/mark-resolved/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error resolving alert: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error resolving alert');
+    });
+}
 </script>
 {% endblock %}
