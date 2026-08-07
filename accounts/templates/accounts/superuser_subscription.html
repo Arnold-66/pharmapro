@@ -1,0 +1,708 @@
+<!-- accounts/templates/accounts/superuser_subscription.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Subscription Management - Super Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== MOBILE RESPONSIVE STYLES ===== */
+    @media (max-width: 768px) {
+        .container-fluid.py-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0.25rem !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0.125rem !important;
+            padding-left: 0.125rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .card {
+            border-radius: 4px !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.5rem 0.5rem !important;
+        }
+        
+        .card-header {
+            padding: 0.5rem 0.5rem !important;
+        }
+        
+        .card-header h1, .card-header h2, .card-header h4 {
+            font-size: 0.9rem !important;
+        }
+        
+        .page-header {
+            padding: 0 0.5rem !important;
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+            align-items: stretch !important;
+        }
+        
+        .page-header h1 {
+            font-size: 1rem !important;
+        }
+        
+        .page-header .btn {
+            width: 100% !important;
+            font-size: 0.75rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        /* ===== STATS CARDS - 2 PER ROW ===== */
+        .stats-row .col-md-3 {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+            padding: 0.125rem !important;
+        }
+        
+        .stat-card .card-body {
+            padding: 0.5rem !important;
+        }
+        
+        .stat-card h6 {
+            font-size: 0.55rem !important;
+            margin-bottom: 0.05rem !important;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .stat-card h2 {
+            font-size: 1.1rem !important;
+        }
+        
+        .stat-card .rounded-circle.p-3 {
+            padding: 0.4rem !important;
+            width: 32px !important;
+            height: 32px !important;
+            min-width: 32px !important;
+            min-height: 32px !important;
+        }
+        
+        .stat-card .rounded-circle.p-3 i {
+            font-size: 1.2rem !important;
+        }
+        
+        /* ===== FILTERS ===== */
+        .filter-row .col-md-3,
+        .filter-row .col-md-2 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            padding: 0.2rem 0 !important;
+        }
+        
+        .filter-row .input-group .form-control {
+            font-size: 0.75rem !important;
+        }
+        
+        .filter-row .form-select {
+            font-size: 0.75rem !important;
+            padding: 0.25rem 0.4rem !important;
+        }
+        
+        /* ===== TABLE ===== */
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .table td, .table th {
+            font-size: 0.65rem !important;
+            padding: 0.3rem 0.25rem !important;
+            white-space: nowrap;
+        }
+        
+        .table .badge {
+            font-size: 0.5rem !important;
+            padding: 0.15rem 0.3rem !important;
+        }
+        
+        .table .fw-semibold {
+            font-size: 0.65rem !important;
+        }
+        
+        .table .small {
+            font-size: 0.55rem !important;
+        }
+        
+        .table .btn-group .btn {
+            font-size: 0.6rem !important;
+            padding: 0.15rem 0.3rem !important;
+        }
+        
+        /* ===== PAGINATION ===== */
+        .pagination .page-link {
+            font-size: 0.7rem !important;
+            padding: 0.2rem 0.4rem !important;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .stat-card h6 {
+            font-size: 0.45rem !important;
+        }
+        
+        .stat-card h2 {
+            font-size: 0.9rem !important;
+        }
+        
+        .stat-card .rounded-circle.p-3 {
+            padding: 0.3rem !important;
+            width: 28px !important;
+            height: 28px !important;
+            min-width: 28px !important;
+            min-height: 28px !important;
+        }
+        
+        .stat-card .rounded-circle.p-3 i {
+            font-size: 1rem !important;
+        }
+    }
+    
+    .card {
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    .card-header {
+        background: transparent;
+        border-bottom: 2px solid #f0f0f0;
+        padding: 1.25rem 1.5rem;
+    }
+    .stat-card {
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        transition: transform 0.2s;
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+    }
+    .table td {
+        vertical-align: middle;
+    }
+    .badge {
+        font-weight: 500;
+        padding: 0.35rem 0.75rem;
+    }
+    .btn-group .btn {
+        border-radius: 6px;
+        margin: 0 1px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4" style="padding: 0 0.5rem;">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800 fw-bold">
+                <i class="fas fa-credit-card text-primary me-2"></i>Subscription Management
+            </h1>
+            <p class="text-muted small mb-0 mt-1">Manage all organization subscriptions</p>
+        </div>
+        <div class="mt-2 mt-sm-0">
+            <a href="{% url 'tenants:list' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left me-1"></i> Back to Organizations
+            </a>
+        </div>
+    </div>
+
+    <!-- ===== STATS CARDS ===== -->
+    <div class="row stats-row mb-4">
+        <div class="col-md-3 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Total Subscriptions</h6>
+                            <h2 class="mb-0">{{ total_subscriptions }}</h2>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-credit-card text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Active</h6>
+                            <h2 class="mb-0 text-success">{{ active_subscriptions }}</h2>
+                        </div>
+                        <div class="bg-success bg-opacity-10 rounded-circle p-3 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-check-circle text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Expiring Soon</h6>
+                            <h2 class="mb-0 text-warning">{{ expiring_soon }}</h2>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 rounded-circle p-3 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-clock text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Total Revenue</h6>
+                            <h2 class="mb-0 text-info">{{ total_revenue|floatformat:0 }}</h2>
+                        </div>
+                        <div class="bg-info bg-opacity-10 rounded-circle p-3 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-dollar-sign text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FILTERS ===== -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 filter-row">
+                <div class="col-md-3 col-12">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control form-control-sm" placeholder="Search organizations..." value="{{ search_query }}">
+                        <button class="btn btn-outline-secondary btn-sm" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-2 col-6">
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="">All Status</option>
+                        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                        <option value="trial" {% if status_filter == 'trial' %}selected{% endif %}>Trial</option>
+                        <option value="expired" {% if status_filter == 'expired' %}selected{% endif %}>Expired</option>
+                        <option value="suspended" {% if status_filter == 'suspended' %}selected{% endif %}>Suspended</option>
+                        <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                    </select>
+                </div>
+                <div class="col-md-2 col-6">
+                    <select name="plan" class="form-select form-select-sm">
+                        <option value="">All Plans</option>
+                        <option value="free" {% if plan_filter == 'free' %}selected{% endif %}>Free Trial</option>
+                        <option value="starter" {% if plan_filter == 'starter' %}selected{% endif %}>Starter</option>
+                        <option value="professional" {% if plan_filter == 'professional' %}selected{% endif %}>Professional</option>
+                        <option value="enterprise" {% if plan_filter == 'enterprise' %}selected{% endif %}>Enterprise</option>
+                    </select>
+                </div>
+                <div class="col-md-2 col-6">
+                    <button type="submit" class="btn btn-primary btn-sm w-100">Apply Filters</button>
+                </div>
+                <div class="col-md-3 col-6">
+                    <a href="{% url 'accounts:superuser_subscription' %}" class="btn btn-outline-secondary btn-sm w-100">
+                        <i class="fas fa-undo me-2"></i>Reset Filters
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== SUBSCRIPTIONS TABLE ===== -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Organization</th>
+                            <th>Plan</th>
+                            <th>Status</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Days Left</th>
+                            <th>Users</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tenant in subscriptions %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if tenant.logo %}
+                                        <img src="{{ tenant.logo.url }}" alt="{{ tenant.company_name }}" class="rounded me-2" width="30" height="30" style="object-fit: cover;">
+                                    {% else %}
+                                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
+                                            <span class="fw-bold small">{{ tenant.company_name|first|upper }}</span>
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <div class="fw-semibold small">{{ tenant.company_name }}</div>
+                                        <div class="small text-muted">{{ tenant.slug }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge {% if tenant.plan == 'enterprise' %}bg-danger{% elif tenant.plan == 'professional' %}bg-primary{% elif tenant.plan == 'starter' %}bg-info{% else %}bg-secondary{% endif %}">
+                                    {{ tenant.get_plan_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge {% if tenant.subscription_status == 'active' %}bg-success{% elif tenant.subscription_status == 'trial' %}bg-info{% elif tenant.subscription_status == 'expired' %}bg-danger{% elif tenant.subscription_status == 'suspended' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                    {{ tenant.get_status_display }}
+                                    {% if tenant.subscription_status == 'trial' %}
+                                        <span class="ms-1 text-white-50">(Trial)</span>
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <small>
+                                    {% if tenant.display_start_date %}
+                                        {{ tenant.display_start_date|date:"Y-m-d" }}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </small>
+                            </td>
+                            <td>
+                                <small>
+                                    {% if tenant.display_end_date %}
+                                        {{ tenant.display_end_date|date:"Y-m-d" }}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </small>
+                            </td>
+                            <td>
+                                {% with days=tenant.get_days_until_expiry %}
+                                    {% if tenant.subscription_status == 'expired' %}
+                                        <span class="badge bg-danger">Expired</span>
+                                    {% elif days > 0 %}
+                                        <span class="badge {% if days <= 3 %}bg-danger{% elif days <= 7 %}bg-warning{% else %}bg-success{% endif %}">
+                                            {{ days }} days
+                                        </span>
+                                    {% elif days == 0 %}
+                                        <span class="badge bg-danger">Expired</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">N/A</span>
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">{{ tenant.user_count|default:0 }}</span>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'tenants:detail' tenant.id %}" class="btn btn-sm btn-outline-info" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" title="Renew Subscription" 
+                                            onclick="renewSubscription('{{ tenant.id }}')">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </button>
+                                    {% if tenant.subscription_status != 'suspended' %}
+                                        <button type="button" class="btn btn-sm btn-outline-warning" title="Suspend" 
+                                                onclick="suspendTenant('{{ tenant.id }}', '{{ tenant.company_name }}')">
+                                            <i class="fas fa-pause"></i>
+                                        </button>
+                                    {% else %}
+                                        <button type="button" class="btn btn-sm btn-outline-success" title="Activate" 
+                                                onclick="activateTenant('{{ tenant.id }}', '{{ tenant.company_name }}')">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                    {% endif %}
+                                    {% if tenant.subscription_status != 'cancelled' %}
+                                        <button type="button" class="btn btn-sm btn-outline-danger" title="Cancel" 
+                                                onclick="cancelSubscription('{{ tenant.id }}', '{{ tenant.company_name }}')">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="fas fa-credit-card fa-4x mb-3 d-block"></i>
+                                        <h5>No subscriptions found</h5>
+                                        <p>No organizations have active subscriptions.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% if subscriptions.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-end mb-0 flex-wrap">
+                        {% if subscriptions.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ subscriptions.previous_page_number }}"><i class="fas fa-chevron-left"></i></a>
+                            </li>
+                        {% endif %}
+                        {% for num in subscriptions.paginator.page_range %}
+                            <li class="page-item {% if subscriptions.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endfor %}
+                        {% if subscriptions.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ subscriptions.next_page_number }}"><i class="fas fa-chevron-right"></i></a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function renewSubscription(tenantId) {
+        Swal.fire({
+            title: 'Renew Subscription?',
+            text: 'This will extend the subscription for 30 days.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, Renew',
+            cancelButtonText: 'Cancel',
+            showLoaderOnConfirm: true,
+            preConfirm: () => {
+                return $.ajax({
+                    url: `/tenants/${tenantId}/renew/`,
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Renewed!',
+                                text: 'Subscription has been renewed successfully.',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            setTimeout(() => location.reload(), 2000);
+                        } else {
+                            throw new Error(response.error || 'Failed to renew subscription');
+                        }
+                    },
+                    error: function(xhr) {
+                        throw new Error(xhr.responseJSON?.error || 'Failed to renew subscription');
+                    }
+                });
+            }
+        }).catch((error) => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Failed to renew subscription'
+            });
+        });
+    }
+
+    function suspendTenant(tenantId, tenantName) {
+        Swal.fire({
+            title: 'Suspend Organization?',
+            html: `
+                <p>Are you sure you want to suspend <strong>${tenantName}</strong>?</p>
+                <p class="text-muted small">The organization will lose access to all features until reactivated.</p>
+                <div class="mt-3">
+                    <label for="suspendReason" class="form-label">Reason for suspension:</label>
+                    <textarea id="suspendReason" class="form-control" rows="3" placeholder="Enter reason for suspension..."></textarea>
+                </div>
+            `,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ffc107',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, Suspend',
+            cancelButtonText: 'Cancel',
+            preConfirm: () => {
+                const reason = document.getElementById('suspendReason').value;
+                if (!reason.trim()) {
+                    Swal.showValidationMessage('Please provide a reason for suspension');
+                    return false;
+                }
+                return reason;
+            },
+            showLoaderOnConfirm: true,
+            preConfirm: (reason) => {
+                return $.ajax({
+                    url: `/tenants/${tenantId}/suspend/`,
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    data: { reason: reason },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Suspended!',
+                                text: 'Organization has been suspended.',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            setTimeout(() => location.reload(), 2000);
+                        } else {
+                            throw new Error(response.error || 'Failed to suspend organization');
+                        }
+                    },
+                    error: function(xhr) {
+                        throw new Error(xhr.responseJSON?.error || 'Failed to suspend organization');
+                    }
+                });
+            }
+        }).catch((error) => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Failed to suspend organization'
+            });
+        });
+    }
+
+    function activateTenant(tenantId, tenantName) {
+        Swal.fire({
+            title: 'Activate Organization?',
+            text: `Are you sure you want to activate ${tenantName}?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, Activate',
+            cancelButtonText: 'Cancel',
+            showLoaderOnConfirm: true,
+            preConfirm: () => {
+                return $.ajax({
+                    url: `/tenants/${tenantId}/activate/`,
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Activated!',
+                                text: 'Organization has been reactivated.',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            setTimeout(() => location.reload(), 2000);
+                        } else {
+                            throw new Error(response.error || 'Failed to activate organization');
+                        }
+                    },
+                    error: function(xhr) {
+                        throw new Error(xhr.responseJSON?.error || 'Failed to activate organization');
+                    }
+                });
+            }
+        }).catch((error) => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Failed to activate organization'
+            });
+        });
+    }
+
+    function cancelSubscription(tenantId, tenantName) {
+        Swal.fire({
+            title: 'Cancel Subscription?',
+            html: `
+                <p>Are you sure you want to cancel the subscription for <strong>${tenantName}</strong>?</p>
+                <p class="text-danger"><strong>Warning:</strong> This action will end the subscription immediately.</p>
+                <div class="mt-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="confirmCancel">
+                        <label class="form-check-label text-danger" for="confirmCancel">
+                            I understand this action is permanent
+                        </label>
+                    </div>
+                </div>
+            `,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, Cancel',
+            cancelButtonText: 'No, Keep Active',
+            preConfirm: () => {
+                const confirmCheck = document.getElementById('confirmCancel');
+                if (!confirmCheck.checked) {
+                    Swal.showValidationMessage('Please confirm that you understand this action is permanent');
+                    return false;
+                }
+                return true;
+            },
+            showLoaderOnConfirm: true,
+            preConfirm: () => {
+                return $.ajax({
+                    url: `/tenants/${tenantId}/cancel/`,
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Cancelled!',
+                                text: 'Subscription has been cancelled.',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            setTimeout(() => location.reload(), 2000);
+                        } else {
+                            throw new Error(response.error || 'Failed to cancel subscription');
+                        }
+                    },
+                    error: function(xhr) {
+                        throw new Error(xhr.responseJSON?.error || 'Failed to cancel subscription');
+                    }
+                });
+            }
+        }).catch((error) => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Failed to cancel subscription'
+            });
+        });
+    }
+</script>
+{% endblock %}

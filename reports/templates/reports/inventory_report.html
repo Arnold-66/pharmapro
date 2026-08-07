@@ -1,0 +1,515 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Inventory Report - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    /* ===== FIXED LAYOUT & MOBILE RESPONSIVE ===== */
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }
+        
+        .card-header h5 {
+            font-size: 0.85rem !important;
+        }
+        
+        .card-header .btn {
+            font-size: 0.65rem !important;
+            padding: 0.15rem 0.4rem !important;
+        }
+        
+        .page-header h1 {
+            font-size: 1.1rem !important;
+            word-break: break-word !important;
+        }
+        
+        .page-header p {
+            font-size: 0.75rem !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .page-header .btn {
+            font-size: 0.65rem !important;
+            padding: 0.2rem 0.4rem !important;
+        }
+        
+        .page-header .d-flex.gap-2 {
+            gap: 0.3rem !important;
+        }
+        
+        /* ===== STATS CARDS GRID - 2 PER ROW ===== */
+        .stats-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 0.5rem !important;
+            padding: 0 0.5rem !important;
+        }
+        
+        .stats-grid .col-md-3 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+        
+        .stats-grid .stat-box {
+            border-radius: 8px !important;
+            margin-bottom: 0 !important;
+            padding: 0.5rem !important;
+        }
+        
+        .stats-grid .stat-box .number {
+            font-size: 1.1rem !important;
+        }
+        
+        .stats-grid .stat-box .label {
+            font-size: 0.6rem !important;
+        }
+        
+        .filter-section {
+            padding: 0.75rem !important;
+            border-radius: 0 !important;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        .filter-section .row {
+            --bs-gutter-x: 0.3rem !important;
+        }
+        
+        .filter-section .col-md-3 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            padding: 0.2rem 0 !important;
+        }
+        
+        .filter-section .form-control,
+        .filter-section .form-select {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.4rem !important;
+        }
+        
+        .filter-section .form-label {
+            font-size: 0.7rem !important;
+            margin-bottom: 0.1rem !important;
+        }
+        
+        .table {
+            font-size: 0.7rem !important;
+        }
+        
+        .table th, .table td {
+            padding: 0.3rem 0.2rem !important;
+        }
+        
+        .table .btn-sm {
+            font-size: 0.55rem !important;
+            padding: 0.1rem 0.25rem !important;
+        }
+        
+        .badge {
+            font-size: 0.55rem !important;
+        }
+        
+        .low-stock-badge {
+            font-size: 0.5rem !important;
+            padding: 1px 6px !important;
+        }
+        
+        .pagination {
+            font-size: 0.7rem !important;
+        }
+        
+        .chart-container {
+            height: 180px !important;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .stats-grid {
+            gap: 0.35rem !important;
+            padding: 0 0.3rem !important;
+        }
+        
+        .stats-grid .stat-box .number {
+            font-size: 0.95rem !important;
+        }
+        
+        .stats-grid .stat-box .label {
+            font-size: 0.5rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1) !important;
+    }
+    
+    .card-header {
+        background: transparent !important;
+        border-bottom: 2px solid #f0f0f0 !important;
+    }
+    
+    .filter-section {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+    }
+    .stat-box {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .stat-box .number {
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+    .stat-box .label {
+        color: #6c757d;
+        font-size: 0.85rem;
+    }
+    .low-stock-badge {
+        background: #dc3545;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- ===== PAGE HEADER - IMPROVED ===== -->
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4" style="padding: 0 0.5rem;">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800 fw-bold">Inventory Report</h1>
+            <p class="text-muted small mb-0 mt-1">Detailed analysis of your inventory</p>
+        </div>
+        <div class="mt-2 mt-sm-0">
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'reports:export_inventory_pdf' %}?{{ request.GET.urlencode }}" class="btn btn-danger btn-sm">
+                    <i class="fas fa-file-pdf me-1"></i> PDF
+                </a>
+                <a href="{% url 'reports:export_inventory_excel' %}?{{ request.GET.urlencode }}" class="btn btn-success btn-sm">
+                    <i class="fas fa-file-excel me-1"></i> Excel
+                </a>
+                <a href="{% url 'reports:dashboard' %}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-arrow-left me-1"></i> Back
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Category</label>
+                <select class="form-select" name="category">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if category == cat.id|stringformat:'s' %}selected{% endif %}>
+                        {{ cat.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Status</label>
+                <select class="form-select" name="status">
+                    <option value="">All Status</option>
+                    <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Inactive</option>
+                    <option value="out_of_stock" {% if status == 'out_of_stock' %}selected{% endif %}>Out of Stock</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Stock Filter</label>
+                <select class="form-select" name="stock_filter">
+                    <option value="">All Stock</option>
+                    <option value="in" {% if stock_filter == 'in' %}selected{% endif %}>In Stock</option>
+                    <option value="low" {% if stock_filter == 'low' %}selected{% endif %}>Low Stock</option>
+                    <option value="out" {% if stock_filter == 'out' %}selected{% endif %}>Out of Stock</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-filter me-1"></i> Filter
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ===== STATISTICS - GRID ON MOBILE ===== -->
+    <div class="row stats-grid g-4 mb-4">
+        <div class="col-md-3">
+            <div class="stat-box">
+                <div class="number text-primary">{{ total_products }}</div>
+                <div class="label">Total Products</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box">
+                <div class="number text-success">Ugx {{ total_stock_value|floatformat:0 }}</div>
+                <div class="label">Total Stock Value</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box">
+                <div class="number text-info">{{ total_stock_quantity|floatformat:0 }}</div>
+                <div class="label">Total Quantity</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box">
+                <div class="number text-warning">Ugx {{ avg_price|floatformat:2 }}</div>
+                <div class="label">Average Price</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock by Category Chart -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-transparent">
+            <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Stock by Category</h5>
+        </div>
+        <div class="card-body">
+            <div class="chart-container" style="position: relative; height: 300px;">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-table me-2"></i>Products List</h5>
+            <span class="badge bg-primary">{{ products.paginator.count }} products</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Product</th>
+                            <th>SKU</th>
+                            <th>Category</th>
+                            <th>Quantity</th>
+                            <th>Purchase Price</th>
+                            <th>Selling Price</th>
+                            <th>Total Value</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>{{ product.name }}</td>
+                            <td><code>{{ product.sku }}</code></td>
+                            <td>{{ product.category.name|default:"-" }}</td>
+                            <td>
+                                {{ product.quantity|floatformat:0 }}
+                                {% if product.quantity <= product.reorder_point and product.quantity > 0 %}
+                                <span class="low-stock-badge">Low</span>
+                                {% elif product.quantity == 0 %}
+                                <span class="badge bg-danger">Out</span>
+                                {% endif %}
+                            </td>
+                            <td>Ugx {{ product.purchase_price|floatformat:2 }}</td>
+                            <td>Ugx {{ product.selling_price|floatformat:2 }}</td>
+                            <td><strong>Ugx {{ product.total_value|floatformat:2 }}</strong></td>
+                            <td>
+                                <span class="badge bg-{% if product.status == 'active' %}success{% elif product.status == 'inactive' %}secondary{% elif product.status == 'out_of_stock' %}danger{% else %}warning{% endif %}">
+                                    {{ product.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'inventory:product_detail' product.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center py-4 text-muted">
+                                <i class="fas fa-boxes fa-2x mb-2 d-block"></i>
+                                No products found matching the criteria.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% if products.has_other_pages %}
+        <div class="card-footer bg-transparent">
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm mb-0 justify-content-center">
+                    {% if products.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ products.previous_page_number }}{% if category %}&category={{ category }}{% endif %}{% if status %}&status={{ status }}{% endif %}{% if stock_filter %}&stock_filter={{ stock_filter }}{% endif %}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% for i in products.paginator.page_range %}
+                        {% if products.number == i %}
+                        <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                        {% elif i > products.number|add:'-3' and i < products.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ i }}{% if category %}&category={{ category }}{% endif %}{% if status %}&status={{ status }}{% endif %}{% if stock_filter %}&stock_filter={{ stock_filter }}{% endif %}">{{ i }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if products.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ products.next_page_number }}{% if category %}&category={{ category }}{% endif %}{% if status %}&status={{ status }}{% endif %}{% if stock_filter %}&stock_filter={{ stock_filter }}{% endif %}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Low Stock Products -->
+    {% if low_stock_products %}
+    <div class="card shadow-sm mt-4 border-danger">
+        <div class="card-header bg-transparent border-danger">
+            <h5 class="mb-0 text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Low Stock Alert</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>SKU</th>
+                            <th>Current Stock</th>
+                            <th>Reorder Point</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in low_stock_products %}
+                        <tr class="table-warning">
+                            <td>{{ product.name }}</td>
+                            <td><code>{{ product.sku }}</code></td>
+                            <td>{{ product.quantity|floatformat:0 }}</td>
+                            <td>{{ product.reorder_point|floatformat:0 }}</td>
+                            <td>
+                                <a href="{% url 'inventory:product_stock_update' product.id %}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-boxes me-1"></i> Restock
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Category Chart
+    const categoryData = {{ stock_by_category|safe }};
+    if (categoryData.length > 0) {
+        const ctx = document.getElementById('categoryChart').getContext('2d');
+        const colors = ['#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6', '#1abc9c', '#e67e22', '#34495e'];
+        
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: categoryData.map(item => item.category__name || 'Uncategorized'),
+                datasets: [{
+                    data: categoryData.map(item => item.total_value || 0),
+                    backgroundColor: colors.slice(0, categoryData.length),
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                return context.label + ': Ugx ' + context.parsed.toLocaleString() + ' (' + percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

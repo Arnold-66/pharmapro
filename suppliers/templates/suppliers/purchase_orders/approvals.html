@@ -1,0 +1,497 @@
+<!-- suppliers/templates/suppliers/purchase_orders/approvals.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}PO Approvals - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== MOBILE RESPONSIVE STYLES ===== */
+    @media (max-width: 768px) {
+        .container-fluid.py-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }
+        
+        .card-header h1, .card-header h2, .card-header h4 {
+            font-size: 0.95rem !important;
+        }
+        
+        .card-header .btn {
+            font-size: 0.7rem !important;
+            padding: 0.2rem 0.5rem !important;
+        }
+        
+        .table {
+            font-size: 0.75rem !important;
+        }
+        
+        .table th, .table td {
+            padding: 0.4rem 0.3rem !important;
+        }
+        
+        .btn-group .btn {
+            font-size: 0.65rem !important;
+            padding: 0.15rem 0.35rem !important;
+        }
+        
+        .stat-card .card-body {
+            padding: 0.5rem !important;
+        }
+        
+        .stat-card h3 {
+            font-size: 1.1rem !important;
+        }
+        
+        .stat-card h6 {
+            font-size: 0.6rem !important;
+        }
+        
+        /* ===== STATS CARDS GRID - 2 PER ROW ===== */
+        .stats-row {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 0.5rem !important;
+            padding: 0 0.5rem !important;
+        }
+        
+        .stats-row .col-md-3 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+        
+        .stats-row .stat-card {
+            border-radius: 8px !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .badge {
+            font-size: 0.6rem !important;
+        }
+        
+        /* ===== HEADER TEXT IMPROVEMENTS ===== */
+        .page-header h1 {
+            font-size: 1.1rem !important;
+            word-break: break-word !important;
+        }
+        
+        .page-header p {
+            font-size: 0.75rem !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .page-header .btn {
+            font-size: 0.7rem !important;
+            padding: 0.25rem 0.6rem !important;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .stats-row {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 0.35rem !important;
+        }
+        
+        .stat-card h3 {
+            font-size: 0.9rem !important;
+        }
+        
+        .stat-card h6 {
+            font-size: 0.5rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.py-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1) !important;
+    }
+    
+    .card-header {
+        background: transparent !important;
+        border-bottom: 2px solid #f0f0f0 !important;
+    }
+    
+    .stat-card {
+        transition: all 0.3s ease;
+        border-radius: 12px !important;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    .stat-card .card-body {
+        border-radius: 12px !important;
+    }
+    .border-warning {
+        border-left: 4px solid #ffc107 !important;
+    }
+    .border-secondary {
+        border-left: 4px solid #6c757d !important;
+    }
+    .border-success {
+        border-left: 4px solid #28a745 !important;
+    }
+    .border-info {
+        border-left: 4px solid #17a2b8 !important;
+    }
+    
+    .btn-group .btn {
+        border-radius: 6px !important;
+        margin: 0 2px !important;
+    }
+    
+    /* Toast Custom Styles */
+    .toast-custom {
+        border-radius: 12px !important;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15) !important;
+        min-width: 300px !important;
+        max-width: 400px !important;
+        border: none !important;
+    }
+    
+    .toast-custom .toast-body {
+        padding: 1rem 1.2rem !important;
+        font-weight: 500 !important;
+    }
+    
+    .toast-custom .btn-close {
+        filter: brightness(0) invert(1);
+        opacity: 0.8;
+    }
+    
+    /* Modal Styles */
+    .modal-content {
+        border-radius: 16px !important;
+        border: none !important;
+    }
+    
+    .modal-header {
+        padding: 1.2rem 1.5rem !important;
+    }
+    
+    .modal-body {
+        padding: 1.5rem !important;
+    }
+    
+    .modal-footer {
+        padding: 1rem 1.5rem !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- ===== HEADER WITH IMPROVED TEXT ===== -->
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4" style="padding: 0 0.5rem;">
+        <div>
+            <h1 class="h2 mb-0 fw-bold">
+                <i class="fas fa-check-double text-success me-2"></i>Purchase Order Approvals
+            </h1>
+            <p class="text-muted mb-0 mt-1">Review and approve pending purchase orders</p>
+        </div>
+        <div class="mt-2 mt-sm-0">
+            <a href="{% url 'suppliers:purchase_order_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-list me-1"></i> All POs
+            </a>
+        </div>
+    </div>
+
+    <!-- ===== STATS CARDS - GRID ON MOBILE ===== -->
+    <div class="row stats-row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card border-warning">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Pending Approval</h6>
+                    <h3 class="text-warning">{{ total_pending }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card border-secondary">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Draft</h6>
+                    <h3 class="text-secondary">{{ total_draft }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card border-success">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Approved</h6>
+                    <h3 class="text-success">{{ total_approved }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card border-info">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Received</h6>
+                    <h3 class="text-info">{{ total_received }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>PO #</th>
+                            <th>Supplier</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th>Submitted By</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for po in purchase_orders %}
+                            <tr>
+                                <td><a href="{% url 'suppliers:purchase_order_detail' po.id %}" class="fw-semibold">{{ po.po_number }}</a></td>
+                                <td>{{ po.supplier.name }}</td>
+                                <td>{{ po.created_at|date:"Y-m-d H:i" }}</td>
+                                <td>Ugx {{ po.total_amount|floatformat:2 }}</td>
+                                <td>{{ po.created_by.get_full_name|default:po.created_by.username }}</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'suppliers:purchase_order_detail' po.id %}" class="btn btn-sm btn-outline-info" title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        {% if user.is_superuser or user.role == 'admin' or user.role == 'manager' %}
+                                            <button type="button" class="btn btn-sm btn-outline-success" onclick="showConfirmModal('approve', '{{ po.id }}', '{{ po.po_number }}')" title="Approve">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="showConfirmModal('reject', '{{ po.id }}', '{{ po.po_number }}')" title="Reject">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        {% else %}
+                                            <span class="text-muted small">(No permission to approve)</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="fas fa-check-circle fa-4x mb-3 d-block text-success"></i>
+                                        <h5>No pending approvals</h5>
+                                        <p>All purchase orders have been reviewed.</p>
+                                        <a href="{% url 'suppliers:purchase_order_list' %}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-list me-1"></i> View All POs
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="confirmModalTitle">
+                    <i class="fas fa-question-circle me-2"></i>Confirm Action
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center" 
+                         style="width: 80px; height: 80px; background: rgba(255, 193, 7, 0.1);">
+                        <i class="fas fa-exclamation-triangle text-warning fa-3x"></i>
+                    </div>
+                </div>
+                <h5 id="confirmModalMessage">Are you sure you want to proceed?</h5>
+                <p class="text-muted" id="confirmModalSubMessage">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-primary px-4" id="confirmModalBtn">
+                    <i class="fas fa-check me-2"></i>Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+<script>
+// ===== TOAST NOTIFICATION FUNCTION =====
+function showToast(message, type = 'success') {
+    const container = document.querySelector('div[style*="position: fixed; top: 20px; right: 20px; z-index: 9999;"]');
+    
+    const toastHTML = `
+        <div class="toast toast-custom align-items-center border-0 mb-3 bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : type === 'warning' ? 'warning' : 'info'} text-white" role="alert" aria-live="assertive" aria-atomic="true" style="display:block;">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'} me-2"></i>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    
+    container.insertAdjacentHTML('beforeend', toastHTML);
+    const toastElement = container.lastElementChild;
+    const toast = new bootstrap.Toast(toastElement, {
+        autohide: true,
+        delay: 5000
+    });
+    toast.show();
+    
+    toastElement.addEventListener('hidden.bs.toast', function() {
+        toastElement.remove();
+    });
+}
+
+// ===== SHOW CONFIRMATION MODAL =====
+function showConfirmModal(action, poId, poNumber) {
+    const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+    const modalTitle = document.getElementById('confirmModalTitle');
+    const modalMessage = document.getElementById('confirmModalMessage');
+    const modalSubMessage = document.getElementById('confirmModalSubMessage');
+    const confirmBtn = document.getElementById('confirmModalBtn');
+    
+    const actionConfigs = {
+        'approve': {
+            title: '<i class="fas fa-check-circle text-success me-2"></i>Approve Purchase Order',
+            message: `Are you sure you want to approve PO <strong>${poNumber}</strong>?`,
+            subMessage: 'This will mark the purchase order as approved and send notification to the requester.',
+            btnClass: 'btn-success',
+            btnIcon: 'fa-check',
+            btnText: 'Approve',
+            successMessage: '✅ PO approved successfully! Notification sent.',
+            status: 'approved'
+        },
+        'reject': {
+            title: '<i class="fas fa-times-circle text-danger me-2"></i>Reject Purchase Order',
+            message: `Are you sure you want to reject PO <strong>${poNumber}</strong>?`,
+            subMessage: 'This will cancel the purchase order and notify the requester.',
+            btnClass: 'btn-danger',
+            btnIcon: 'fa-times',
+            btnText: 'Reject',
+            successMessage: '❌ PO rejected successfully! Notification sent.',
+            status: 'cancelled'
+        }
+    };
+    
+    const config = actionConfigs[action];
+    if (!config) return;
+    
+    modalTitle.innerHTML = config.title;
+    modalMessage.innerHTML = config.message;
+    modalSubMessage.textContent = config.subMessage;
+    
+    confirmBtn.className = `btn ${config.btnClass} px-4`;
+    confirmBtn.innerHTML = `<i class="fas ${config.btnIcon} me-2"></i>${config.btnText}`;
+    
+    // Remove old event listeners
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+    
+    // Add new event listener
+    newConfirmBtn.addEventListener('click', function() {
+        modal.hide();
+        updatePOStatus(poId, config.status, config.successMessage);
+    });
+    
+    modal.show();
+}
+
+// ===== UPDATE PO STATUS =====
+function updatePOStatus(poId, status, successMessage) {
+    $.ajax({
+        url: `/suppliers/purchase-orders/${poId}/update-status/`,
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        data: { status: status },
+        success: function(response) {
+            if (response.success) {
+                showToast(successMessage || response.message, 'success');
+                setTimeout(function() {
+                    location.reload();
+                }, 1500);
+            } else {
+                showToast('Error: ' + response.error, 'error');
+            }
+        },
+        error: function(xhr) {
+            let errorMsg = 'Error updating status';
+            if (xhr.responseJSON && xhr.responseJSON.error) {
+                errorMsg = xhr.responseJSON.error;
+            }
+            showToast('Error: ' + errorMsg, 'error');
+        }
+    });
+}
+</script>
+{% endblock %}

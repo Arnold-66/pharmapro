@@ -1,0 +1,759 @@
+<!-- accounts/templates/accounts/users.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Users - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== RESET ALL PADDING/MARGINS ON MOBILE ===== */
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0 !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0.25rem !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0.125rem !important;
+            padding-left: 0.125rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .card {
+            border-radius: 4px !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.5rem 0.5rem !important;
+        }
+        
+        .card-header {
+            padding: 0.5rem 0.5rem !important;
+        }
+        
+        .card-header h4, .card-header h6 {
+            font-size: 0.7rem !important;
+        }
+        
+        .page-header {
+            padding: 0 0.5rem !important;
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+            align-items: stretch !important;
+        }
+        
+        .page-header h1 {
+            font-size: 1rem !important;
+        }
+        
+        .page-header .btn {
+            width: 100% !important;
+            font-size: 0.75rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .form-label {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .badge {
+            font-size: 0.6rem !important;
+            padding: 0.2rem 0.35rem !important;
+        }
+        
+        /* ===== STATS CARDS - 2 PER ROW WITH VISIBLE TEXT ===== */
+        .row.g-3.mb-4 {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0.25rem !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row.g-3.mb-4 > .col-6 {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+            padding-right: 0.125rem !important;
+            padding-left: 0.125rem !important;
+        }
+        
+        .stat-card {
+            border-radius: 4px !important;
+            margin-bottom: 0 !important;
+            height: 100% !important;
+        }
+        
+        .stat-card .card-body {
+            padding: 0.5rem 0.5rem !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+        
+        .stat-card .stat-icon {
+            width: 32px !important;
+            height: 32px !important;
+            min-width: 32px !important;
+            min-height: 32px !important;
+            padding: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 50% !important;
+            flex-shrink: 0 !important;
+        }
+        
+        .stat-card .stat-icon i {
+            font-size: 0.9rem !important;
+        }
+        
+        .stat-card .stat-content {
+            flex: 1 !important;
+            min-width: 0 !important;
+            overflow: visible !important;
+        }
+        
+        .stat-card .stat-content h6 {
+            font-size: 0.55rem !important;
+            margin-bottom: 0.05rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.3px !important;
+            color: #6c757d !important;
+            font-weight: 600 !important;
+            white-space: normal !important;
+            word-wrap: break-word !important;
+            line-height: 1.2 !important;
+        }
+        
+        .stat-card .stat-content h2 {
+            font-size: 0.85rem !important;
+            margin-bottom: 0 !important;
+            font-weight: 700 !important;
+            line-height: 1.2 !important;
+            word-wrap: break-word !important;
+        }
+        
+        /* Table on mobile */
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .table td, .table th {
+            font-size: 0.75rem !important;
+            padding: 0.4rem 0.3rem !important;
+        }
+        
+        .table .btn-group .btn {
+            font-size: 0.6rem !important;
+            padding: 0.15rem 0.3rem !important;
+        }
+        
+        .table .avatar-sm {
+            width: 25px !important;
+            height: 25px !important;
+            font-size: 0.6rem !important;
+        }
+        
+        .table .fw-semibold {
+            font-size: 0.75rem !important;
+        }
+        
+        .filter-row .col-md-4,
+        .filter-row .col-md-3,
+        .filter-row .col-md-2 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            padding: 0.2rem 0 !important;
+        }
+        
+        .pagination .page-link {
+            font-size: 0.7rem !important;
+            padding: 0.2rem 0.4rem !important;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .stat-card .card-body {
+            padding: 0.25rem 0.25rem !important;
+            gap: 0.3rem !important;
+        }
+        
+        .stat-card .stat-icon {
+            width: 26px !important;
+            height: 26px !important;
+            min-width: 26px !important;
+            min-height: 26px !important;
+        }
+        
+        .stat-card .stat-icon i {
+            font-size: 0.7rem !important;
+        }
+        
+        .stat-card .stat-content h6 {
+            font-size: 0.45rem !important;
+        }
+        
+        .stat-card .stat-content h2 {
+            font-size: 0.75rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0.5rem !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0.25rem !important;
+            padding-left: 0.25rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+    
+    /* ===== COMMON STYLES ===== */
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+    
+    .card-header {
+        background: transparent !important;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    /* ===== STAT CARD STYLES ===== */
+    .stat-card {
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        transition: transform 0.2s;
+        overflow: hidden;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+        display: flex !important;
+        align-items: center !important;
+        ga    .stat-card .card-body {
+p: 1rem !important;
+        padding: 1rem !important;
+    }
+    
+    .stat-card .stat-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+    
+    .stat-card .stat-icon i {
+        font-size: 1.5rem;
+    }
+    
+    .stat-card .stat-content {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .stat-card .stat-content h6 {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #6c757d;
+        margin-bottom: 0.15rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .stat-card .stat-content h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0;
+        line-height: 1.2;
+    }
+    
+    /* ===== COLOR VARIATIONS ===== */
+    .bg-primary-soft {
+        background-color: rgba(52, 152, 219, 0.12);
+        color: #3498db;
+    }
+    
+    .bg-success-soft {
+        background-color: rgba(46, 204, 113, 0.12);
+        color: #28a745;
+    }
+    
+    .bg-info-soft {
+        background-color: rgba(23, 162, 184, 0.12);
+        color: #17a2b8;
+    }
+    
+    .bg-warning-soft {
+        background-color: rgba(255, 193, 7, 0.12);
+        color: #ffc107;
+    }
+    
+    .text-primary-dark {
+        color: #2c3e50;
+    }
+    
+    .text-success-dark {
+        color: #1e7e34;
+    }
+    
+    /* ===== TABLE STYLES ===== */
+    .table th {
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .table td {
+        vertical-align: middle;
+    }
+    
+    .avatar-sm {
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .avatar-sm img {
+        width: 35px;
+        height: 35px;
+        object-fit: cover;
+    }
+    
+    .btn-primary {
+        background: #2c3e50;
+        border-color: #2c3e50;
+    }
+    
+    .btn-primary:hover {
+        background: #1a2a3a;
+        border-color: #1a2a3a;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+    
+    .badge {
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4" style="padding: 0 0.5rem;">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800 fw-bold">
+                <i class="fas fa-users text-primary me-2"></i>User Management
+            </h1>
+            <p class="text-muted small mb-0 mt-1">Manage users in your organization</p>
+        </div>
+        <div class="mt-2 mt-sm-0">
+            <a href="{% url 'accounts:user_create' %}" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus me-1"></i> Add User
+            </a>
+        </div>
+    </div>
+
+    <!-- ===== STATS CARDS ===== -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="stat-icon bg-primary-soft">
+                        <i class="fas fa-users text-primary"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h6>Total Users</h6>
+                        <h2 class="text-primary-dark">{{ total_users }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="stat-icon bg-success-soft">
+                        <i class="fas fa-circle text-success"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h6>Online Now</h6>
+                        <h2 class="text-success-dark">{{ online_count }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="stat-icon bg-info-soft">
+                        <i class="fas fa-check-circle text-info"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h6>Active</h6>
+                        <h2 class="text-info">{{ active_count }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="stat-icon bg-warning-soft">
+                        <i class="fas fa-user-shield text-warning"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h6>Admins</h6>
+                        <h2 class="text-warning">{{ admin_count }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FILTERS ===== -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 filter-row">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control" placeholder="Search users..." value="{{ search_query }}">
+                        <button class="btn btn-outline-secondary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="role" class="form-select">
+                        <option value="">All Roles</option>
+                        {% for role_code, role_name in roles %}
+                            <option value="{{ role_code }}" {% if role_filter == role_code %}selected{% endif %}>
+                                {{ role_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                        <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+                        <option value="online" {% if status_filter == 'online' %}selected{% endif %}>Online</option>
+                        <option value="offline" {% if status_filter == 'offline' %}selected{% endif %}>Offline</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Apply</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== USERS TABLE ===== -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Online</th>
+                            <th>Last Activity</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm me-2">
+                                            {% if user.profile_picture %}
+                                                <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="rounded-circle">
+                                            {% else %}
+                                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; background: #2c3e50 !important;">
+                                                    <span class="fw-bold">{{ user.get_full_name|first|upper }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold">{{ user.get_full_name }}</div>
+                                            <div class="small text-muted">@{{ user.username }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    <span class="badge bg-{% if user.role == 'admin' %}warning{% elif user.role == 'manager' %}info{% elif user.role == 'staff' %}secondary{% elif user.role == 'super_admin' %}danger{% else %}primary{% endif %}">
+                                        {{ user.get_role_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if user.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if user.is_online %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-circle me-1"></i> Online
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-circle me-1"></i> Offline
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        {{ user.last_activity|timesince }} ago
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'accounts:user_detail' user.id %}" class="btn btn-sm btn-outline-info" title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'accounts:user_edit' user.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        {% if user.role != 'admin' or request.user.is_superuser %}
+                                            <button type="button" class="btn btn-sm btn-outline-{% if user.is_active %}danger{% else %}success{% endif %} toggle-user-btn" 
+                                                    data-user-id="{{ user.id }}" 
+                                                    data-is-active="{{ user.is_active|lower }}"
+                                                    {% if user.id == request.user.id %}disabled{% endif %}
+                                                    title="{% if user.is_active %}Deactivate{% else %}Activate{% endif %}">
+                                                <i class="fas fa-{% if user.is_active %}ban{% else %}check{% endif %}"></i>
+                                            </button>
+                                        {% endif %}
+                                        {% if user.id != request.user.id and user.role != 'super_admin' %}
+                                            <button type="button" class="btn btn-sm btn-outline-danger delete-user-btn" 
+                                                    data-user-id="{{ user.id }}" 
+                                                    data-user-name="{{ user.get_full_name }}"
+                                                    title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="fas fa-users fa-4x mb-3 d-block"></i>
+                                        <h5>No users found</h5>
+                                        <p>Start by adding your first user to the organization.</p>
+                                        <a href="{% url 'accounts:user_create' %}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-user-plus me-1"></i> Add User
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% if users.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-end mb-0">
+                        {% if users.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ users.previous_page_number }}">Previous</a>
+                            </li>
+                        {% endif %}
+                        {% for num in users.paginator.page_range %}
+                            <li class="page-item {% if users.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endfor %}
+                        {% if users.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ users.next_page_number }}">Next</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle user status
+        document.querySelectorAll('.toggle-user-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const userId = this.dataset.userId;
+                const isActive = this.dataset.isActive === 'true';
+                const action = isActive ? 'deactivate' : 'activate';
+                
+                Swal.fire({
+                    title: `${action} User?`,
+                    text: `Are you sure you want to ${action} this user?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: action === 'deactivate' ? '#dc3545' : '#28a745',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: `${action.charAt(0).toUpperCase() + action.slice(1)}`,
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`/accounts/users/${userId}/toggle-active/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}',
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                location.reload();
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: data.error || 'Error toggling user status'
+                                });
+                            }
+                        })
+                        .catch(() => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Error toggling user status'
+                            });
+                        });
+                    }
+                });
+            });
+        });
+        
+        // Delete user
+        document.querySelectorAll('.delete-user-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const userId = this.dataset.userId;
+                const userName = this.dataset.userName;
+                
+                Swal.fire({
+                    title: 'Delete User?',
+                    html: `
+                        <p>Are you sure you want to delete <strong>${userName}</strong>?</p>
+                        <p class="text-muted small">
+                            <i class="fas fa-info-circle me-1"></i>
+                            This action cannot be undone.
+                        </p>
+                    `,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Delete User',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`/accounts/users/${userId}/delete/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}',
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: 'User has been deleted successfully.',
+                                    timer: 2000,
+                                    showConfirmButton: false,
+                                    toast: true,
+                                    position: 'top-end'
+                                });
+                                setTimeout(() => location.reload(), 1500);
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: data.error || 'Error deleting user'
+                                });
+                            }
+                        })
+                        .catch(() => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Error deleting user'
+                            });
+                        });
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

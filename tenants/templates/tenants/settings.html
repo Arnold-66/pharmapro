@@ -1,0 +1,204 @@
+<!-- apps/tenants/templates/tenants/settings.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Organization Settings</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <h5>Organization Information</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Company Name</label>
+                                    <input type="text" name="company_name" class="form-control" value="{{ tenant.company_name }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Company Email</label>
+                                    <input type="email" name="company_email" class="form-control" value="{{ tenant.company_email }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Company Phone</label>
+                                    <input type="text" name="company_phone" class="form-control" value="{{ tenant.company_phone }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Company Address</label>
+                                    <input type="text" name="company_address" class="form-control" value="{{ tenant.company_address }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h5>Branding</h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Primary Color</label>
+                                    <input type="color" name="primary_color" class="form-control" value="{{ tenant.primary_color|default:'#1e293b' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Secondary Color</label>
+                                    <input type="color" name="secondary_color" class="form-control" value="{{ tenant.secondary_color|default:'#f8f9fa' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Accent Color</label>
+                                    <input type="color" name="accent_color" class="form-control" value="{{ tenant.accent_color|default:'#0d6efd' }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Logo</label>
+                                    <input type="file" name="logo" class="form-control" accept="image/*">
+                                    {% if tenant.logo %}
+                                        <small>Current: <a href="{{ tenant.logo.url }}" target="_blank">View Logo</a></small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Favicon</label>
+                                    <input type="file" name="favicon" class="form-control" accept="image/*">
+                                    {% if tenant.favicon %}
+                                        <small>Current: <a href="{{ tenant.favicon.url }}" target="_blank">View Favicon</a></small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h5>General Settings</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Timezone</label>
+                                    <select name="timezone" class="form-control">
+                                        {% for value, label in timezones %}
+                                            <option value="{{ value }}" {% if settings.timezone == value %}selected{% endif %}>
+                                                {{ label }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Currency</label>
+                                    <select name="currency" class="form-control">
+                                        {% for value, label in currencies %}
+                                            <option value="{{ value }}" {% if settings.currency == value %}selected{% endif %}>
+                                                {{ label }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Date Format</label>
+                                    <select name="date_format" class="form-control">
+                                        {% for value, label in date_formats %}
+                                            <option value="{{ value }}" {% if settings.date_format == value %}selected{% endif %}>
+                                                {{ label }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Time Format</label>
+                                    <select name="time_format" class="form-control">
+                                        {% for value, label in time_formats %}
+                                            <option value="{{ value }}" {% if settings.time_format == value %}selected{% endif %}>
+                                                {{ label }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Tax Rate (%)</label>
+                                    <input type="number" step="0.01" name="tax_rate" class="form-control" value="{{ settings.tax_rate|default:'0' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Invoice Prefix</label>
+                                    <input type="text" name="invoice_prefix" class="form-control" value="{{ settings.invoice_prefix|default:'INV-' }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input type="checkbox" name="enable_notifications" class="form-check-input" id="enable_notifications" {% if settings.enable_notifications %}checked{% endif %}>
+                                    <label class="form-check-label" for="enable_notifications">Enable Notifications</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input type="checkbox" name="enable_email_notifications" class="form-check-input" id="enable_email_notifications" {% if settings.enable_email_notifications %}checked{% endif %}>
+                                    <label class="form-check-label" for="enable_email_notifications">Enable Email Notifications</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input type="checkbox" name="enable_sms_notifications" class="form-check-input" id="enable_sms_notifications" {% if settings.enable_sms_notifications %}checked{% endif %}>
+                                    <label class="form-check-label" for="enable_sms_notifications">Enable SMS Notifications</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input type="checkbox" name="tax_inclusive" class="form-check-input" id="tax_inclusive" {% if settings.tax_inclusive %}checked{% endif %}>
+                                    <label class="form-check-label" for="tax_inclusive">Tax Inclusive Pricing</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Invoice Footer</label>
+                            <textarea name="invoice_footer" class="form-control" rows="3">{{ settings.invoice_footer|default:'' }}</textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary mt-3">Save Settings</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}pu

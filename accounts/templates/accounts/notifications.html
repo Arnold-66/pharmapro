@@ -1,0 +1,818 @@
+<!-- accounts/templates/accounts/notifications.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== RESET ALL PADDING/MARGINS ON MOBILE ===== */
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0 !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0.25rem !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0.125rem !important;
+            padding-left: 0.125rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .card {
+            border-radius: 4px !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.5rem 0.5rem !important;
+        }
+        
+        .card-header {
+            padding: 0.5rem 0.5rem !important;
+        }
+        
+        .page-header {
+            padding: 0 0.5rem !important;
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+            align-items: stretch !important;
+        }
+        
+        .page-header h2 {
+            font-size: 1rem !important;
+        }
+        
+        .page-header .btn {
+            width: 100% !important;
+            font-size: 0.75rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .form-label {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .badge {
+            font-size: 0.6rem !important;
+            padding: 0.2rem 0.35rem !important;
+        }
+        
+        /* ===== STATS CARDS - 2 PER ROW WITH VISIBLE TEXT ===== */
+        .row.g-3.mb-4 {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0.25rem !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row.g-3.mb-4 > .col-6 {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+            padding-right: 0.125rem !important;
+            padding-left: 0.125rem !important;
+        }
+        
+        .stat-card {
+            border-radius: 4px !important;
+            margin-bottom: 0 !important;
+            height: 100% !important;
+        }
+        
+        .stat-card .card-body {
+            padding: 0.5rem 0.5rem !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+        
+        .stat-card .stat-icon {
+            width: 32px !important;
+            height: 32px !important;
+            min-width: 32px !important;
+            min-height: 32px !important;
+            padding: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 50% !important;
+            flex-shrink: 0 !important;
+        }
+        
+        .stat-card .stat-icon i {
+            font-size: 0.9rem !important;
+        }
+        
+        .stat-card .stat-content {
+            flex: 1 !important;
+            min-width: 0 !important;
+            overflow: visible !important;
+        }
+        
+        .stat-card .stat-content h6 {
+            font-size: 0.55rem !important;
+            margin-bottom: 0.05rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.3px !important;
+            color: #6c757d !important;
+            font-weight: 600 !important;
+            white-space: normal !important;
+            word-wrap: break-word !important;
+            line-height: 1.2 !important;
+        }
+        
+        .stat-card .stat-content h3 {
+            font-size: 0.85rem !important;
+            margin-bottom: 0 !important;
+            font-weight: 700 !important;
+            line-height: 1.2 !important;
+            word-wrap: break-word !important;
+        }
+        
+        /* ===== FILTERS ===== */
+        .filter-row .col-md-3 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            padding: 0.2rem 0 !important;
+        }
+        
+        .filter-row .col-md-3.d-flex {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+        
+        /* ===== NOTIFICATION LIST ===== */
+        .list-group-item {
+            padding: 0.6rem 0.5rem !important;
+        }
+        
+        .list-group-item .row {
+            --bs-gutter-x: 0 !important;
+        }
+        
+        .list-group-item .col-1 {
+            flex: 0 0 12% !important;
+            max-width: 12% !important;
+            padding: 0 !important;
+        }
+        
+        .list-group-item .col-1.text-center i {
+            font-size: 1.2rem !important;
+        }
+        
+        .list-group-item .col {
+            flex: 0 0 76% !important;
+            max-width: 76% !important;
+            padding: 0 0.25rem !important;
+        }
+        
+        .list-group-item .col-1:last-child {
+            flex: 0 0 12% !important;
+            max-width: 12% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        
+        .list-group-item .d-flex.justify-content-between {
+            flex-direction: column !important;
+            gap: 0.3rem !important;
+        }
+        
+        .list-group-item .d-flex.gap-3 {
+            flex-wrap: wrap !important;
+            gap: 0.25rem !important;
+        }
+        
+        .list-group-item .d-flex.gap-3 span,
+        .list-group-item .d-flex.gap-3 a {
+            font-size: 0.6rem !important;
+        }
+        
+        .list-group-item .d-flex.gap-2 {
+            align-self: flex-end !important;
+            margin-top: 0.25rem !important;
+        }
+        
+        .list-group-item .d-flex.gap-2 .btn {
+            font-size: 0.6rem !important;
+            padding: 0.15rem 0.3rem !important;
+        }
+        
+        .list-group-item h6 {
+            font-size: 0.8rem !important;
+        }
+        
+        .list-group-item p {
+            font-size: 0.7rem !important;
+        }
+        
+        .badge.rounded-circle {
+            font-size: 0.5rem !important;
+            padding: 0.15rem 0.25rem !important;
+        }
+        
+        /* ===== PAGINATION ===== */
+        .pagination .page-link {
+            font-size: 0.7rem !important;
+            padding: 0.2rem 0.4rem !important;
+        }
+        
+        .pagination {
+            flex-wrap: wrap !important;
+            gap: 0.15rem !important;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .stat-card .card-body {
+            padding: 0.25rem 0.25rem !important;
+            gap: 0.3rem !important;
+        }
+        
+        .stat-card .stat-icon {
+            width: 26px !important;
+            height: 26px !important;
+            min-width: 26px !important;
+            min-height: 26px !important;
+        }
+        
+        .stat-card .stat-icon i {
+            font-size: 0.7rem !important;
+        }
+        
+        .stat-card .stat-content h6 {
+            font-size: 0.45rem !important;
+        }
+        
+        .stat-card .stat-content h3 {
+            font-size: 0.75rem !important;
+        }
+        
+        .list-group-item .col-1 {
+            flex: 0 0 15% !important;
+            max-width: 15% !important;
+        }
+        
+        .list-group-item .col {
+            flex: 0 0 70% !important;
+            max-width: 70% !important;
+        }
+        
+        .list-group-item .col-1:last-child {
+            flex: 0 0 15% !important;
+            max-width: 15% !important;
+        }
+        
+        .list-group-item .col-1.text-center i {
+            font-size: 1rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0.5rem !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0.25rem !important;
+            padding-left: 0.25rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+    
+    /* ===== COMMON STYLES ===== */
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+    
+    .card-header {
+        background: transparent !important;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    /* ===== STAT CARD STYLES ===== */
+    .stat-card {
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        transition: transform 0.2s;
+        overflow: hidden;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .stat-card .card-body {
+        display: flex !important;
+        align-items: center !important;
+        gap: 1rem !important;
+        padding: 1rem !important;
+    }
+    
+    .stat-card .stat-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+    
+    .stat-card .stat-icon i {
+        font-size: 1.5rem;
+    }
+    
+    .stat-card .stat-content {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .stat-card .stat-content h6 {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #6c757d;
+        margin-bottom: 0.15rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .stat-card .stat-content h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0;
+        line-height: 1.2;
+    }
+    
+    /* ===== COLOR VARIATIONS ===== */
+    .bg-primary-soft {
+        background-color: rgba(52, 152, 219, 0.12);
+        color: #3498db;
+    }
+    
+    .bg-success-soft {
+        background-color: rgba(46, 204, 113, 0.12);
+        color: #28a745;
+    }
+    
+    .bg-info-soft {
+        background-color: rgba(23, 162, 184, 0.12);
+        color: #17a2b8;
+    }
+    
+    .bg-warning-soft {
+        background-color: rgba(255, 193, 7, 0.12);
+        color: #ffc107;
+    }
+    
+    .text-primary-dark {
+        color: #2c3e50;
+    }
+    
+    .text-success-dark {
+        color: #1e7e34;
+    }
+    
+    /* ===== LIST GROUP ITEMS ===== */
+    .list-group-item {
+        transition: background-color 0.2s ease;
+        border-left: 3px solid transparent;
+    }
+    
+    .list-group-item:hover {
+        background-color: #f8f9fa !important;
+    }
+    
+    .list-group-item.bg-light:hover {
+        background-color: #e9ecef !important;
+    }
+    
+    .list-group-item.bg-light {
+        border-left-color: #0d6efd;
+    }
+    
+    /* Toast Custom Styles */
+    .toast-custom {
+        border-radius: 12px !important;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15) !important;
+        min-width: 300px !important;
+        max-width: 400px !important;
+        border: none !important;
+    }
+    
+    .toast-custom .toast-body {
+        padding: 1rem 1.2rem !important;
+        font-weight: 500 !important;
+    }
+    
+    .toast-custom .btn-close {
+        filter: brightness(0) invert(1);
+        opacity: 0.8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4" style="padding: 0 0.5rem;">
+        <div>
+            <h2 class="h3 mb-0 text-gray-800 fw-bold">
+                <i class="fas fa-bell text-primary me-2"></i>Notifications
+            </h2>
+            <p class="text-muted small mb-0 mt-1">Stay updated with your notifications</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap mt-2 mt-sm-0">
+            {% if unread_count > 0 %}
+            <button class="btn btn-primary btn-sm" onclick="markAllRead()">
+                <i class="fas fa-check-double me-1"></i> Mark All Read
+            </button>
+            {% endif %}
+            <a href="{% url 'accounts:notifications' %}?mark_all_read=1" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-sync-alt me-1"></i> Refresh
+            </a>
+        </div>
+    </div>
+
+    <!-- ===== STATS CARDS ===== -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="stat-icon bg-primary-soft">
+                        <i class="fas fa-bell text-primary"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h6>Total</h6>
+                        <h3 class="text-primary-dark">{{ total_count }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="stat-icon bg-warning-soft">
+                        <i class="fas fa-envelope text-warning"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h6>Unread</h6>
+                        <h3 class="text-warning">{{ unread_count }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="stat-icon bg-success-soft">
+                        <i class="fas fa-check-circle text-success"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h6>Read</h6>
+                        <h3 class="text-success-dark">{{ read_count|default:0 }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="stat-icon bg-info-soft">
+                        <i class="fas fa-tags text-info"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h6>Categories</h6>
+                        <h3 class="text-info">{{ categories|length }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FILTERS ===== -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 filter-row">
+                <div class="col-md-3 col-6">
+                    <label class="form-label small fw-semibold">Type</label>
+                    <select name="type" class="form-select form-select-sm">
+                        <option value="">All Types</option>
+                        {% for type in notification_types %}
+                        <option value="{{ type.0 }}" {% if current_type == type.0 %}selected{% endif %}>
+                            {{ type.1 }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3 col-6">
+                    <label class="form-label small fw-semibold">Category</label>
+                    <select name="category" class="form-select form-select-sm">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.0 }}" {% if current_category == cat.0 %}selected{% endif %}>
+                            {{ cat.1 }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3 col-6">
+                    <label class="form-label small fw-semibold">Status</label>
+                    <select name="is_read" class="form-select form-select-sm">
+                        <option value="">All Status</option>
+                        <option value="unread" {% if current_status == 'unread' %}selected{% endif %}>Unread</option>
+                        <option value="read" {% if current_status == 'read' %}selected{% endif %}>Read</option>
+                    </select>
+                </div>
+                <div class="col-md-3 col-6 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary btn-sm w-100">
+                        <i class="fas fa-filter me-1"></i> Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== NOTIFICATIONS LIST ===== -->
+    <div class="card">
+        <div class="card-body p-0">
+            {% if notifications %}
+            <div class="list-group list-group-flush">
+                {% for notification in notifications %}
+                <div class="list-group-item list-group-item-action {% if not notification.is_read %}bg-light{% endif %}" 
+                     data-notification-id="{{ notification.id }}">
+                    <div class="row align-items-center">
+                        <div class="col-1 text-center">
+                            <i class="fas {{ notification.icon|default:'fa-bell' }} 
+                                      {% if notification.notification_type == 'success' %}text-success
+                                      {% elif notification.notification_type == 'warning' %}text-warning
+                                      {% elif notification.notification_type == 'error' %}text-danger
+                                      {% elif notification.notification_type == 'alert' %}text-danger
+                                      {% else %}text-info{% endif %} fa-2x">
+                            </i>
+                        </div>
+                        <div class="col">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="w-100">
+                                    <h6 class="mb-1 {% if not notification.is_read %}fw-bold{% endif %}">
+                                        {{ notification.title }}
+                                    </h6>
+                                    <p class="mb-1 text-muted small">{{ notification.message|truncatechars:150 }}</p>
+                                    <div class="d-flex gap-3 small text-muted flex-wrap">
+                                        <span><i class="fas fa-tag me-1"></i>{{ notification.get_category_display }}</span>
+                                        <span><i class="fas fa-clock me-1"></i>{{ notification.created_at|timesince }} ago</span>
+                                        {% if notification.link %}
+                                        <a href="{{ notification.link }}" class="text-primary text-decoration-none">
+                                            {{ notification.link_text|default:"View Details" }}
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-1 flex-shrink-0 ms-2">
+                                    {% if not notification.is_read %}
+                                    <button class="btn btn-sm btn-outline-primary" 
+                                            onclick="markRead('{{ notification.id }}')" title="Mark as read">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    {% endif %}
+                                    <button class="btn btn-sm btn-outline-danger" 
+                                            onclick="deleteNotification('{{ notification.id }}')" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-1 text-center">
+                            {% if not notification.is_read %}
+                            <span class="badge bg-primary rounded-circle d-inline-block" style="width: 10px; height: 10px; padding: 0;">
+                                <span class="visually-hidden">Unread</span>
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- ===== PAGINATION ===== -->
+            {% if notifications.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-end mb-0 flex-wrap">
+                        {% if notifications.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ notifications.previous_page_number }}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_status %}&is_read={{ current_status }}{% endif %}">
+                                <i class="fas fa-chevron-left"></i>
+                                <span class="d-none d-sm-inline"> Previous</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for num in notifications.paginator.page_range %}
+                            {% if num == notifications.number %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                            {% elif num > notifications.number|add:'-3' and num < notifications.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_status %}&is_read={{ current_status }}{% endif %}">
+                                    {{ num }}
+                                </a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if notifications.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ notifications.next_page_number }}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_status %}&is_read={{ current_status }}{% endif %}">
+                                <span class="d-none d-sm-inline">Next </span>
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+            
+            {% else %}
+            <!-- ===== EMPTY STATE ===== -->
+            <div class="text-center py-5">
+                <div class="mb-3">
+                    <i class="fas fa-bell-slash fa-4x text-muted"></i>
+                </div>
+                <h5 class="text-muted">No notifications found</h5>
+                <p class="text-muted small">You're all caught up! 🎉</p>
+                <a href="{% url 'accounts:dashboard' %}" class="btn btn-primary btn-sm mt-2">
+                    <i class="fas fa-home me-1"></i> Go to Dashboard
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- ===== TOAST CONTAINER ===== -->
+<div style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+<script>
+// ===== TOAST NOTIFICATION FUNCTION =====
+function showToast(message, type = 'success') {
+    const container = document.querySelector('div[style*="position: fixed; top: 20px; right: 20px; z-index: 9999;"]');
+    
+    const toastHTML = `
+        <div class="toast toast-custom align-items-center border-0 mb-3 bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : type === 'warning' ? 'warning' : 'info'} text-white" role="alert" aria-live="assertive" aria-atomic="true" style="display:block;">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'} me-2"></i>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    
+    container.insertAdjacentHTML('beforeend', toastHTML);
+    const toastElement = container.lastElementChild;
+    const toast = new bootstrap.Toast(toastElement, {
+        autohide: true,
+        delay: 5000
+    });
+    toast.show();
+    
+    toastElement.addEventListener('hidden.bs.toast', function() {
+        toastElement.remove();
+    });
+}
+
+// ===== MARK SINGLE NOTIFICATION AS READ =====
+function markRead(notificationId) {
+    if (!notificationId) return;
+    
+    $.ajax({
+        url: `/accounts/notification/${notificationId}/mark-read/`,
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+            if (response.success) {
+                showToast('Notification marked as read ✅', 'success');
+                setTimeout(function() {
+                    location.reload();
+                }, 1000);
+            } else {
+                showToast('Error: ' + (response.error || 'Could not mark as read'), 'error');
+            }
+        },
+        error: function(xhr) {
+            let errorMsg = 'Error marking notification as read';
+            if (xhr.responseJSON && xhr.responseJSON.error) {
+                errorMsg = xhr.responseJSON.error;
+            }
+            showToast('Error: ' + errorMsg, 'error');
+        }
+    });
+}
+
+// ===== MARK ALL NOTIFICATIONS AS READ =====
+function markAllRead() {
+    $.ajax({
+        url: '{% url "accounts:notification_mark_all_read" %}',
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+            if (response.success) {
+                showToast('All notifications marked as read ✅', 'success');
+                setTimeout(function() {
+                    location.reload();
+                }, 1000);
+            } else {
+                showToast('Error: ' + (response.error || 'Could not mark all as read'), 'error');
+            }
+        },
+        error: function(xhr) {
+            let errorMsg = 'Error marking all notifications as read';
+            if (xhr.responseJSON && xhr.responseJSON.error) {
+                errorMsg = xhr.responseJSON.error;
+            }
+            showToast('Error: ' + errorMsg, 'error');
+        }
+    });
+}
+
+// ===== DELETE NOTIFICATION =====
+function deleteNotification(notificationId) {
+    if (!notificationId) return;
+    if (!confirm('Are you sure you want to delete this notification?')) return;
+    
+    $.ajax({
+        url: `/accounts/notification/${notificationId}/delete/`,
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+            if (response.success) {
+                showToast('Notification deleted successfully 🗑️', 'success');
+                setTimeout(function() {
+                    location.reload();
+                }, 1000);
+            } else {
+                showToast('Error: ' + (response.error || 'Could not delete notification'), 'error');
+            }
+        },
+        error: function(xhr) {
+            let errorMsg = 'Error deleting notification';
+            if (xhr.responseJSON && xhr.responseJSON.error) {
+                errorMsg = xhr.responseJSON.error;
+            }
+            showToast('Error: ' + errorMsg, 'error');
+        }
+    });
+}
+</script>
+{% endblock %}

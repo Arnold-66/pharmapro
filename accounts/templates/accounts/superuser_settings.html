@@ -1,0 +1,487 @@
+<!-- accounts/templates/accounts/superuser_settings.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}System Settings - Super Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== MOBILE RESPONSIVE STYLES ===== */
+    @media (max-width: 768px) {
+        .container-fluid.py-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0.25rem !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0.125rem !important;
+            padding-left: 0.125rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .card {
+            border-radius: 4px !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.5rem 0.5rem !important;
+        }
+        
+        .card-header {
+            padding: 0.5rem 0.5rem !important;
+        }
+        
+        .card-header h4 {
+            font-size: 0.9rem !important;
+        }
+        
+        .card-header h6 {
+            font-size: 0.75rem !important;
+        }
+        
+        .page-header {
+            padding: 0 0.5rem !important;
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+            align-items: stretch !important;
+        }
+        
+        .page-header h1 {
+            font-size: 1rem !important;
+        }
+        
+        .page-header .btn {
+            width: 100% !important;
+            font-size: 0.75rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.8rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .form-label {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+        
+        .form-text {
+            font-size: 0.7rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .badge {
+            font-size: 0.6rem !important;
+            padding: 0.2rem 0.35rem !important;
+        }
+        
+        .input-group .btn {
+            padding: 0.3rem 0.5rem !important;
+        }
+        
+        .form-control-color {
+            height: 40px !important;
+        }
+        
+        .d-flex.gap-2.mt-4 {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .d-flex.gap-2.mt-4 .btn {
+            width: 100% !important;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .card-header h4 {
+            font-size: 0.8rem !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.7rem !important;
+            padding: 0.3rem 0.4rem !important;
+        }
+    }
+    
+    .card {
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    .card-header {
+        background: transparent;
+        border-bottom: 2px solid #f0f0f0;
+        padding: 1.25rem 1.5rem;
+    }
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 0.625rem 0.875rem;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+    .btn {
+        border-radius: 8px;
+        padding: 0.625rem 1.5rem;
+        font-weight: 500;
+    }
+    .badge {
+        font-weight: 500;
+        padding: 0.35rem 0.75rem;
+    }
+    .form-control-color {
+        padding: 0.25rem;
+        height: 50px;
+    }
+    .input-group .btn {
+        padding: 0.625rem 0.875rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4" style="padding: 0 0.5rem;">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800 fw-bold">
+                <i class="fas fa-cogs text-primary me-2"></i>System Settings
+                <span class="badge bg-danger ms-2">Super Admin</span>
+            </h1>
+            <p class="text-muted small mb-0 mt-1">Configure global system settings</p>
+        </div>
+        <div class="mt-2 mt-sm-0">
+            <a href="{% url 'tenants:list' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-sliders-h me-2"></i>System Configuration
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- General Settings -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="fas fa-globe me-2"></i>General Settings</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 col-12 mb-3">
+                                        <label for="site_name" class="form-label fw-bold">Site Name</label>
+                                        <input type="text" class="form-control" id="site_name" name="site_name" 
+                                               value="{{ settings.site_name|default:'PharmaPro' }}">
+                                    </div>
+                                    <div class="col-md-6 col-12 mb-3">
+                                        <label for="site_url" class="form-label fw-bold">Site URL</label>
+                                        <input type="url" class="form-control" id="site_url" name="site_url" 
+                                               value="{{ settings.site_url|default:'https://pharmapro.com' }}">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 col-12 mb-3">
+                                        <label for="admin_email" class="form-label fw-bold">Admin Email</label>
+                                        <input type="email" class="form-control" id="admin_email" name="admin_email" 
+                                               value="{{ settings.admin_email|default:'' }}">
+                                    </div>
+                                    <div class="col-md-6 col-12 mb-3">
+                                        <label for="support_email" class="form-label fw-bold">Support Email</label>
+                                        <input type="email" class="form-control" id="support_email" name="support_email" 
+                                               value="{{ settings.support_email|default:'support@pharmapro.com' }}">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 col-12 mb-3">
+                                        <label for="maintenance_mode" class="form-label fw-bold">Maintenance Mode</label>
+                                        <select class="form-select" id="maintenance_mode" name="maintenance_mode">
+                                            <option value="off" {% if not settings.maintenance_mode %}selected{% endif %}>Off</option>
+                                            <option value="on" {% if settings.maintenance_mode %}selected{% endif %}>On</option>
+                                        </select>
+                                        <div class="form-text text-muted">
+                                            <i class="fas fa-info-circle"></i>
+                                            When enabled, the site will show a maintenance page to all users except admins.
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-12 mb-3">
+                                        <label for="maintenance_message" class="form-label fw-bold">Maintenance Message</label>
+                                        <textarea class="form-control" id="maintenance_message" name="maintenance_message" rows="3">{{ settings.maintenance_message|default:'We are currently performing maintenance. Please check back later.' }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Branding Settings -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="fas fa-palette me-2"></i>Branding</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 col-6 mb-3">
+                                        <label for="primary_color" class="form-label fw-bold">Primary Color</label>
+                                        <input type="color" class="form-control form-control-color" id="primary_color" name="primary_color" 
+                                               value="{{ settings.primary_color|default:'#2c3e50' }}">
+                                    </div>
+                                    <div class="col-md-4 col-6 mb-3">
+                                        <label for="secondary_color" class="form-label fw-bold">Secondary Color</label>
+                                        <input type="color" class="form-control form-control-color" id="secondary_color" name="secondary_color" 
+                                               value="{{ settings.secondary_color|default:'#3498db' }}">
+                                    </div>
+                                    <div class="col-md-4 col-12 mb-3">
+                                        <label for="accent_color" class="form-label fw-bold">Accent Color</label>
+                                        <input type="color" class="form-control form-control-color" id="accent_color" name="accent_color" 
+                                               value="{{ settings.accent_color|default:'#e74c3c' }}">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 col-12 mb-3">
+                                        <label for="site_logo" class="form-label fw-bold">Site Logo</label>
+                                        <input type="file" class="form-control" id="site_logo" name="site_logo" accept="image/*">
+                                        {% if settings.site_logo %}
+                                            <div class="mt-2">
+                                                <img src="{{ settings.site_logo.url }}" alt="Current Logo" style="max-height: 60px;">
+                                                <span class="text-muted ms-2">Current logo</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 col-12 mb-3">
+                                        <label for="site_favicon" class="form-label fw-bold">Favicon</label>
+                                        <input type="file" class="form-control" id="site_favicon" name="site_favicon" accept="image/x-icon,image/png">
+                                        {% if settings.site_favicon %}
+                                            <div class="mt-2">
+                                                <img src="{{ settings.site_favicon.url }}" alt="Current Favicon" style="max-height: 30px;">
+                                                <span class="text-muted ms-2">Current favicon</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Security Settings -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Security Settings</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 col-12 mb-3">
+                                        <label class="form-label fw-bold">Registration</label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="allow_registration" name="allow_registration"
+                                                   {% if settings.allow_registration %}checked{% endif %}>
+                                            <label class="form-check-label" for="allow_registration">
+                                                Allow New Registrations
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="require_verification" name="require_verification"
+                                                   {% if settings.require_verification %}checked{% endif %}>
+                                            <label class="form-check-label" for="require_verification">
+                                                Require Email Verification
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-12 mb-3">
+                                        <label class="form-label fw-bold">Session & Security</label>
+                                        <div class="mb-2">
+                                            <label for="session_timeout" class="form-label">Session Timeout (minutes)</label>
+                                            <input type="number" class="form-control" id="session_timeout" name="session_timeout" 
+                                                   value="{{ settings.session_timeout|default:60 }}" min="5" max="1440">
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="force_ssl" name="force_ssl"
+                                                   {% if settings.force_ssl %}checked{% endif %}>
+                                            <label class="form-check-label" for="force_ssl">
+                                                Force HTTPS/SSL
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Email Settings -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="fas fa-envelope me-2"></i>Email Settings</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 col-12 mb-3">
+                                        <label for="smtp_host" class="form-label fw-bold">SMTP Host</label>
+                                        <input type="text" class="form-control" id="smtp_host" name="smtp_host" 
+                                               value="{{ settings.smtp_host|default:'smtp.gmail.com' }}">
+                                    </div>
+                                    <div class="col-md-6 col-12 mb-3">
+                                        <label for="smtp_port" class="form-label fw-bold">SMTP Port</label>
+                                        <input type="number" class="form-control" id="smtp_port" name="smtp_port" 
+                                               value="{{ settings.smtp_port|default:587 }}">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 col-12 mb-3">
+                                        <label for="smtp_username" class="form-label fw-bold">SMTP Username</label>
+                                        <input type="text" class="form-control" id="smtp_username" name="smtp_username" 
+                                               value="{{ settings.smtp_username|default:'' }}">
+                                    </div>
+                                    <div class="col-md-6 col-12 mb-3">
+                                        <label for="smtp_password" class="form-label fw-bold">SMTP Password</label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" id="smtp_password" name="smtp_password" 
+                                                   value="{{ settings.smtp_password|default:'' }}">
+                                            <button class="btn btn-outline-secondary" type="button" id="toggleSmtpPassword">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        <div class="form-text text-muted">
+                                            <i class="fas fa-info-circle"></i>
+                                            Password is stored securely and will not be displayed after saving.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="use_tls" name="use_tls"
+                                           {% if settings.use_tls %}checked{% endif %}>
+                                    <label class="form-check-label" for="use_tls">
+                                        Use TLS Encryption
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Stripe Settings -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="fab fa-stripe me-2"></i>Payment Settings (Stripe)</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 col-12 mb-3">
+                                        <label for="stripe_publishable_key" class="form-label fw-bold">Publishable Key</label>
+                                        <input type="text" class="form-control" id="stripe_publishable_key" name="stripe_publishable_key" 
+                                               value="{{ settings.stripe_publishable_key|default:'' }}">
+                                    </div>
+                                    <div class="col-md-6 col-12 mb-3">
+                                        <label for="stripe_secret_key" class="form-label fw-bold">Secret Key</label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" id="stripe_secret_key" name="stripe_secret_key" 
+                                                   value="{{ settings.stripe_secret_key|default:'' }}">
+                                            <button class="btn btn-outline-secondary" type="button" id="toggleStripeKey">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 col-12 mb-3">
+                                        <label for="stripe_webhook_secret" class="form-label fw-bold">Webhook Secret</label>
+                                        <input type="text" class="form-control" id="stripe_webhook_secret" name="stripe_webhook_secret" 
+                                               value="{{ settings.stripe_webhook_secret|default:'' }}">
+                                    </div>
+                                    <div class="col-md-6 col-12 mb-3">
+                                        <label class="form-label fw-bold">Test Mode</label>
+                                        <div class="form-check mt-2">
+                                            <input class="form-check-input" type="checkbox" id="stripe_test_mode" name="stripe_test_mode"
+                                                   {% if settings.stripe_test_mode %}checked{% endif %}>
+                                            <label class="form-check-label" for="stripe_test_mode">
+                                                Enable Test Mode
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-save me-2"></i> Save Settings
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="resetSettings()">
+                                <i class="fas fa-undo me-2"></i> Reset to Defaults
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $(document).ready(function() {
+        // Toggle SMTP password visibility
+        $('#toggleSmtpPassword').click(function() {
+            const input = $('#smtp_password');
+            const icon = $(this).find('i');
+            if (input.attr('type') === 'password') {
+                input.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                input.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
+        
+        // Toggle Stripe key visibility
+        $('#toggleStripeKey').click(function() {
+            const input = $('#stripe_secret_key');
+            const icon = $(this).find('i');
+            if (input.attr('type') === 'password') {
+                input.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                input.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
+    });
+    
+    function resetSettings() {
+        Swal.fire({
+            title: 'Reset Settings?',
+            text: 'Are you sure you want to reset all settings to default values?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, Reset',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '{% url "accounts:superuser_settings_reset" %}';
+            }
+        });
+    }
+</script>
+{% endblock %}

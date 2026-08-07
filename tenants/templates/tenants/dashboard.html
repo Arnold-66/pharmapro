@@ -1,0 +1,632 @@
+<!-- accounts/templates/accounts/dashboard.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}{{ tenant.name }} Dashboard - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== RESET ALL PADDING/MARGINS ON MOBILE ===== */
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0 !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0.25rem !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0.125rem !important;
+            padding-left: 0.125rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .card {
+            border-radius: 4px !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.5rem 0.5rem !important;
+        }
+        
+        .card-header {
+            padding: 0.5rem 0.5rem !important;
+        }
+        
+        .card-header h5 {
+            font-size: 0.7rem !important;
+        }
+        
+        .page-header {
+            padding: 0 0.5rem !important;
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+            align-items: stretch !important;
+        }
+        
+        .page-header h1 {
+            font-size: 1rem !important;
+        }
+        
+        .page-header .badge {
+            font-size: 0.6rem !important;
+            padding: 0.2rem 0.4rem !important;
+        }
+        
+        /* ===== STATS CARDS - 2 PER ROW ===== */
+        .row.g-4.mb-4 {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0.25rem !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row.g-4.mb-4 > [class*="col-"] {
+            padding-right: 0.125rem !important;
+            padding-left: 0.125rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .row.g-4.mb-4 > .col-xl-3,
+        .row.g-4.mb-4 > .col-md-6 {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+        }
+        
+        .stat-card {
+            border-radius: 4px !important;
+            margin-bottom: 0 !important;
+            height: 100% !important;
+        }
+        
+        .stat-card .card-body {
+            padding: 0.5rem 0.5rem !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+        
+        .stat-card .stat-icon {
+            width: 36px !important;
+            height: 36px !important;
+            min-width: 36px !important;
+            min-height: 36px !important;
+            padding: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 50% !important;
+            flex-shrink: 0 !important;
+        }
+        
+        .stat-card .stat-icon i {
+            font-size: 1rem !important;
+        }
+        
+        .stat-card .stat-content {
+            flex: 1 !important;
+            min-width: 0 !important;
+            overflow: visible !important;
+        }
+        
+        .stat-card .stat-content h6 {
+            font-size: 0.55rem !important;
+            margin-bottom: 0.05rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.3px !important;
+            color: #6c757d !important;
+            font-weight: 600 !important;
+            white-space: normal !important;
+            word-wrap: break-word !important;
+            line-height: 1.2 !important;
+        }
+        
+        .stat-card .stat-content h3 {
+            font-size: 0.85rem !important;
+            margin-bottom: 0 !important;
+            font-weight: 700 !important;
+            line-height: 1.2 !important;
+            word-wrap: break-word !important;
+        }
+        
+        /* Alert on mobile */
+        .alert {
+            padding: 0.75rem !important;
+            border-radius: 4px !important;
+            margin: 0 0.5rem 0.5rem 0.5rem !important;
+        }
+        
+        .alert ul {
+            padding-left: 1rem !important;
+            margin-top: 0.3rem !important;
+        }
+        
+        .alert ul li {
+            font-size: 0.7rem !important;
+        }
+        
+        /* Table on mobile */
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .table td, .table th {
+            font-size: 0.75rem !important;
+            padding: 0.4rem 0.3rem !important;
+        }
+        
+        .table .badge {
+            font-size: 0.5rem !important;
+            padding: 0.15rem 0.3rem !important;
+        }
+        
+        /* Chart on mobile */
+        #salesChart {
+            height: 180px !important;
+        }
+        
+        .card-body .text-center.py-4 {
+            padding: 1rem !important;
+        }
+        
+        .card-body .text-center.py-4 .fa-3x {
+            font-size: 2rem !important;
+        }
+        
+        .card-body .text-center.py-4 p {
+            font-size: 0.75rem !important;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .stat-card .card-body {
+            padding: 0.35rem 0.35rem !important;
+            gap: 0.3rem !important;
+        }
+        
+        .stat-card .stat-icon {
+            width: 30px !important;
+            height: 30px !important;
+            min-width: 30px !important;
+            min-height: 30px !important;
+        }
+        
+        .stat-card .stat-icon i {
+            font-size: 0.8rem !important;
+        }
+        
+        .stat-card .stat-content h6 {
+            font-size: 0.45rem !important;
+        }
+        
+        .stat-card .stat-content h3 {
+            font-size: 0.75rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .row.g-4 {
+            --bs-gutter-x: 0.5rem !important;
+        }
+        
+        .row.g-4 > [class*="col-"] {
+            padding-right: 0.25rem !important;
+            padding-left: 0.25rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+    
+    /* ===== COMMON STYLES ===== */
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+    
+    .card-header {
+        background: transparent !important;
+        border-bottom: 2px solid #f0f0f0 !important;
+    }
+    
+    .card-header .btn-sm {
+        font-size: 0.7rem !important;
+        padding: 0.2rem 0.5rem !important;
+    }
+    
+    /* ===== STAT CARD STYLES ===== */
+    .stat-card {
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        transition: transform 0.2s;
+        overflow: hidden;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .stat-card .card-body {
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.75rem !important;
+        padding: 1rem 1.25rem !important;
+    }
+    
+    .stat-card .stat-icon {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+    
+    .stat-card .stat-icon i {
+        font-size: 1.4rem;
+    }
+    
+    .stat-card .stat-content {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .stat-card .stat-content h6 {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #6c757d;
+        margin-bottom: 0.1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .stat-card .stat-content h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0;
+        line-height: 1.2;
+    }
+    
+    /* ===== COLOR VARIATIONS ===== */
+    .bg-primary-soft {
+        background-color: rgba(52, 152, 219, 0.12) !important;
+        color: #3498db;
+    }
+    
+    .bg-success-soft {
+        background-color: rgba(46, 204, 113, 0.12) !important;
+        color: #28a745;
+    }
+    
+    .bg-info-soft {
+        background-color: rgba(23, 162, 184, 0.12) !important;
+        color: #17a2b8;
+    }
+    
+    .bg-warning-soft {
+        background-color: rgba(255, 193, 7, 0.12) !important;
+        color: #ffc107;
+    }
+    
+    .text-primary-dark {
+        color: #2c3e50;
+    }
+    
+    .text-success-dark {
+        color: #1e7e34;
+    }
+    
+    .table th {
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .table td {
+        vertical-align: middle;
+    }
+    
+    .badge {
+        font-weight: 500;
+    }
+    
+    .alert {
+        border-radius: 10px;
+        border: none;
+    }
+    
+    .alert-warning {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4" style="padding: 0 0.5rem;">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800 fw-bold">{{ tenant.name }} Dashboard</h1>
+            <p class="text-muted small mb-0 mt-1">Welcome back, {{ user.get_full_name|default:user.username }}!</p>
+        </div>
+        <div class="mt-2 mt-sm-0 d-flex gap-2 flex-wrap">
+            <span class="badge bg-primary">{{ tenant.plan|title }} Plan</span>
+            <span class="badge bg-{% if tenant.subscription_status == 'active' %}success{% elif tenant.subscription_status == 'trial' %}warning{% else %}secondary{% endif %}">
+                {{ tenant.get_subscription_status_display }}
+            </span>
+        </div>
+    </div>
+
+    <!-- ===== STATISTICS CARDS ===== -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6 col-6">
+            <div class="card shadow-sm stat-card h-100">
+                <div class="card-body">
+                    <div class="stat-icon bg-primary-soft">
+                        <i class="fas fa-boxes text-primary"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h6>Products</h6>
+                        <h3 class="text-primary-dark">{{ total_products }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 col-6">
+            <div class="card shadow-sm stat-card h-100">
+                <div class="card-body">
+                    <div class="stat-icon bg-success-soft">
+                        <i class="fas fa-shopping-cart text-success"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h6>Sales</h6>
+                        <h3 class="text-success-dark">{{ total_sales }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 col-6">
+            <div class="card shadow-sm stat-card h-100">
+                <div class="card-body">
+                    <div class="stat-icon bg-info-soft">
+                        <i class="fas fa-users text-info"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h6>Users</h6>
+                        <h3 class="text-info">{{ total_users }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 col-6">
+            <div class="card shadow-sm stat-card h-100">
+                <div class="card-body">
+                    <div class="stat-icon bg-warning-soft">
+                        <i class="fas fa-dollar-sign text-warning"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h6>Today's Sales</h6>
+                        <h3 class="text-warning">Ugx {{ today_sales|floatformat:2 }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LOW STOCK ALERT ===== -->
+    {% if low_stock %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <div class="d-flex align-items-start">
+            <i class="fas fa-exclamation-triangle me-2 mt-1"></i>
+            <div>
+                <strong>Low Stock Alert:</strong> The following products need reordering.
+                <ul class="mb-0 mt-2">
+                    {% for product in low_stock %}
+                    <li>{{ product.name }} - Stock: {{ product.quantity|floatformat:0 }} (Reorder at: {{ product.reorder_point|floatformat:0 }})</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+
+    <!-- ===== RECENT SALES ===== -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap">
+            <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Sales</h5>
+            <a href="{% url 'sales:sale_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Sale ID</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in recent_sales %}
+                        <tr>
+                            <td>#{{ sale.id|slice:":8" }}</td>
+                            <td>{{ sale.sale_date|date:'M d, Y H:i' }}</td>
+                            <td>Ugx {{ sale.total_amount|floatformat:2 }}</td>
+                            <td>
+                                <span class="badge bg-{% if sale.payment_status == 'paid' %}success{% elif sale.payment_status == 'partial' %}warning{% else %}danger{% endif %}">
+                                    {{ sale.get_payment_status_display|default:'Completed' }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted">
+                                <i class="fas fa-shopping-cart fa-2x mb-2 d-block"></i>
+                                No sales recorded yet.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MONTHLY SALES CHART ===== -->
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap">
+            <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Monthly Sales</h5>
+            <span class="badge bg-secondary">{{ monthly_sales|length }} months</span>
+        </div>
+        <div class="card-body">
+            <canvas id="salesChart" height="100"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get monthly sales data from Django template
+        {% if monthly_sales %}
+            const monthlySalesData = {{ monthly_sales|safe }};
+            const salesChartElement = document.getElementById('salesChart');
+            
+            if (monthlySalesData && monthlySalesData.length > 0) {
+                // Prepare data for chart
+                const labels = monthlySalesData.map(item => {
+                    // Create date from the month string (YYYY-MM-DD)
+                    const date = new Date(item.month + 'T00:00:00');
+                    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                });
+                
+                const values = monthlySalesData.map(item => parseFloat(item.total) || 0);
+
+                // Create chart
+                const ctx = salesChartElement.getContext('2d');
+                
+                // Destroy existing chart if any
+                if (window.salesChart) {
+                    window.salesChart.destroy();
+                }
+                
+                window.salesChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Monthly Sales (UGX)',
+                            data: values,
+                            backgroundColor: 'rgba(44, 62, 80, 0.6)',
+                            borderColor: 'rgba(44, 62, 80, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    font: {
+                                        size: window.innerWidth < 768 ? 10 : 12
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Ugx ' + context.parsed.y.toLocaleString();
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return 'Ugx ' + value.toLocaleString();
+                                    },
+                                    font: {
+                                        size: window.innerWidth < 768 ? 8 : 10
+                                    }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: {
+                                        size: window.innerWidth < 768 ? 8 : 10
+                                    },
+                                    maxRotation: window.innerWidth < 768 ? 45 : 0
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                // No data - show message
+                if (salesChartElement) {
+                    const parent = salesChartElement.parentElement;
+                    parent.innerHTML = `
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-chart-bar fa-3x mb-3 d-block"></i>
+                            <p>No sales data available for chart.</p>
+                            <small>Sales data will appear here once you start making sales.</small>
+                        </div>
+                    `;
+                }
+            }
+        {% else %}
+            // No monthly sales data at all
+            const salesChartElement = document.getElementById('salesChart');
+            if (salesChartElement) {
+                const parent = salesChartElement.parentElement;
+                parent.innerHTML = `
+                    <div class="text-center py-4 text-muted">
+                        <i class="fas fa-chart-bar fa-3x mb-3 d-block"></i>
+                        <p>No sales data available for chart.</p>
+                        <small>Sales data will appear here once you start making sales.</small>
+                    </div>
+                `;
+            }
+        {% endif %}
+    });
+</script>
+{% endblock %}

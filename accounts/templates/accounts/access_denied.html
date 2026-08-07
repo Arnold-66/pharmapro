@@ -1,0 +1,499 @@
+<!-- accounts/templates/accounts/access_denied.html -->
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Access Denied - PharmaPro</title>
+
+    <!-- Tailwind + Google Fonts + Font Awesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+    <style>
+        /* reset – no rounded edges, no glass, no gradients, no shadows */
+        * {
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef1f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        /* plain card – wider, straight corners, solid white */
+        .access-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 560px;
+            border: 1px solid #d0d7de;
+            box-shadow: none;
+            transition: none;
+        }
+
+        /* brand block – solid dark, no gradient, no rounded */
+        .brand-block {
+            background: #1e293b;
+            padding: 2rem 2rem 1.5rem;
+            text-align: center;
+            border-bottom: 2px solid #b0b8c4;
+        }
+
+        .brand-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: #334155;
+            padding: 0.5rem 1.5rem 0.5rem 1rem;
+            border: 1px solid #4b5a6f;
+        }
+
+        .brand-icon i {
+            font-size: 2rem;
+            color: #cbd5e1;
+        }
+
+        .brand-icon span {
+            font-weight: 700;
+            font-size: 1.8rem;
+            letter-spacing: -0.02em;
+            color: #f1f5f9;
+        }
+
+        .brand-sub {
+            display: inline-block;
+            margin-top: 0.6rem;
+            background: #334155;
+            padding: 0.2rem 1.5rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #cbd5e1;
+            border: 1px solid #4b5a6f;
+            letter-spacing: 0.5px;
+        }
+
+        /* form body – more padding */
+        .form-body {
+            padding: 2.5rem 2.5rem 2rem;
+            text-align: center;
+        }
+
+        /* headings */
+        .form-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.3rem;
+        }
+
+        .form-sub {
+            color: #475569;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* icon circle - bigger */
+        .icon-circle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100px;
+            height: 100px;
+            border: 2px solid #b91c1c;
+            background: #fee9e7;
+            margin-bottom: 1.5rem;
+        }
+
+        .icon-circle i {
+            font-size: 3rem;
+            color: #b91c1c;
+        }
+
+        /* error box */
+        .error-box {
+            background: #fee9e7;
+            border: 1px solid #b91c1c;
+            color: #991b1b;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        .error-box i {
+            margin-top: 0.2rem;
+            font-size: 1.1rem;
+        }
+
+        .error-box strong {
+            color: #991b1b;
+        }
+
+        .error-box .role-badge {
+            display: inline-block;
+            background: #991b1b;
+            color: white;
+            padding: 0.1rem 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.3rem;
+        }
+
+        /* info box - expanded */
+        .info-box {
+            border: 1px solid #d0d7de;
+            background: #f8fafc;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .info-box h6 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .info-box ul li {
+            font-size: 0.85rem;
+            color: #475569;
+            padding: 0.25rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .info-box ul li i {
+            width: 1.2rem;
+            font-size: 0.8rem;
+        }
+
+        .info-box ul li .text-success {
+            color: #10b981;
+        }
+
+        .info-box ul li .text-danger {
+            color: #b91c1c;
+        }
+
+        /* button - larger */
+        .btn-access {
+            background: #1e293b;
+            border: 1px solid #0f172a;
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 0.8rem 2rem;
+            cursor: pointer;
+            transition: background 0.15s;
+            letter-spacing: 0.3px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            min-width: 200px;
+            text-decoration: none;
+        }
+
+        .btn-access:hover {
+            background: #0f172a;
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-access:active {
+            background: #0b111e;
+        }
+
+        .btn-access-light {
+            background: transparent;
+            border-color: #d0d7de;
+            color: #1e293b;
+        }
+
+        .btn-access-light:hover {
+            background: #f1f4f9;
+            color: #0f172a;
+        }
+
+        /* action row */
+        .action-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* user info */
+        .user-info {
+            border-top: 1px solid #d0d7de;
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .user-info p {
+            font-size: 0.8rem;
+            color: #475569;
+            margin: 0.2rem 0;
+        }
+
+        .user-info strong {
+            color: #0f172a;
+        }
+
+        /* footer */
+        .footer-divider {
+            border-top: 1px solid #d0d7de;
+            margin: 1.5rem 0 1rem;
+        }
+
+        .footer-text {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .footer-text a {
+            color: #1e293b;
+            font-weight: 600;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+        }
+
+        .footer-text a:hover {
+            border-bottom-color: #1e293b;
+        }
+
+        /* utilities */
+        .text-muted {
+            color: #475569;
+        }
+        .text-xs {
+            font-size: 0.7rem;
+        }
+        .text-sm {
+            font-size: 0.85rem;
+        }
+        .mt-1 {
+            margin-top: 0.25rem;
+        }
+        .mt-2 {
+            margin-top: 0.5rem;
+        }
+        .mt-3 {
+            margin-top: 0.75rem;
+        }
+        .mt-4 {
+            margin-top: 1rem;
+        }
+        .mb-1 {
+            margin-bottom: 0.25rem;
+        }
+        .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+        .mb-3 {
+            margin-bottom: 0.75rem;
+        }
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+        .flex {
+            display: flex;
+        }
+        .flex-col {
+            flex-direction: column;
+        }
+        .items-center {
+            align-items: center;
+        }
+        .justify-center {
+            justify-content: center;
+        }
+        .gap-2 {
+            gap: 0.5rem;
+        }
+        .gap-3 {
+            gap: 0.75rem;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .w-full {
+            width: 100%;
+        }
+        .border-t {
+            border-top: 1px solid #d0d7de;
+        }
+        .pt-3 {
+            padding-top: 0.75rem;
+        }
+
+        /* responsive */
+        @media (max-width: 576px) {
+            .access-card {
+                max-width: 100%;
+            }
+            .form-body {
+                padding: 1.5rem 1.2rem;
+            }
+            .brand-block {
+                padding: 1.5rem 1rem;
+            }
+            .brand-icon span {
+                font-size: 1.4rem;
+            }
+            .brand-icon i {
+                font-size: 1.5rem;
+            }
+            .form-title {
+                font-size: 1.5rem;
+            }
+            .icon-circle {
+                width: 70px;
+                height: 70px;
+            }
+            .icon-circle i {
+                font-size: 2.2rem;
+            }
+            .action-row {
+                flex-direction: column;
+                width: 100%;
+            }
+            .btn-access {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="access-card">
+
+        <!-- brand – flat, no rounded, solid dark -->
+        <div class="brand-block">
+            <div class="brand-icon">
+                <i class="fas fa-pills"></i>
+                <span>PharmaPro</span>
+            </div>
+            <div class="brand-sub">
+                <i class="fas fa-notes-medical mr-1"></i> access denied
+            </div>
+        </div>
+
+        <!-- form body -->
+        <div class="form-body">
+
+            <!-- Icon -->
+            <div class="icon-circle">
+                <i class="fas fa-ban"></i>
+            </div>
+
+            <div class="form-title">Access Denied</div>
+            <div class="form-sub">You don't have permission to access this page</div>
+
+            <!-- Message -->
+            <div class="error-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <p class="mb-1"><strong>This page is restricted.</strong></p>
+                    <p class="mb-1">Only <strong>Organization Administrators</strong>, 
+                    <strong>Managers</strong>, and <strong>Super Admins</strong> can access this section.</p>
+                    <div class="mt-1">
+                        <span class="role-badge">Your Role: {{ user.get_role_display|default:"Unknown" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Required Permissions -->
+            <div class="info-box">
+                <h6><i class="fas fa-info-circle me-1"></i> Required Permissions:</h6>
+                <ul>
+                    <li><i class="fas fa-check-circle text-success"></i> Organization Administrator (Admin)</li>
+                    <li><i class="fas fa-check-circle text-success"></i> Manager</li>
+                    <li><i class="fas fa-check-circle text-success"></i> Super Admin</li>
+                    <li><i class="fas fa-times-circle text-danger"></i> Staff (your current role)</li>
+                </ul>
+            </div>
+
+            <!-- Actions -->
+            <div class="action-row">
+                <button onclick="goBack()" class="btn-access">
+                    <i class="fas fa-arrow-left"></i> Go Back
+                </button>
+                <a href="{% url 'accounts:dashboard' %}" class="btn-access btn-access-light">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+            </div>
+
+            <!-- User Info -->
+            <div class="user-info">
+                <p>
+                    <i class="fas fa-user me-1"></i>
+                    Logged in as: <strong>{{ user.get_full_name|default:user.username }}</strong>
+                </p>
+                {% if user.tenant %}
+                <p>
+                    <i class="fas fa-building me-1"></i>
+                    Organization: <strong>{{ user.tenant.company_name }}</strong>
+                </p>
+                {% endif %}
+                <p class="mt-1 text-xs text-muted">
+                    <i class="fas fa-clock me-1"></i>
+                    {{ user.last_login|date:"Y-m-d H:i" }}
+                </p>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer-divider"></div>
+            <div class="footer-text">
+                <p class="mb-1">&copy; {% now "Y" %} PharmaPro. All rights reserved.</p>
+                <p class="mb-0">
+                    Need access? <a href="mailto:support@pharmapro.com">Contact your system administrator</a>
+                </p>
+            </div>
+
+        </div> <!-- end form-body -->
+    </div> <!-- end access-card -->
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                goBack();
+            }
+        });
+
+        if (window.history.length <= 1) {
+            window.location.href = "{% url 'accounts:dashboard' %}";
+        }
+    </script>
+
+</body>
+</html>

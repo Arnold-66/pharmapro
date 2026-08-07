@@ -1,0 +1,1088 @@
+<!-- apps/suppliers/templates/suppliers/approvals.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Supplier Approvals - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== MOBILE RESPONSIVE STYLES ===== */
+    @media (max-width: 768px) {
+        .container-fluid.py-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+        }
+        
+        /* Fix for stat cards - 2x2 grid */
+        .row.mb-4 {
+            --bs-gutter-x: 0.25rem !important;
+            --bs-gutter-y: 0.25rem !important;
+            margin-right: -0.125rem !important;
+            margin-left: -0.125rem !important;
+        }
+        
+        .row.mb-4 > [class*="col-"] {
+            padding-right: 0.125rem !important;
+            padding-left: 0.125rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .row.mb-4 .col-md-3.col-sm-6 {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+        }
+        
+        .row.mb-4 .col-md-3.col-sm-6 .stat-card .card-body {
+            padding: 0.5rem !important;
+        }
+        
+        .row.mb-4 .col-md-3.col-sm-6 .stat-card h6 {
+            font-size: 0.55rem !important;
+            margin-bottom: 0.1rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.3px !important;
+        }
+        
+        .row.mb-4 .col-md-3.col-sm-6 .stat-card h2 {
+            font-size: 1rem !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .row.mb-4 .col-md-3.col-sm-6 .stat-card .rounded-circle.p-3 {
+            padding: 0.3rem !important;
+            width: 36px !important;
+            height: 36px !important;
+        }
+        
+        .row.mb-4 .col-md-3.col-sm-6 .stat-card .rounded-circle.p-3 i {
+            font-size: 1rem !important;
+        }
+        
+        /* Cards edge-to-edge */
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+        }
+        
+        .card-footer {
+            padding: 0.6rem 0.875rem !important;
+        }
+        
+        .page-header h1 {
+            font-size: 1.1rem !important;
+        }
+        
+        .page-header .btn {
+            font-size: 0.75rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .page-header .d-flex {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+            align-items: stretch !important;
+        }
+        
+        .page-header .col-auto {
+            width: 100% !important;
+        }
+        
+        .col-md-3, .col-md-2 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .d-flex.gap-2 {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .d-flex.gap-2 .btn {
+            width: 100% !important;
+        }
+        
+        /* View toggle buttons */
+        .d-flex.align-items-center.gap-3 {
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }
+        
+        .d-flex.align-items-center.gap-3 .btn {
+            width: auto !important;
+            flex: 1 !important;
+            min-width: 80px !important;
+        }
+        
+        /* Table adjustments */
+        .table-responsive {
+            font-size: 0.6rem !important;
+        }
+        
+        .table-responsive .table td,
+        .table-responsive .table th {
+            padding: 0.3rem 0.25rem !important;
+            white-space: nowrap !important;
+        }
+        
+        .table-responsive .badge {
+            font-size: 0.45rem !important;
+            padding: 0.15rem 0.25rem !important;
+        }
+        
+        .table-responsive .btn-group .btn {
+            padding: 0.1rem 0.2rem !important;
+            font-size: 0.45rem !important;
+            width: auto !important;
+        }
+        
+        .table-responsive .rounded-circle {
+            width: 24px !important;
+            height: 24px !important;
+            font-size: 0.6rem !important;
+        }
+        
+        .table-responsive .fw-semibold {
+            font-size: 0.6rem !important;
+        }
+        
+        .table-responsive .small.text-muted {
+            font-size: 0.5rem !important;
+        }
+        
+        .pagination .page-link {
+            padding: 0.2rem 0.4rem !important;
+            font-size: 0.65rem !important;
+        }
+        
+        .card-footer .pagination {
+            justify-content: center !important;
+        }
+        
+        .modal-dialog {
+            margin: 0.5rem !important;
+        }
+        
+        .modal-content {
+            border-radius: 12px !important;
+        }
+        
+        .form-check {
+            padding: 0.25rem 0 !important;
+        }
+        
+        .approval-badge {
+            font-size: 0.6rem !important;
+            padding: 0.15rem 0.35rem !important;
+        }
+        
+        /* Bulk actions */
+        .card.mt-4 .card-body .d-flex {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 0.5rem !important;
+        }
+        
+        .card.mt-4 .card-body .d-flex .btn {
+            width: 100% !important;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .row.mb-4 .col-md-3.col-sm-6 .stat-card .card-body {
+            padding: 0.35rem !important;
+        }
+        
+        .row.mb-4 .col-md-3.col-sm-6 .stat-card h6 {
+            font-size: 0.4rem !important;
+        }
+        
+        .row.mb-4 .col-md-3.col-sm-6 .stat-card h2 {
+            font-size: 0.75rem !important;
+        }
+        
+        .row.mb-4 .col-md-3.col-sm-6 .stat-card .rounded-circle.p-3 {
+            padding: 0.2rem !important;
+            width: 28px !important;
+            height: 28px !important;
+        }
+        
+        .row.mb-4 .col-md-3.col-sm-6 .stat-card .rounded-circle.p-3 i {
+            font-size: 0.7rem !important;
+        }
+        
+        .table-responsive {
+            font-size: 0.55rem !important;
+        }
+        
+        .table-responsive .table td,
+        .table-responsive .table th {
+            padding: 0.2rem 0.15rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.py-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .row.mb-4 {
+            --bs-gutter-x: 0.5rem !important;
+        }
+        
+        .row.mb-4 > [class*="col-"] {
+            padding-right: 0.25rem !important;
+            padding-left: 0.25rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1) !important;
+    }
+    
+    .stat-card {
+        transition: transform 0.2s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-3px);
+    }
+    
+    .stat-card .card-body {
+        padding: 1rem 1.25rem !important;
+    }
+    
+    .stat-card .rounded-circle {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .table td, .table th {
+        vertical-align: middle;
+    }
+    
+    .btn-group .btn {
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .modal-content {
+        border-radius: 12px !important;
+        border: none !important;
+    }
+    
+    .form-check-input[type="checkbox"] {
+        cursor: pointer;
+    }
+    
+    .form-check-input:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    
+    .approval-badge {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h2 mb-0 page-header">
+                <i class="fas fa-user-check text-warning me-2"></i>Supplier Approvals
+            </h1>
+            <p class="text-muted d-none d-sm-block">Manage supplier approvals</p>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'suppliers:supplier_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> <span class="d-none d-sm-inline">Back to Suppliers</span>
+                <span class="d-inline d-sm-none">Back</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Cards - 2x2 grid on mobile -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Pending</h6>
+                            <h2 class="mb-0 text-warning">{{ total_pending }}</h2>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-clock text-warning fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Approved</h6>
+                            <h2 class="mb-0 text-success">{{ total_approved }}</h2>
+                        </div>
+                        <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-check-circle text-success fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Total</h6>
+                            <h2 class="mb-0 text-primary">{{ total_suppliers }}</h2>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-truck text-primary fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Rate</h6>
+                            <h2 class="mb-0 text-info">
+                                {% if total_suppliers > 0 %}
+                                    {{ total_approved|add:total_pending|floatformat:0|add:0 }}
+                                {% else %}
+                                    0
+                                {% endif %}%
+                            </h2>
+                        </div>
+                        <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-percent text-info fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Toggle -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <span class="fw-bold text-muted">View:</span>
+                <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if status_filter %}status={{ status_filter }}&{% endif %}{% if type_filter %}type={{ type_filter }}&{% endif %}show_approved=false" 
+                   class="btn btn-sm {% if not show_approved %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+                    <i class="fas fa-clock me-1"></i> Pending ({{ total_pending }})
+                </a>
+                <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if status_filter %}status={{ status_filter }}&{% endif %}{% if type_filter %}type={{ type_filter }}&{% endif %}show_approved=true" 
+                   class="btn btn-sm {% if show_approved %}btn-success{% else %}btn-outline-secondary{% endif %}">
+                    <i class="fas fa-check-circle me-1"></i> Approved ({{ total_approved }})
+                </a>
+                <a href="?show_approved=false" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-undo me-1"></i> Reset
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <input type="hidden" name="show_approved" value="{{ show_approved|yesno:'true,false' }}">
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control" placeholder="Search suppliers..." value="{{ search_query }}">
+                        <button class="btn btn-outline-secondary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <select name="status" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                        <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+                        <option value="suspended" {% if status_filter == 'suspended' %}selected{% endif %}>Suspended</option>
+                        <option value="blacklisted" {% if status_filter == 'blacklisted' %}selected{% endif %}>Blacklisted</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="type" class="form-select">
+                        <option value="">All Types</option>
+                        <option value="manufacturer" {% if type_filter == 'manufacturer' %}selected{% endif %}>Manufacturer</option>
+                        <option value="distributor" {% if type_filter == 'distributor' %}selected{% endif %}>Distributor</option>
+                        <option value="wholesaler" {% if type_filter == 'wholesaler' %}selected{% endif %}>Wholesaler</option>
+                        <option value="importer" {% if type_filter == 'importer' %}selected{% endif %}>Importer</option>
+                        <option value="retailer" {% if type_filter == 'retailer' %}selected{% endif %}>Retailer</option>
+                        <option value="exporter" {% if type_filter == 'exporter' %}selected{% endif %}>Exporter</option>
+                        <option value="other" {% if type_filter == 'other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-grow-1">Apply Filters</button>
+                        <a href="{% url 'suppliers:supplier_approvals' %}" class="btn btn-outline-secondary">Clear</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Suppliers Table -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th style="width: 40px;">
+                                <input type="checkbox" id="selectAll" class="form-check-input" {% if show_approved %}disabled{% endif %}>
+                            </th>
+                            <th>Supplier</th>
+                            <th class="d-none d-sm-table-cell">Contact</th>
+                            <th class="d-none d-md-table-cell">Type</th>
+                            <th>Status</th>
+                            <th>Approval</th>
+                            <th class="d-none d-sm-table-cell">Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for supplier in suppliers %}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="form-check-input supplier-checkbox" value="{{ supplier.id }}" {% if supplier.is_approved %}disabled{% endif %}>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar avatar-sm me-2">
+                                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; flex-shrink: 0;">
+                                                <span class="fw-bold">{{ supplier.name|first|upper }}</span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold">{{ supplier.name|truncatechars:15 }}</div>
+                                            <div class="small text-muted d-none d-sm-block">Code: {{ supplier.code }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="d-none d-sm-table-cell">
+                                    <div>
+                                        <div>{{ supplier.contact_person|truncatechars:12 }}</div>
+                                        <div class="small text-muted">
+                                            <i class="fas fa-phone me-1"></i>{{ supplier.phone }}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="d-none d-md-table-cell">
+                                    <span class="badge bg-info">
+                                        {{ supplier.get_supplier_type_display|slice:":8" }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if supplier.status == 'active' %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% elif supplier.status == 'inactive' %}
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    {% elif supplier.status == 'suspended' %}
+                                        <span class="badge bg-warning">Suspended</span>
+                                    {% elif supplier.status == 'blacklisted' %}
+                                        <span class="badge bg-danger">Blacklisted</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if supplier.is_approved %}
+                                        <span class="badge bg-success approval-badge">
+                                            <i class="fas fa-check-circle me-1"></i> Approved
+                                        </span>
+                                        {% if supplier.verified_at %}
+                                            <br><small class="text-muted">{{ supplier.verified_at|date:"M d, Y" }}</small>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge bg-warning approval-badge">
+                                            <i class="fas fa-clock me-1"></i> Pending
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="d-none d-sm-table-cell">
+                                    <span title="{{ supplier.created_at|date:'Y-m-d H:i' }}">
+                                        {{ supplier.created_at|timesince }} ago
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'suppliers:supplier_detail' supplier.id %}" class="btn btn-sm btn-outline-info" title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        {% if not supplier.is_approved %}
+                                            <button type="button" class="btn btn-sm btn-outline-success approve-single-btn" 
+                                                    data-supplier-id="{{ supplier.id }}" 
+                                                    data-supplier-name="{{ supplier.name }}"
+                                                    title="Approve">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        {% else %}
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" disabled title="Already Approved">
+                                                <i class="fas fa-check-circle text-success"></i>
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="fas fa-check-circle fa-4x text-success mb-3 d-block"></i>
+                                        <h5>
+                                            {% if show_approved %}
+                                                No approved suppliers found
+                                            {% else %}
+                                                No pending approvals
+                                            {% endif %}
+                                        </h5>
+                                        <p>
+                                            {% if show_approved %}
+                                                All suppliers are pending approval or no suppliers exist.
+                                            {% else %}
+                                                All suppliers have been approved.
+                                            {% endif %}
+                                        </p>
+                                        <a href="{% url 'suppliers:supplier_list' %}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-truck me-1"></i> View All Suppliers
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% if suppliers.has_other_pages %}
+            <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="text-muted small">
+                    Showing {{ suppliers.start_index }} to {{ suppliers.end_index }} of {{ suppliers.paginator.count }} suppliers
+                </div>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm mb-0">
+                        {% if suppliers.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ suppliers.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if show_approved %}&show_approved=true{% endif %}">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+                            </li>
+                        {% endif %}
+                        {% for num in suppliers.paginator.page_range %}
+                            {% if suppliers.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > suppliers.number|add:'-3' and num < suppliers.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if show_approved %}&show_approved=true{% endif %}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if suppliers.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ suppliers.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if show_approved %}&show_approved=true{% endif %}">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Bulk Actions -->
+    {% if suppliers and not show_approved %}
+    <div class="card mt-4 shadow-sm">
+        <div class="card-body">
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <span class="fw-bold text-muted">Bulk Actions:</span>
+                <button type="button" class="btn btn-success" id="bulkApproveBtn">
+                    <i class="fas fa-check-double me-1"></i> Approve Selected
+                </button>
+                <span class="text-muted small" id="selectedCount">0 selected</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer"></div>
+
+<!-- Include SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get CSRF token from cookie or meta tag
+    function getCsrfToken() {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('csrftoken='))
+            ?.split('=')[1];
+        
+        if (cookieValue) {
+            return cookieValue;
+        }
+        
+        const metaTag = document.querySelector('meta[name="csrf-token"]');
+        if (metaTag) {
+            return metaTag.getAttribute('content');
+        }
+        
+        const formToken = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (formToken) {
+            return formToken.value;
+        }
+        
+        return '';
+    }
+
+    // Show toast notification
+    function showToast(message, type = 'success') {
+        const colors = {
+            success: '#10b981',
+            error: '#ef4444',
+            warning: '#f59e0b',
+            info: '#3b82f6'
+        };
+        
+        const icons = {
+            success: 'fa-check-circle',
+            error: 'fa-exclamation-circle',
+            warning: 'fa-exclamation-triangle',
+            info: 'fa-info-circle'
+        };
+        
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+        
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            background: white;
+            border-left: 4px solid ${colors[type]};
+            border-radius: 8px;
+            padding: 16px 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 400px;
+            animation: slideInRight 0.5s ease-out;
+        `;
+        toast.innerHTML = `
+            <div style="color: ${colors[type]}; font-size: 20px;">
+                <i class="fas ${icons[type]}"></i>
+            </div>
+            <div style="flex: 1; font-size: 14px; color: #1f2937; font-weight: 500;">
+                ${message}
+            </div>
+            <button onclick="this.parentElement.remove()" style="background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 16px;">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.transform = 'translateX(100%)';
+            setTimeout(() => toast.remove(), 300);
+        }, 5000);
+    }
+
+    // Add animation styles if not present
+    if (!document.getElementById('toastStyles')) {
+        const style = document.createElement('style');
+        style.id = 'toastStyles';
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // Select All checkbox
+    const selectAll = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('.supplier-checkbox:not([disabled])');
+    const selectedCount = document.getElementById('selectedCount');
+    
+    if (selectAll) {
+        selectAll.addEventListener('change', function() {
+            checkboxes.forEach(cb => {
+                cb.checked = this.checked;
+            });
+            updateSelectedCount();
+        });
+    }
+    
+    document.querySelectorAll('.supplier-checkbox:not([disabled])').forEach(cb => {
+        cb.addEventListener('change', updateSelectedCount);
+    });
+    
+    function updateSelectedCount() {
+        const checked = document.querySelectorAll('.supplier-checkbox:checked:not([disabled])').length;
+        if (selectedCount) {
+            selectedCount.textContent = `${checked} selected`;
+        }
+    }
+    
+    // Approve single supplier with SweetAlert2
+    document.querySelectorAll('.approve-single-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const supplierId = this.dataset.supplierId;
+            const supplierName = this.dataset.supplierName;
+            
+            Swal.fire({
+                title: 'Approve Supplier',
+                html: `
+                    <div class="text-start">
+                        <p>Are you sure you want to approve <strong>"${supplierName}"</strong>?</p>
+                        <div class="mt-3 p-3 bg-light rounded">
+                            <p class="mb-1"><i class="fas fa-check-circle text-success me-2"></i> This supplier will be:</p>
+                            <ul class="mb-0">
+                                <li>✅ Marked as <strong>Approved</strong></li>
+                                <li>✅ Eligible for purchase orders</li>
+                                <li>✅ Visible in supplier lists</li>
+                            </ul>
+                        </div>
+                        <p class="text-muted small mt-2"><i class="fas fa-info-circle me-1"></i> This action can be reversed later if needed.</p>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-check me-2"></i> Yes, Approve Supplier',
+                cancelButtonText: '<i class="fas fa-times me-2"></i> Cancel',
+                reverseButtons: true,
+                background: '#ffffff',
+                backdrop: 'rgba(0,0,0,0.4)',
+                customClass: {
+                    popup: 'rounded-4 shadow-lg',
+                    confirmButton: 'btn btn-success px-4 py-2',
+                    cancelButton: 'btn btn-secondary px-4 py-2',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const originalHtml = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    this.disabled = true;
+                    
+                    const csrfToken = getCsrfToken();
+                    
+                    fetch(`/suppliers/${supplierId}/approve/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken,
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'same-origin'
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(data => {
+                                throw new Error(data.error || 'Failed to approve supplier');
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // Success toast
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Approved!',
+                                text: `${supplierName} has been approved successfully.`,
+                                timer: 2000,
+                                showConfirmButton: false,
+                                customClass: {
+                                    popup: 'rounded-4'
+                                }
+                            });
+                            
+                            // Update the row instead of reloading
+                            const row = this.closest('tr');
+                            const approvalCell = row.querySelector('td:nth-child(6)');
+                            const actionCell = row.querySelector('td:last-child');
+                            
+                            // Update approval status
+                            approvalCell.innerHTML = `
+                                <span class="badge bg-success approval-badge">
+                                    <i class="fas fa-check-circle me-1"></i> Approved
+                                </span>
+                                <br><small class="text-muted">${new Date().toLocaleDateString()}</small>
+                            `;
+                            
+                            // Update actions
+                            actionCell.innerHTML = `
+                                <div class="btn-group" role="group">
+                                    <a href="/suppliers/${supplierId}/" class="btn btn-sm btn-outline-info" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" disabled title="Already Approved">
+                                        <i class="fas fa-check-circle text-success"></i>
+                                    </button>
+                                </div>
+                            `;
+                            
+                            // Disable checkbox
+                            const checkbox = row.querySelector('.supplier-checkbox');
+                            if (checkbox) {
+                                checkbox.disabled = true;
+                            }
+                            
+                            // Update stats
+                            const pendingBadge = document.querySelector('.stat-card .text-warning');
+                            const approvedBadge = document.querySelector('.stat-card .text-success');
+                            if (pendingBadge) {
+                                const pendingCount = parseInt(pendingBadge.textContent) - 1;
+                                pendingBadge.textContent = pendingCount;
+                            }
+                            if (approvedBadge) {
+                                const approvedCount = parseInt(approvedBadge.textContent) + 1;
+                                approvedBadge.textContent = approvedCount;
+                            }
+                            
+                            // Update view toggle badges
+                            const pendingToggle = document.querySelector('a[href*="show_approved=false"]');
+                            const approvedToggle = document.querySelector('a[href*="show_approved=true"]');
+                            if (pendingToggle) {
+                                const badge = pendingToggle.querySelector('.badge');
+                                if (badge) badge.textContent = pendingBadge ? pendingBadge.textContent : '0';
+                            }
+                            if (approvedToggle) {
+                                const badge = approvedToggle.querySelector('.badge');
+                                if (badge) badge.textContent = approvedBadge ? approvedBadge.textContent : '0';
+                            }
+                            
+                            this.innerHTML = originalHtml;
+                            this.disabled = false;
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: data.error || 'Failed to approve supplier',
+                                confirmButtonColor: '#dc3545',
+                                customClass: {
+                                    popup: 'rounded-4'
+                                }
+                            });
+                            this.innerHTML = originalHtml;
+                            this.disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: error.message || 'An unexpected error occurred',
+                            confirmButtonColor: '#dc3545',
+                            customClass: {
+                                popup: 'rounded-4'
+                            }
+                        });
+                        this.innerHTML = originalHtml;
+                        this.disabled = false;
+                    });
+                }
+            });
+        });
+    });
+    
+    // Bulk approve with SweetAlert2
+    const bulkApproveBtn = document.getElementById('bulkApproveBtn');
+    if (bulkApproveBtn) {
+        bulkApproveBtn.addEventListener('click', function() {
+            const selected = document.querySelectorAll('.supplier-checkbox:checked:not([disabled])');
+            if (selected.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No Selection',
+                    text: 'Please select at least one supplier to approve.',
+                    confirmButtonColor: '#f59e0b',
+                    customClass: {
+                        popup: 'rounded-4'
+                    }
+                });
+                return;
+            }
+            
+            const supplierNames = Array.from(selected).map(cb => {
+                const row = cb.closest('tr');
+                const nameCell = row.querySelector('.fw-semibold');
+                return nameCell ? nameCell.textContent : 'Unknown';
+            });
+            
+            Swal.fire({
+                title: `Approve ${selected.length} Supplier${selected.length > 1 ? 's' : ''}?`,
+                html: `
+                    <div class="text-start">
+                        <p>Are you sure you want to approve <strong>${selected.length}</strong> supplier${selected.length > 1 ? 's' : ''}?</p>
+                        <div class="mt-3 p-3 bg-light rounded">
+                            <p class="mb-2"><i class="fas fa-list me-2"></i> Selected suppliers:</p>
+                            <ul class="mb-0">
+                                ${supplierNames.map(name => `<li>✅ ${name}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <p class="text-muted small mt-2"><i class="fas fa-info-circle me-1"></i> This action cannot be undone for all selected suppliers at once.</p>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: `<i class="fas fa-check-double me-2"></i> Approve ${selected.length} Supplier${selected.length > 1 ? 's' : ''}`,
+                cancelButtonText: '<i class="fas fa-times me-2"></i> Cancel',
+                reverseButtons: true,
+                background: '#ffffff',
+                backdrop: 'rgba(0,0,0,0.4)',
+                customClass: {
+                    popup: 'rounded-4 shadow-lg',
+                    confirmButton: 'btn btn-success px-4 py-2',
+                    cancelButton: 'btn btn-secondary px-4 py-2',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const supplierIds = Array.from(selected).map(cb => cb.value);
+                    
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Approving...';
+                    this.disabled = true;
+                    
+                    const csrfToken = getCsrfToken();
+                    const formData = new FormData();
+                    supplierIds.forEach(id => formData.append('supplier_ids[]', id));
+                    
+                    fetch('/suppliers/bulk-approve/', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken
+                        },
+                        body: formData,
+                        credentials: 'same-origin'
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(data => {
+                                throw new Error(data.error || 'Failed to approve suppliers');
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: `${data.message || 'Suppliers Approved!'}`,
+                                text: `${selected.length} supplier${selected.length > 1 ? 's have' : ' has'} been approved successfully.`,
+                                timer: 2000,
+                                showConfirmButton: false,
+                                customClass: {
+                                    popup: 'rounded-4'
+                                }
+                            });
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: data.error || 'Failed to approve suppliers',
+                                confirmButtonColor: '#dc3545',
+                                customClass: {
+                                    popup: 'rounded-4'
+                                }
+                            });
+                            this.innerHTML = '<i class="fas fa-check-double me-1"></i> Approve Selected';
+                            this.disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: error.message || 'An unexpected error occurred',
+                            confirmButtonColor: '#dc3545',
+                            customClass: {
+                                popup: 'rounded-4'
+                            }
+                        });
+                        this.innerHTML = '<i class="fas fa-check-double me-1"></i> Approve Selected';
+                        this.disabled = false;
+                    });
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

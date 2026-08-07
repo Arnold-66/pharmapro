@@ -1,0 +1,488 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Sales Report - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    /* ===== FIXED LAYOUT & MOBILE RESPONSIVE ===== */
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }
+        
+        .card-header h5 {
+            font-size: 0.85rem !important;
+        }
+        
+        .card-header .btn {
+            font-size: 0.65rem !important;
+            padding: 0.15rem 0.4rem !important;
+        }
+        
+        .page-header h1 {
+            font-size: 1.1rem !important;
+            word-break: break-word !important;
+        }
+        
+        .page-header p {
+            font-size: 0.75rem !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .page-header .btn {
+            font-size: 0.65rem !important;
+            padding: 0.2rem 0.4rem !important;
+        }
+        
+        .page-header .export-buttons {
+            gap: 0.3rem !important;
+        }
+        
+        /* ===== STATS CARDS GRID - 2 PER ROW ===== */
+        .stats-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 0.5rem !important;
+            padding: 0 0.5rem !important;
+        }
+        
+        .stats-grid .col-md-3 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+        
+        .stats-grid .stat-box {
+            border-radius: 8px !important;
+            margin-bottom: 0 !important;
+            padding: 0.5rem !important;
+        }
+        
+        .stats-grid .stat-box .number {
+            font-size: 1.1rem !important;
+        }
+        
+        .stats-grid .stat-box .label {
+            font-size: 0.6rem !important;
+        }
+        
+        .filter-section {
+            padding: 0.75rem !important;
+            border-radius: 0 !important;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        .filter-section .row {
+            --bs-gutter-x: 0.3rem !important;
+        }
+        
+        .filter-section .col-md-3,
+        .filter-section .col-md-2 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            padding: 0.2rem 0 !important;
+        }
+        
+        .filter-section .form-control,
+        .filter-section .form-select {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.4rem !important;
+        }
+        
+        .filter-section .form-label {
+            font-size: 0.7rem !important;
+            margin-bottom: 0.1rem !important;
+        }
+        
+        .table {
+            font-size: 0.7rem !important;
+        }
+        
+        .table th, .table td {
+            padding: 0.3rem 0.2rem !important;
+        }
+        
+        .table .btn-sm {
+            font-size: 0.55rem !important;
+            padding: 0.1rem 0.25rem !important;
+        }
+        
+        .badge {
+            font-size: 0.55rem !important;
+        }
+        
+        .pagination {
+            font-size: 0.7rem !important;
+        }
+        
+        .chart-container {
+            height: 180px !important;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .stats-grid {
+            gap: 0.35rem !important;
+            padding: 0 0.3rem !important;
+        }
+        
+        .stats-grid .stat-box .number {
+            font-size: 0.95rem !important;
+        }
+        
+        .stats-grid .stat-box .label {
+            font-size: 0.5rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1) !important;
+    }
+    
+    .card-header {
+        background: transparent !important;
+        border-bottom: 2px solid #f0f0f0 !important;
+    }
+    
+    .filter-section {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+    }
+    .stat-box {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .stat-box .number {
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+    .stat-box .label {
+        color: #6c757d;
+        font-size: 0.85rem;
+    }
+    .export-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- ===== PAGE HEADER - IMPROVED ===== -->
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4" style="padding: 0 0.5rem;">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800 fw-bold">Sales Report</h1>
+            <p class="text-muted small mb-0 mt-1">Detailed analysis of your sales performance</p>
+        </div>
+        <div class="mt-2 mt-sm-0">
+            <div class="export-buttons">
+                <a href="{% url 'reports:export_sales_pdf' %}?{{ request.GET.urlencode }}" class="btn btn-danger btn-sm">
+                    <i class="fas fa-file-pdf me-1"></i> PDF
+                </a>
+                <a href="{% url 'reports:export_sales_excel' %}?{{ request.GET.urlencode }}" class="btn btn-success btn-sm">
+                    <i class="fas fa-file-excel me-1"></i> Excel
+                </a>
+                <a href="{% url 'reports:dashboard' %}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-arrow-left me-1"></i> Back
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Date From</label>
+                <input type="date" class="form-control" name="date_from" value="{{ date_from }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Date To</label>
+                <input type="date" class="form-control" name="date_to" value="{{ date_to }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Status</label>
+                <select class="form-select" name="status">
+                    <option value="">All Status</option>
+                    <option value="paid" {% if status == 'paid' %}selected{% endif %}>Paid</option>
+                    <option value="partial" {% if status == 'partial' %}selected{% endif %}>Partial</option>
+                    <option value="unpaid" {% if status == 'unpaid' %}selected{% endif %}>Unpaid</option>
+                    <option value="refunded" {% if status == 'refunded' %}selected{% endif %}>Refunded</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Payment Method</label>
+                <select class="form-select" name="payment_method">
+                    <option value="">All Methods</option>
+                    <option value="cash" {% if payment_method == 'cash' %}selected{% endif %}>Cash</option>
+                    <option value="credit_card" {% if payment_method == 'credit_card' %}selected{% endif %}>Credit Card</option>
+                    <option value="debit_card" {% if payment_method == 'debit_card' %}selected{% endif %}>Debit Card</option>
+                    <option value="mobile_money" {% if payment_method == 'mobile_money' %}selected{% endif %}>Mobile Money</option>
+                    <option value="bank_transfer" {% if payment_method == 'bank_transfer' %}selected{% endif %}>Bank Transfer</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-filter me-1"></i> Filter
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ===== STATISTICS - GRID ON MOBILE ===== -->
+    <div class="row stats-grid g-4 mb-4">
+        <div class="col-md-3">
+            <div class="stat-box">
+                <div class="number text-primary">{{ total_sales }}</div>
+                <div class="label">Total Sales</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box">
+                <div class="number text-success">Ugx {{ total_revenue|floatformat:0 }}</div>
+                <div class="label">Total Revenue</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box">
+                <div class="number text-info">Ugx {{ total_tax|floatformat:0 }}</div>
+                <div class="label">Total Tax</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box">
+                <div class="number text-warning">Ugx {{ total_discount|floatformat:0 }}</div>
+                <div class="label">Total Discount</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales Chart -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-transparent">
+            <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Sales Trend</h5>
+        </div>
+        <div class="card-body">
+            <div class="chart-container" style="position: relative; height: 300px;">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-table me-2"></i>Sales List</h5>
+            <span class="badge bg-primary">{{ sales.paginator.count }} records</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Invoice</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Subtotal</th>
+                            <th>Tax</th>
+                            <th>Discount</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in sales %}
+                        <tr>
+                            <td><code>{{ sale.invoice_number }}</code></td>
+                            <td>{{ sale.customer_name|default:"Walk-in" }}</td>
+                            <td>{{ sale.sale_date|date:"Y-m-d H:i" }}</td>
+                            <td>Ugx {{ sale.subtotal|floatformat:2 }}</td>
+                            <td>Ugx {{ sale.tax_amount|floatformat:2 }}</td>
+                            <td>Ugx {{ sale.discount_amount|floatformat:2 }}</td>
+                            <td><strong>Ugx {{ sale.total_amount|floatformat:2 }}</strong></td>
+                            <td>
+                                <span class="badge bg-{% if sale.payment_status == 'paid' %}success{% elif sale.payment_status == 'partial' %}warning{% else %}danger{% endif %}">
+                                    {{ sale.get_payment_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'sales:sale_detail' sale.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center py-4 text-muted">
+                                <i class="fas fa-shopping-cart fa-2x mb-2 d-block"></i>
+                                No sales found matching the criteria.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% if sales.has_other_pages %}
+        <div class="card-footer bg-transparent">
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm mb-0 justify-content-center">
+                    {% if sales.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ sales.previous_page_number }}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if status %}&status={{ status }}{% endif %}{% if payment_method %}&payment_method={{ payment_method }}{% endif %}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% for i in sales.paginator.page_range %}
+                        {% if sales.number == i %}
+                        <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                        {% elif i > sales.number|add:'-3' and i < sales.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ i }}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if status %}&status={{ status }}{% endif %}{% if payment_method %}&payment_method={{ payment_method }}{% endif %}">{{ i }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if sales.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ sales.next_page_number }}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if status %}&status={{ status }}{% endif %}{% if payment_method %}&payment_method={{ payment_method }}{% endif %}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Sales Chart
+    const salesData = {{ sales_by_day|safe }};
+    if (salesData.length > 0) {
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: salesData.map(item => {
+                    const date = new Date(item.date);
+                    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                }),
+                datasets: [{
+                    label: 'Revenue',
+                    data: salesData.map(item => item.total || 0),
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }, {
+                    label: 'Transactions',
+                    data: salesData.map(item => item.count || 0),
+                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'Ugx ' + value.toLocaleString();
+                            }
+                        }
+                    },
+                    y1: {
+                        position: 'right',
+                        beginAtZero: true,
+                        grid: {
+                            drawOnChartArea: false
+                        },
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

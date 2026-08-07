@@ -1,0 +1,695 @@
+<!-- inventory/templates/inventory/dashboard.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+{% load inventory_filters %}
+
+{% block title %}Inventory Dashboard - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Reset all padding/margins on mobile for true edge-to-edge */
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+        }
+        
+        /* FIX: Properly handle row gaps to prevent stacking issues */
+        .row.g-4 {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0.25rem !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        /* FIX: Ensure cards don't stack on top of each other */
+        .row.g-4 > [class*="col-"] {
+            padding-right: 0.125rem !important;
+            padding-left: 0.125rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        /* FIX: For 6 stat cards - show 2 per row on mobile to allow text to be visible */
+        .row.g-4 > .col-6 {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+        }
+        
+        .card {
+            border-radius: 4px !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+            height: 100% !important;
+        }
+        
+        .card-body {
+            padding: 0.5rem 0.5rem !important;
+        }
+        
+        .card-header {
+            padding: 0.5rem 0.5rem !important;
+        }
+        
+        .card-header h5 {
+            font-size: 0.7rem !important;
+        }
+        
+        .page-header {
+            padding: 0 0.5rem !important;
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+            align-items: stretch !important;
+        }
+        
+        .page-header h1 {
+            font-size: 1rem !important;
+        }
+        
+        .page-header .btn {
+            width: 100% !important;
+            font-size: 0.75rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        /* FIX: Stat card icon and text sizing - SHOW FULL TEXT */
+        .stat-card .d-flex.align-items-center {
+            gap: 0.4rem !important;
+        }
+        
+        .stat-card .bg-opacity-10.rounded.p-3 {
+            padding: 0.4rem !important;
+            min-width: 32px !important;
+            min-height: 32px !important;
+            max-width: 36px !important;
+            max-height: 36px !important;
+            margin-right: 0.4rem !important;
+            flex-shrink: 0 !important;
+        }
+        
+        .stat-card .bg-opacity-10.rounded.p-3 i {
+            font-size: 0.8rem !important;
+        }
+        
+        .stat-card .flex-grow-1 {
+            min-width: 0 !important;
+            overflow: visible !important;
+        }
+        
+        .stat-card h6 {
+            font-size: 0.55rem !important;
+            margin-bottom: 0.1rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.3px !important;
+            white-space: normal !important;
+            overflow: visible !important;
+            text-overflow: clip !important;
+            word-wrap: break-word !important;
+        }
+        
+        .stat-card h3 {
+            font-size: 0.85rem !important;
+            margin-bottom: 0 !important;
+            white-space: normal !important;
+            overflow: visible !important;
+            text-overflow: clip !important;
+            word-wrap: break-word !important;
+        }
+        
+        /* FIX: Adjust col-6 to handle 2 columns properly */
+        .col-6 {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+        }
+        
+        /* List items */
+        .list-group-item {
+            padding: 0.4rem 0.5rem !important;
+            font-size: 0.7rem !important;
+        }
+        
+        .list-group-item .fw-semibold {
+            font-size: 0.7rem !important;
+        }
+        
+        .list-group-item .badge {
+            font-size: 0.5rem !important;
+        }
+        
+        /* Table adjustments */
+        .table-responsive {
+            font-size: 0.6rem !important;
+        }
+        
+        .table-responsive .table td,
+        .table-responsive .table th {
+            padding: 0.25rem 0.25rem !important;
+        }
+        
+        .table-responsive .badge {
+            font-size: 0.5rem !important;
+        }
+        
+        /* Chart container */
+        .chart-container {
+            height: 200px !important;
+        }
+        
+        /* Status badges */
+        .badge.p-2 {
+            font-size: 0.5rem !important;
+            padding: 0.15rem 0.3rem !important;
+        }
+        
+        /* Row gaps for inner sections */
+        .row.g-2 {
+            --bs-gutter-x: 0.125rem !important;
+        }
+        
+        .row.g-2 > [class*="col-"] {
+            padding-right: 0.0625rem !important;
+            padding-left: 0.0625rem !important;
+        }
+        
+        /* FIX: Prevent cards from overlapping */
+        .row.g-4.mb-4 {
+            margin-bottom: 0.25rem !important;
+        }
+        
+        /* Ensure stat cards are properly spaced */
+        .stat-card {
+            padding: 0 !important;
+        }
+        
+        /* FIX: Make sure stat cards don't overflow */
+        .stat-card .card {
+            margin-bottom: 0 !important;
+        }
+        
+        /* FIX: Stock value text overflow */
+        .stat-card h3.mb-0 {
+            font-size: 0.75rem !important;
+            word-wrap: break-word !important;
+        }
+        
+        /* FIX: Ensure the d-flex doesn't overflow */
+        .stat-card .d-flex {
+            overflow: visible !important;
+        }
+    }
+    
+    /* Very small phones - keep 2 columns but smaller text */
+    @media (max-width: 380px) {
+        .stat-card .bg-opacity-10.rounded.p-3 {
+            padding: 0.3rem !important;
+            min-width: 26px !important;
+            min-height: 26px !important;
+            max-width: 30px !important;
+            max-height: 30px !important;
+        }
+        
+        .stat-card .bg-opacity-10.rounded.p-3 i {
+            font-size: 0.65rem !important;
+        }
+        
+        .stat-card h6 {
+            font-size: 0.45rem !important;
+        }
+        
+        .stat-card h3 {
+            font-size: 0.7rem !important;
+        }
+        
+        .card-body {
+            padding: 0.4rem 0.3rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .row.g-4 {
+            --bs-gutter-x: 0.5rem !important;
+        }
+        
+        .row.g-4 > [class*="col-"] {
+            padding-right: 0.25rem !important;
+            padding-left: 0.25rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 10px !important;
+        }
+        
+        .stat-card .card-body {
+            padding: 1rem 1.25rem !important;
+        }
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 page-header">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">Inventory Dashboard</h1>
+            <p class="text-muted small d-none d-sm-block">Overview of your inventory management</p>
+        </div>
+        <div>
+            <a href="{% url 'inventory:product_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> <span class="d-none d-sm-inline">Add Product</span>
+                <span class="d-inline d-sm-none">Product</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards - FIXED: 6 cards in 2 columns on mobile to show text -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-2 col-md-4 col-6 stat-card">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 rounded p-3 me-3">
+                            <i class="fas fa-boxes text-primary fa-2x"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-muted mb-1">Total Products</h6>
+                            <h3 class="mb-0">{{ total_products }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6 stat-card">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-warning bg-opacity-10 rounded p-3 me-3">
+                            <i class="fas fa-exclamation-triangle text-warning fa-2x"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-muted mb-1">Low Stock</h6>
+                            <h3 class="mb-0">{{ low_stock }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6 stat-card">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-danger bg-opacity-10 rounded p-3 me-3">
+                            <i class="fas fa-times-circle text-danger fa-2x"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-muted mb-1">Out of Stock</h6>
+                            <h3 class="mb-0">{{ out_of_stock }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6 stat-card">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-info bg-opacity-10 rounded p-3 me-3">
+                            <i class="fas fa-tags text-info fa-2x"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-muted mb-1">Categories</h6>
+                            <h3 class="mb-0">{{ total_categories }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6 stat-card">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-success bg-opacity-10 rounded p-3 me-3">
+                            <i class="fas fa-ruler text-success fa-2x"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-muted mb-1">Units</h6>
+                            <h3 class="mb-0">{{ total_units }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-6 stat-card">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-success bg-opacity-10 rounded p-3 me-3">
+                            <i class="fas fa-dollar-sign text-success fa-2x"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-muted mb-1">Stock Value</h6>
+                            <h3 class="mb-0">Ugx {{ stock_value|floatformat:0 }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rest of the dashboard content remains the same -->
+    <div class="row g-4">
+        <!-- Low Stock Products -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>Low Stock Products
+                    </h5>
+                    <a href="{% url 'inventory:product_list' %}?stock=low" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for product in low_stock_products %}
+                        <a href="{% url 'inventory:product_detail' product.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-semibold">{{ product.name }}</div>
+                                    <div class="small text-muted d-none d-sm-block">SKU: {{ product.sku }}</div>
+                                </div>
+                                <div>
+                                    <span class="badge bg-{% if product.quantity == 0 %}danger{% else %}warning{% endif %}">
+                                        {{ product.quantity|floatformat:0 }} in stock
+                                    </span>
+                                    <span class="small text-muted ms-2 d-none d-sm-inline">Reorder: {{ product.reorder_point }}</span>
+                                </div>
+                            </div>
+                        </a>
+                        {% empty %}
+                        <div class="list-group-item text-center py-4 text-muted">
+                            <i class="fas fa-check-circle text-success fa-2x mb-2 d-block"></i>
+                            All products are well stocked!
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expiring Products -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock text-danger me-2"></i>Expiring Soon
+                    </h5>
+                    <span class="badge bg-danger d-none d-sm-inline">Next 30 Days</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for product in expiring_products %}
+                        <a href="{% url 'inventory:product_detail' product.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-semibold">{{ product.name }}</div>
+                                    <div class="small text-muted d-none d-sm-block">Batch: {{ product.batch_number|default:'N/A' }}</div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-{% if product.expiry_date|timeuntil < '7 days' %}danger{% elif product.expiry_date|timeuntil < '14 days' %}warning{% else %}info{% endif %}">
+                                        {{ product.expiry_date|timeuntil }} left
+                                    </span>
+                                    <div class="small text-muted">{{ product.expiry_date|date:'M d, Y' }}</div>
+                                </div>
+                            </div>
+                        </a>
+                        {% empty %}
+                        <div class="list-group-item text-center py-4 text-muted">
+                            <i class="fas fa-check-circle text-success fa-2x mb-2 d-block"></i>
+                            No products expiring soon!
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-2">
+        <!-- Recent Stock Movements -->
+        <div class="col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exchange-alt text-primary me-2"></i>Recent Stock Movements
+                    </h5>
+                    <a href="{% url 'inventory:stock_movements' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Type</th>
+                                    <th class="d-none d-sm-table-cell">Quantity</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for movement in recent_movements %}
+                                <tr>
+                                    <td class="text-truncate" style="max-width: 80px;">{{ movement.product.name }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if movement.movement_type == 'purchase' %}success{% elif movement.movement_type == 'sale' %}danger{% else %}info{% endif %}">
+                                            {{ movement.get_movement_type_display|slice:":6" }}
+                                        </span>
+                                    </td>
+                                    <td class="d-none d-sm-table-cell">{{ movement.quantity }}</td>
+                                    <td>{{ movement.created_at|date:'M d, H:i' }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted">
+                                        No stock movements recorded yet.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Alerts -->
+        <div class="col-lg-5">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bell text-warning me-2"></i>Recent Alerts
+                        <span class="badge bg-danger ms-2">{{ recent_alerts|length }}</span>
+                    </h5>
+                    <a href="{% url 'inventory:alerts' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for alert in recent_alerts %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="fw-semibold">
+                                        <span class="badge bg-{% if alert.severity == 'critical' %}danger{% elif alert.severity == 'warning' %}warning{% else %}info{% endif %} me-1">
+                                            {{ alert.get_severity_display|slice:":3" }}
+                                        </span>
+                                        {{ alert.product.name }}
+                                    </div>
+                                    <div class="small text-muted">{{ alert.message|truncatechars:40 }}</div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="small text-muted">{{ alert.created_at|timesince }} ago</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="list-group-item text-center py-4 text-muted">
+                            <i class="fas fa-check-circle text-success fa-2x mb-2 d-block"></i>
+                            No alerts! Everything looks good.
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Status Pie Chart & Top Products -->
+    <div class="row g-4 mt-2">
+        <div class="col-lg-5">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie text-primary me-2"></i>Product Status Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <div style="position: relative; height: 350px; width: 100%;" class="chart-container">
+                        <canvas id="statusPieChart"></canvas>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
+                        {% for status in status_distribution %}
+                        <div class="text-center">
+                            <span class="badge bg-{% if status.status == 'active' %}success{% elif status.status == 'out_of_stock' %}danger{% elif status.status == 'discontinued' %}secondary{% else %}warning{% endif %} p-2">
+                                {{ status.count }} {{ status.get_status_display|slice:":8" }}
+                            </span>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted">No products found.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar text-primary me-2"></i>Top Moved Products (30 days)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th class="d-none d-sm-table-cell">Movements</th>
+                                    <th>Total Qty</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in top_moved_products %}
+                                <tr>
+                                    <td><strong>{{ product.product__name|truncatechars:20 }}</strong></td>
+                                    <td class="d-none d-sm-table-cell">{{ product.total_movements }}</td>
+                                    <td>{{ product.total_quantity|floatformat:0 }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-3">
+                                        No movements in the last 30 days.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const statusData = [
+        {% for status in status_distribution %}
+        {
+            status: '{{ status.status }}',
+            count: {{ status.count }},
+            label: '{{ status.get_status_display }}',
+            products: [
+                {% for product in status_products|get_item:status.status %}
+                    '{{ product }}',
+                {% endfor %}
+            ]
+        },
+        {% endfor %}
+    ];
+
+    const statusColors = {
+        'active': '#28a745',
+        'out_of_stock': '#dc3545',
+        'discontinued': '#6c757d',
+        'inactive': '#6c757d',
+        'pending': '#ffc107',
+        'expired': '#dc3545',
+        'low_stock': '#ffc107',
+        'in_stock': '#28a745',
+    };
+
+    const labels = statusData.map(item => {
+        const productList = item.products.length > 0 ? item.products.slice(0, 5).join(', ') : '';
+        const count = item.count;
+        return item.products.length > 0 ? 
+            `${item.label} (${count}) - ${productList}${item.products.length > 5 ? '...' : ''}` : 
+            `${item.label} (${count})`;
+    });
+
+    const data = statusData.map(item => item.count);
+    const colors = statusData.map(item => statusColors[item.status] || '#6c757d');
+    const total = data.reduce((a, b) => a + b, 0);
+
+    const ctx = document.getElementById('statusPieChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: colors,
+                borderWidth: 2,
+                borderColor: '#ffffff',
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 10,
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        font: {
+                            size: window.innerWidth < 768 ? 9 : 12,
+                            weight: '500'
+                        },
+                        boxWidth: window.innerWidth < 768 ? 10 : 15
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed;
+                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                            const statusItem = statusData[context.dataIndex];
+                            const productNames = statusItem.products.length > 0 ? 
+                                '\nProducts: ' + statusItem.products.join(', ') : '';
+                            return `${context.label}\nCount: ${value} (${percentage}%)${productNames}`;
+                        }
+                    }
+                }
+            },
+            cutout: '0%',
+        }
+    });
+});
+</script>
+{% endblock %}

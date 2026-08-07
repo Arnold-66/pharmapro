@@ -1,0 +1,26 @@
+Welcome to {{ tenant.company_name }}!
+
+Hello {{ user.get_full_name }},
+
+Your account has been created by your organization administrator.
+
+Your Login Credentials:
+Email: {{ user.email }}
+Password: {{ password }}
+
+IMPORTANT: For security reasons, please change your password after your first login.
+
+Login URL: http://localhost:8000{{ login_url }}
+
+After logging in, please:
+1. Change your password
+2. Update your profile information
+3. Set up your preferences
+
+If you have any questions, please contact your system administrator.
+
+Best regards,
+The {{ tenant.company_name }} Team
+
+---
+© {% now "Y" %} {{ tenant.company_name }}. All rights reserved.

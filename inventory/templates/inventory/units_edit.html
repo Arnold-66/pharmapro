@@ -1,0 +1,153 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Edit {{ unit.name }} - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+        }
+        
+        .col-md-8.col-lg-6 {
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+        
+        .row.justify-content-center {
+            --bs-gutter-x: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+        }
+        
+        .card-header h5 {
+            font-size: 0.85rem !important;
+        }
+        
+        .form-control {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .form-label {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+        
+        .form-text {
+            font-size: 0.6rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+            width: 100% !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .d-flex.gap-2.justify-content-end {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 10px !important;
+        }
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h5 class="mb-0">
+                        <i class="fas fa-edit text-primary me-2"></i>Edit Unit
+                    </h5>
+                    <a href="{% url 'inventory:unit_list' %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> <span class="d-none d-sm-inline">Back</span>
+                        <span class="d-inline d-sm-none">←</span>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="unitForm">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Unit Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="{{ unit.name }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="abbreviation" class="form-label">Abbreviation <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="abbreviation" name="abbreviation" 
+                                   value="{{ unit.abbreviation }}" required>
+                            <div class="form-text">Short form used in displays and reports.</div>
+                        </div>
+
+                        <hr>
+                        <div class="d-flex gap-2 justify-content-end flex-wrap">
+                            <a href="{% url 'inventory:unit_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-save me-1"></i> Update Unit
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('unitForm').addEventListener('submit', function(e) {
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Updating...';
+            btn.disabled = true;
+        });
+    });
+</script>
+{% endblock %}

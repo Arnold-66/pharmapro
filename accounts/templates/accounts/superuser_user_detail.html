@@ -1,0 +1,441 @@
+<!-- accounts/templates/accounts/superuser_user_detail.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== RESET ALL PADDING/MARGINS ON MOBILE ===== */
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0 !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }
+        
+        .card-header h6 {
+            font-size: 0.85rem !important;
+        }
+        
+        .page-header h1 {
+            font-size: 1.1rem !important;
+        }
+        
+        .page-header p {
+            font-size: 0.75rem !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .page-header .btn {
+            font-size: 0.65rem !important;
+            padding: 0.2rem 0.4rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .badge {
+            font-size: 0.6rem !important;
+            padding: 0.2rem 0.35rem !important;
+        }
+        
+        /* Profile image on mobile */
+        .profile-image {
+            width: 80px !important;
+            height: 80px !important;
+            font-size: 2rem !important;
+        }
+        
+        /* Stats on mobile */
+        .stats-row .col-4 h3 {
+            font-size: 1.2rem !important;
+        }
+        
+        .stats-row .col-4 small {
+            font-size: 0.6rem !important;
+        }
+        
+        /* Breadcrumb on mobile */
+        .breadcrumb {
+            font-size: 0.75rem !important;
+            padding: 0.5rem 0 !important;
+        }
+        
+        .breadcrumb-item {
+            font-size: 0.75rem !important;
+        }
+        
+        /* Action buttons on mobile */
+        .action-buttons {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .action-buttons .btn {
+            width: 100% !important;
+        }
+        
+        /* User info on mobile */
+        .user-info-row .col-md-6 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+        
+        /* List group on mobile */
+        .list-group-item {
+            padding: 0.6rem 0.75rem !important;
+        }
+        
+        .list-group-item .d-flex {
+            flex-direction: column !important;
+            gap: 0.25rem !important;
+        }
+        
+        .list-group-item .text-muted.ms-2 {
+            margin-left: 0 !important;
+        }
+        
+        .list-group-item .ms-3 {
+            margin-left: 0 !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0.5rem !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0.25rem !important;
+            padding-left: 0.25rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+    
+    /* ===== COMMON STYLES ===== */
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+    
+    .card-header {
+        background: transparent !important;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .badge {
+        padding: 0.4rem 0.8rem;
+        font-weight: 500;
+    }
+    
+    .list-group-item {
+        border-color: #f0f0f0;
+    }
+    
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .profile-image {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border: 3px solid #fff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .btn-primary {
+        background: #2c3e50;
+        border-color: #2c3e50;
+    }
+    
+    .btn-primary:hover {
+        background: #1a2a3a;
+        border-color: #1a2a3a;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4" style="padding: 0 0.5rem;">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{% url 'accounts:superuser_users' %}">All Users</a></li>
+                    <li class="breadcrumb-item active">{{ viewed_user.get_full_name }}</li>
+                </ol>
+            </nav>
+            <h1 class="h3 mb-0 text-gray-800 fw-bold">{{ viewed_user.get_full_name }}</h1>
+            <p class="text-muted small mb-0 mt-1">@{{ viewed_user.username }}</p>
+        </div>
+        <div class="mt-2 mt-sm-0 d-flex gap-2 action-buttons">
+            <a href="{% url 'accounts:superuser_user_create' %}?edit={{ viewed_user.id }}" class="btn btn-primary btn-sm">
+                <i class="fas fa-edit me-1"></i> Edit User
+            </a>
+            <a href="{% url 'accounts:superuser_users' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left me-1"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- ===== LEFT COLUMN - PROFILE ===== -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        {% if viewed_user.profile_picture %}
+                            <img src="{{ viewed_user.profile_picture.url }}" alt="{{ viewed_user.get_full_name }}" class="rounded-circle profile-image">
+                        {% else %}
+                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto profile-image" style="font-size: 4rem; background: #2c3e50 !important;">
+                                {{ viewed_user.get_full_name|first|upper }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <h4>{{ viewed_user.get_full_name }}</h4>
+                    <p class="text-muted">@{{ viewed_user.username }}</p>
+                    
+                    <div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
+                        {% if is_online %}
+                            <span class="badge bg-success">
+                                <i class="fas fa-circle me-1"></i> Online
+                            </span>
+                        {% else %}
+                            <span class="badge bg-secondary">
+                                <i class="fas fa-circle me-1"></i> Offline
+                            </span>
+                        {% endif %}
+                        {% if viewed_user.is_active %}
+                            <span class="badge bg-success">Active</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row text-start mt-3">
+                        <div class="col-6">
+                            <small class="text-muted d-block">Role</small>
+                            <span class="badge bg-{% if viewed_user.role == 'admin' %}warning{% elif viewed_user.role == 'manager' %}info{% elif viewed_user.role == 'staff' %}secondary{% elif viewed_user.role == 'super_admin' %}danger{% else %}primary{% endif %}">
+                                {{ viewed_user.get_role_display }}
+                            </span>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block">Email Verified</small>
+                            {% if viewed_user.email_verified %}
+                                <span class="badge bg-success">Verified</span>
+                            {% else %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <small class="text-muted d-block">Joined</small>
+                            <strong>{{ viewed_user.created_at|date:"M d, Y" }}</strong>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block">Last Activity</small>
+                            <strong>{{ viewed_user.last_activity|timesince }} ago</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Permissions -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-lock me-2"></i>Permissions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                        {% if viewed_user.can_view %}
+                            <span class="badge bg-primary">View</span>
+                        {% endif %}
+                        {% if viewed_user.can_create %}
+                            <span class="badge bg-success">Create</span>
+                        {% endif %}
+                        {% if viewed_user.can_edit %}
+                            <span class="badge bg-info">Edit</span>
+                        {% endif %}
+                        {% if viewed_user.can_delete %}
+                            <span class="badge bg-danger">Delete</span>
+                        {% endif %}
+                        {% if not viewed_user.can_view and not viewed_user.can_create and not viewed_user.can_edit and not viewed_user.can_delete %}
+                            <span class="text-muted">No permissions assigned</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ===== RIGHT COLUMN - DETAILS ===== -->
+        <div class="col-md-8">
+            <!-- User Info -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>User Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row user-info-row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Full Name</small>
+                                <strong>{{ viewed_user.get_full_name }}</strong>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Email</small>
+                                <strong>{{ viewed_user.email }}</strong>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Phone</small>
+                                <strong>{{ viewed_user.phone|default:"Not provided" }}</strong>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Username</small>
+                                <strong>{{ viewed_user.username }}</strong>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Tenant</small>
+                                <strong>{{ viewed_user.tenant.name|default:"None" }}</strong>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Bio</small>
+                                <p class="mb-0">{{ viewed_user.bio|default:"No bio provided" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Activity Stats -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Activity Statistics</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center stats-row">
+                        <div class="col-4">
+                            <h3>{{ recent_activities }}</h3>
+                            <small class="text-muted">Activities (7 days)</small>
+                        </div>
+                        <div class="col-4">
+                            <h3>{{ activities|length }}</h3>
+                            <small class="text-muted">Recent Activities</small>
+                        </div>
+                        <div class="col-4">
+                            <h3>
+                                {% if is_online %}
+                                    <span class="text-success">Online</span>
+                                {% else %}
+                                    <span class="text-muted">{{ last_seen|timesince }} ago</span>
+                                {% endif %}
+                            </h3>
+                            <small class="text-muted">Status</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                    <h6 class="mb-0"><i class="fas fa-history me-2"></i>Recent Activity</h6>
+                    <span class="badge bg-secondary">{{ activities|length }}</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for activity in activities %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                    <div>
+                                        <i class="fas fa-activity me-2 text-primary"></i>
+                                        <strong>{{ activity.action }}</strong>
+                                        <span class="text-muted ms-2">
+                                            on {{ activity.model_name }}
+                                        </span>
+                                    </div>
+                                    <small class="text-muted">{{ activity.timestamp|timesince }} ago</small>
+                                </div>
+                                <div class="mt-1">
+                                    <small class="text-muted">
+                                        <i class="fas fa-fingerprint me-1"></i>
+                                        ID: {{ activity.object_id }}
+                                    </small>
+                                    {% if activity.ip_address %}
+                                        <small class="text-muted ms-3">
+                                            <i class="fas fa-network-wired me-1"></i>
+                                            {{ activity.ip_address }}
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="list-group-item text-center py-4">
+                                <div class="text-muted">
+                                    <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                                    <p>No activity recorded for this user.</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

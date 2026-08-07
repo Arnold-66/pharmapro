@@ -1,0 +1,495 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Categories - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+        }
+        
+        .row.g-3 {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row.g-3 > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .row.g-4 {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0.25rem !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row.g-4 > [class*="col-"] {
+            padding-right: 0.125rem !important;
+            padding-left: 0.125rem !important;
+        }
+        
+        .col-md-3 {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+        }
+        
+        .card-header h5 {
+            font-size: 0.85rem !important;
+        }
+        
+        .page-header {
+            padding: 0 0.875rem !important;
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+            align-items: stretch !important;
+        }
+        
+        .page-header h1 {
+            font-size: 1.1rem !important;
+        }
+        
+        .page-header .btn {
+            width: 100% !important;
+        }
+        
+        .col-md-4 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+            width: 100% !important;
+        }
+        
+        .table-responsive {
+            font-size: 0.65rem !important;
+        }
+        
+        .table-responsive .table td,
+        .table-responsive .table th {
+            padding: 0.3rem 0.3rem !important;
+            white-space: nowrap !important;
+        }
+        
+        .table-responsive .badge {
+            font-size: 0.5rem !important;
+            padding: 0.15rem 0.3rem !important;
+        }
+        
+        .table-responsive .btn-group .btn {
+            padding: 0.1rem 0.3rem !important;
+            font-size: 0.55rem !important;
+            width: auto !important;
+        }
+        
+        .d-flex.justify-content-between.align-items-center.mt-4 {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+            padding: 0 0.875rem !important;
+        }
+        
+        .pagination {
+            flex-wrap: wrap !important;
+        }
+        
+        .pagination .page-link {
+            padding: 0.25rem 0.5rem !important;
+            font-size: 0.7rem !important;
+        }
+        
+        .btn-group {
+            display: flex !important;
+            gap: 0.125rem !important;
+        }
+        
+        .py-5 .fa-3x {
+            font-size: 2.5rem !important;
+        }
+        
+        .py-5 p {
+            font-size: 0.8rem !important;
+        }
+        
+        .col-md-3 .card .card-body {
+            padding: 0.5rem !important;
+        }
+        
+        .col-md-3 .card .card-body .bg-opacity-10.rounded.p-3 {
+            padding: 0.35rem !important;
+            min-width: 30px !important;
+            min-height: 30px !important;
+        }
+        
+        .col-md-3 .card .card-body .bg-opacity-10.rounded.p-3 i {
+            font-size: 0.85rem !important;
+        }
+        
+        .col-md-3 .card .card-body h6 {
+            font-size: 0.5rem !important;
+        }
+        
+        .col-md-3 .card .card-body h3 {
+            font-size: 0.85rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .row.g-3 {
+            --bs-gutter-x: 0.5rem !important;
+        }
+        
+        .row.g-3 > [class*="col-"] {
+            padding-right: 0.25rem !important;
+            padding-left: 0.25rem !important;
+        }
+        
+        .table-responsive {
+            font-size: 0.75rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 10px !important;
+        }
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 page-header">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">Categories</h1>
+            <p class="text-muted small d-none d-sm-block">Manage product categories with hierarchy</p>
+        </div>
+        <div>
+            <a href="{% url 'inventory:category_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> <span class="d-none d-sm-inline">Add Category</span>
+                <span class="d-inline d-sm-none">Category</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0" 
+                               name="search" placeholder="Search categories..." 
+                               value="{{ search_query }}">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select" name="parent">
+                        <option value="">All Categories</option>
+                        <option value="top">Top Level Only</option>
+                        {% for category in all_categories %}
+                        <option value="{{ category.id }}" {% if parent_filter == category.id|stringformat:'s' %}selected{% endif %}>
+                            {{ category.get_full_path }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search me-1"></i> Filter
+                    </button>
+                    <a href="{% url 'inventory:category_list' %}" class="btn btn-secondary mt-2">
+                        <i class="fas fa-undo me-1"></i> Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Categories Tree -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th style="min-width: 200px;">Category</th>
+                            <th class="d-none d-md-table-cell">Path</th>
+                            <th>Products</th>
+                            <th class="d-none d-sm-table-cell">Subcategories</th>
+                            <th class="d-none d-sm-table-cell">Status</th>
+                            <th class="d-none d-lg-table-cell">Created</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for category in categories %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div style="width: {{ category.get_depth|default:0|add:1|add:15 }}px;">
+                                        {% if category.get_depth > 0 %}
+                                        <span class="text-muted" style="font-size: 10px;">
+                                            {% for i in category.get_depth|default:0|add:1|make_list %}
+                                            ──
+                                            {% endfor %}
+                                            └─
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        {% if category.color %}
+                                        <span class="rounded-circle me-2" style="width: 12px; height: 12px; background-color: {{ category.color }}; display: inline-block;"></span>
+                                        {% endif %}
+                                        <span class="fw-semibold">{{ category.name|truncatechars:15 }}</span>
+                                        {% if category.is_default %}
+                                        <span class="badge bg-primary ms-1 d-none d-sm-inline">Default</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="d-none d-md-table-cell">
+                                <span class="small text-muted">{{ category.get_full_path|truncatechars:20 }}</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-info">{{ category.get_products_count }}</span>
+                            </td>
+                            <td class="d-none d-sm-table-cell">
+                                {% if category.subcategories.count > 0 %}
+                                <span class="badge bg-warning text-dark">{{ category.subcategories.count }}</span>
+                                {% else %}
+                                <span class="text-muted small">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="d-none d-sm-table-cell">
+                                {% if category.is_active %}
+                                <span class="badge bg-success">Active</span>
+                                {% else %}
+                                <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td class="d-none d-lg-table-cell">
+                                <span title="{{ category.created_at|date:'Y-m-d H:i' }}">
+                                    {{ category.created_at|timesince }} ago
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{% url 'inventory:category_edit' category.id %}" class="btn btn-outline-primary" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'inventory:category_delete' category.id %}" class="btn btn-outline-danger" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                    {% if category.subcategories.count > 0 %}
+                                    <button type="button" class="btn btn-outline-info" title="View Subcategories" onclick="toggleSubcategories('{{ category.id }}')">
+                                        <i class="fas fa-chevron-down" id="chevron-{{ category.id }}"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% if category.subcategories.count > 0 %}
+                        <tr id="subcategories-{{ category.id }}" style="display: none;">
+                            <td colspan="7" class="p-0">
+                                <div class="bg-light p-2 p-sm-3">
+                                    <table class="table table-sm table-borderless mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 40%;">Subcategory</th>
+                                                <th style="width: 20%;">Products</th>
+                                                <th style="width: 20%;">Status</th>
+                                                <th style="width: 20%;" class="text-end">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for sub in category.subcategories.all %}
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fas fa-chevron-right text-muted me-2" style="font-size: 10px;"></i>
+                                                        <span>{{ sub.name }}</span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-info">{{ sub.get_products_count }}</span>
+                                                </td>
+                                                <td>
+                                                    {% if sub.is_active %}
+                                                    <span class="badge bg-success">Active</span>
+                                                    {% else %}
+                                                    <span class="badge bg-danger">Inactive</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td class="text-end">
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <a href="{% url 'inventory:category_edit' sub.id %}" class="btn btn-outline-primary">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <a href="{% url 'inventory:category_delete' sub.id %}" class="btn btn-outline-danger">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <i class="fas fa-tags fa-3x text-muted mb-3 d-block"></i>
+                                <p class="text-muted mb-0">No categories found.</p>
+                                <p class="text-muted small">Try adjusting your search or <a href="{% url 'inventory:category_create' %}">create a new category</a>.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Statistics -->
+    <div class="row g-4 mt-3">
+        <div class="col-md-3 col-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 rounded p-3 me-3">
+                            <i class="fas fa-tags text-primary fa-2x"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Total Categories</h6>
+                            <h3 class="mb-0">{{ total_categories }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-success bg-opacity-10 rounded p-3 me-3">
+                            <i class="fas fa-folder-open text-success fa-2x"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Active Categories</h6>
+                            <h3 class="mb-0">{{ active_categories }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-info bg-opacity-10 rounded p-3 me-3">
+                            <i class="fas fa-sitemap text-info fa-2x"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Subcategories</h6>
+                            <h3 class="mb-0">{{ total_subcategories }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-warning bg-opacity-10 rounded p-3 me-3">
+                            <i class="fas fa-layer-group text-warning fa-2x"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Max Depth</h6>
+                            <h3 class="mb-0">{{ max_depth }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelector('input[name="search"]').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            this.closest('form').submit();
+        }
+    });
+
+    document.querySelector('select[name="parent"]').addEventListener('change', function() {
+        this.closest('form').submit();
+    });
+
+    function toggleSubcategories(categoryId) {
+        const subRow = document.getElementById(`subcategories-${categoryId}`);
+        const chevron = document.getElementById(`chevron-${categoryId}`);
+        
+        if (subRow.style.display === 'none') {
+            subRow.style.display = 'table-row';
+            chevron.className = 'fas fa-chevron-up';
+        } else {
+            subRow.style.display = 'none';
+            chevron.className = 'fas fa-chevron-down';
+        }
+    }
+</script>
+{% endblock %}

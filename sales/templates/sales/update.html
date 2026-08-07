@@ -1,0 +1,607 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Update Sale #{{ sale.invoice_number }} - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<style>
+    /* Reset all padding/margins on mobile for true edge-to-edge */
+    @media (max-width: 768px) {
+        /* Override container padding completely */
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+        }
+        
+        /* Remove all gutter spacing */
+        .row.g-3 {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        /* Remove padding from all columns */
+        .row.g-3 > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        /* Remove padding from col-lg-8 mx-auto */
+        .col-lg-8.mx-auto {
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+        
+        /* Make cards edge-to-edge */
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        /* Remove body padding */
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        /* Card header adjustments */
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+        }
+        
+        .card-header h5 {
+            font-size: 0.85rem !important;
+        }
+        
+        /* Form adjustments */
+        .form-control, .form-select {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .form-label {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+        
+        .form-text {
+            font-size: 0.6rem !important;
+        }
+        
+        /* Alert summary - stack vertically */
+        .alert-info .row {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .alert-info .col-md-4 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            text-align: center !important;
+        }
+        
+        /* Payment history table */
+        .table-responsive {
+            font-size: 0.7rem !important;
+        }
+        
+        .table-responsive .table td,
+        .table-responsive .table th {
+            padding: 0.3rem 0.3rem !important;
+            white-space: nowrap !important;
+        }
+        
+        /* Payment form - stack all fields */
+        .col-md-4, .col-md-3 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        /* Buttons */
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+            width: 100% !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .btn-group {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0.25rem !important;
+        }
+        
+        /* Action buttons at bottom */
+        .mt-3 .btn {
+            width: 100% !important;
+        }
+        
+        /* Alert warning */
+        .alert-warning {
+            font-size: 0.8rem !important;
+            padding: 0.5rem !important;
+        }
+        
+        /* Input group */
+        .input-group-text {
+            font-size: 0.75rem !important;
+            padding: 0.25rem 0.4rem !important;
+        }
+        
+        /* Display text */
+        .display-6 {
+            font-size: 1.25rem !important;
+        }
+        
+        /* Modal adjustments */
+        .modal-dialog {
+            margin: 1rem !important;
+        }
+        
+        /* SweetAlert2 adjustments */
+        .swal2-popup {
+            font-size: 0.85rem !important;
+        }
+        
+        .swal2-title {
+            font-size: 1.2rem !important;
+        }
+    }
+    
+    /* Medium screens - reduce padding */
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .row.g-3 {
+            --bs-gutter-x: 0.5rem !important;
+        }
+        
+        .row.g-3 > [class*="col-"] {
+            padding-right: 0.25rem !important;
+            padding-left: 0.25rem !important;
+        }
+    }
+    
+    /* Desktop - normal spacing */
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 10px !important;
+        }
+    }
+    
+    /* Card hover effect */
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+    
+    /* Input readonly styling */
+    #change_amount {
+        cursor: not-allowed;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h5 class="mb-0">
+                        <i class="fas fa-edit text-primary me-2"></i>Update Sale #{{ sale.invoice_number }}
+                    </h5>
+                    <a href="{% url 'sales:sale_detail' sale.id %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> <span class="d-none d-sm-inline">Back</span>
+                        <span class="d-inline d-sm-none">←</span>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <!-- Sale Summary -->
+                    <div class="alert alert-info">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <small class="text-muted d-block">Total Amount</small>
+                                <strong class="text-success">Ugx {{ sale.total_amount|floatformat:2 }}</strong>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted d-block">Paid Amount</small>
+                                <strong class="text-primary">Ugx {{ sale.paid_amount|floatformat:2 }}</strong>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted d-block">Balance Due</small>
+                                <strong class="text-{% if sale.balance_due > 0 %}danger{% else %}success{% endif %}">
+                                    Ugx {{ sale.balance_due|floatformat:2 }}
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Existing Payments -->
+                    {% if payments %}
+                    <div class="mb-4">
+                        <h6 class="text-muted fw-bold mb-3">
+                            <i class="fas fa-history me-2"></i>Payment History
+                        </h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Amount</th>
+                                        <th>Method</th>
+                                        <th class="d-none d-md-table-cell">Payer</th>
+                                        <th class="d-none d-lg-table-cell">Reference</th>
+                                        <th class="d-none d-sm-table-cell">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for payment in payments %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td class="text-success fw-bold">Ugx {{ payment.amount|floatformat:2 }}</td>
+                                        <td>{{ payment.get_method_display|slice:":10" }}</td>
+                                        <td class="d-none d-md-table-cell">{{ payment.payer_name|default:'-' }}</td>
+                                        <td class="d-none d-lg-table-cell">{{ payment.reference|default:'-' }}</td>
+                                        <td class="d-none d-sm-table-cell">{{ payment.created_at|date:'M d, H:i' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr class="fw-bold">
+                                        <td colspan="5" class="text-end">Total Paid:</td>
+                                        <td class="text-success">Ugx {{ sale.paid_amount|floatformat:2 }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    <hr>
+                    {% endif %}
+
+                    <!-- Update Status Section -->
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="update_status">
+
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label for="payment_status" class="form-label">Payment Status</label>
+                                <select class="form-select" id="payment_status" name="payment_status">
+                                    <option value="paid" {% if sale.payment_status == 'paid' %}selected{% endif %}>Paid</option>
+                                    <option value="partial" {% if sale.payment_status == 'partial' %}selected{% endif %}>Partially Paid</option>
+                                    <option value="unpaid" {% if sale.payment_status == 'unpaid' %}selected{% endif %}>Unpaid</option>
+                                    <option value="refunded" {% if sale.payment_status == 'refunded' %}selected{% endif %}>Refunded</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Update Status
+                            </button>
+                            {% if sale.balance_due > 0 %}
+                            <button type="button" class="btn btn-success" id="markAsPaidBtn">
+                                <i class="fas fa-check-circle me-1"></i> Mark as Paid
+                            </button>
+                            {% endif %}
+                        </div>
+                    </form>
+
+                    <hr>
+
+                    <!-- Add Payment Section -->
+                    <h6 id="addPayment" class="text-muted fw-bold mb-3">
+                        <i class="fas fa-money-bill-wave me-2"></i>Add Payment
+                    </h6>
+                    <form method="post" id="paymentForm" action="">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_payment">
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="amount" class="form-label">Amount Due <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="amount" name="amount" 
+                                       placeholder="0.00" step="0.01" min="0.01" 
+                                       value="{{ sale.balance_due|floatformat:2 }}" required
+                                       oninput="calculateChange()">
+                                <div class="form-text">Balance: Ugx {{ sale.balance_due|floatformat:2 }}</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="amount_received" class="form-label">Amount Received</label>
+                                <input type="number" class="form-control" id="amount_received" 
+                                       placeholder="0.00" step="0.01" min="0"
+                                       oninput="calculateChange()">
+                                <div class="form-text">Enter amount received from customer</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="change_amount" class="form-label">Change</label>
+                                <input type="number" class="form-control" id="change_amount" 
+                                       placeholder="0.00" step="0.01" readonly
+                                       style="background-color: #e9ecef; font-weight: bold;">
+                                <div class="form-text text-success" id="changeText">Change to return</div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="method" class="form-label">Method <span class="text-danger">*</span></label>
+                                <select class="form-select" id="method" name="method" required>
+                                    <option value="cash">Cash</option>
+                                    <option value="credit_card">Credit Card</option>
+                                    <option value="debit_card">Debit Card</option>
+                                    <option value="bank_transfer">Bank Transfer</option>
+                                    <option value="cheque">Cheque</option>
+                                    <option value="mobile_money">Mobile Money</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="payer_name" class="form-label">Payer Name</label>
+                                <input type="text" class="form-control" id="payer_name" name="payer_name" 
+                                       placeholder="Name of person paying" value="{{ sale.customer_name|default:'' }}">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="reference" class="form-label">Reference</label>
+                                <input type="text" class="form-control" id="reference" name="reference" 
+                                       placeholder="Reference number">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="payment_notes" class="form-label">Payment Notes</label>
+                                <input type="text" class="form-control" id="payment_notes" name="notes" 
+                                       placeholder="Payment notes">
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-plus me-1"></i> Add Payment
+                                </button>
+                                {% if sale.balance_due > 0 %}
+                                <button type="button" class="btn btn-info" id="fillBalanceBtn">
+                                    <i class="fas fa-calculator me-1"></i> Fill Balance
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </form>
+
+                    <hr>
+
+                    <!-- Cancel Sale -->
+                    <div class="mt-3">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Warning:</strong> Cancelling this sale will restore all stock items.
+                        </div>
+                        <button type="button" class="btn btn-danger" id="cancelSaleBtn">
+                            <i class="fas fa-times-circle me-1"></i> Cancel Sale
+                        </button>
+                        <form method="post" id="cancelForm" style="display: none;" action="">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="cancel">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const balanceDue = parseFloat('{{ sale.balance_due|floatformat:2 }}');
+        const amountInput = document.getElementById('amount');
+        const amountReceivedInput = document.getElementById('amount_received');
+        const changeInput = document.getElementById('change_amount');
+        const changeText = document.getElementById('changeText');
+        
+        // Calculate change function
+        window.calculateChange = function() {
+            const due = parseFloat(amountInput.value) || 0;
+            const received = parseFloat(amountReceivedInput.value) || 0;
+            const change = received - due;
+            
+            if (change > 0) {
+                changeInput.value = change.toFixed(2);
+                changeInput.style.color = '#28a745';
+                changeText.textContent = `Change to return: Ugx ${change.toFixed(2)}`;
+                changeText.className = 'text-success';
+            } else if (change < 0) {
+                changeInput.value = Math.abs(change).toFixed(2);
+                changeInput.style.color = '#dc3545';
+                changeText.textContent = `Amount still due: Ugx ${Math.abs(change).toFixed(2)}`;
+                changeText.className = 'text-danger';
+            } else {
+                changeInput.value = '0.00';
+                changeInput.style.color = '#6c757d';
+                changeText.textContent = 'Exact payment, no change';
+                changeText.className = 'text-muted';
+            }
+        };
+        
+        // Set initial amount received to balance due
+        amountReceivedInput.value = balanceDue.toFixed(2);
+        calculateChange();
+        
+        // Fill balance button
+        document.getElementById('fillBalanceBtn').addEventListener('click', function() {
+            if (balanceDue > 0) {
+                amountInput.value = balanceDue.toFixed(2);
+                amountReceivedInput.value = balanceDue.toFixed(2);
+                calculateChange();
+                
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Balance Filled',
+                    text: `Amount set to Ugx ${balanceDue.toFixed(2)}`,
+                    timer: 2000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            }
+        });
+
+        // Mark as Paid button
+        document.getElementById('markAsPaidBtn').addEventListener('click', function() {
+            Swal.fire({
+                title: 'Mark as Paid?',
+                html: `
+                    <div class="text-start">
+                        <p><strong>Sale #{{ sale.invoice_number }}</strong></p>
+                        <p>Total Amount: <strong>Ugx {{ sale.total_amount|floatformat:2 }}</strong></p>
+                        <p>Already Paid: <strong>Ugx {{ sale.paid_amount|floatformat:2 }}</strong></p>
+                        <p>Balance Due: <strong class="text-danger">Ugx {{ sale.balance_due|floatformat:2 }}</strong></p>
+                        <hr>
+                        <p>This will:</p>
+                        <ul class="text-start">
+                            <li>✅ Add a payment for the remaining balance</li>
+                            <li>✅ Mark the sale as fully paid</li>
+                        </ul>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#dc3545',
+                confirmButtonText: 'Yes, mark as paid',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    amountInput.value = balanceDue.toFixed(2);
+                    amountReceivedInput.value = balanceDue.toFixed(2);
+                    calculateChange();
+                    
+                    const payerName = document.getElementById('payer_name');
+                    if (!payerName.value) {
+                        payerName.value = '{{ sale.customer_name|default:"Walk-in Customer" }}';
+                    }
+                    
+                    document.getElementById('paymentForm').submit();
+                    
+                    Swal.fire({
+                        title: 'Processing...',
+                        text: 'Marking sale as paid...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                }
+            });
+        });
+
+        // Cancel sale
+        document.getElementById('cancelSaleBtn').addEventListener('click', function() {
+            Swal.fire({
+                title: '⚠️ Cancel Sale?',
+                html: `
+                    <div class="text-start">
+                        <p><strong>Sale #{{ sale.invoice_number }}</strong></p>
+                        <p><strong>Total Amount:</strong> Ugx {{ sale.total_amount|floatformat:2 }}</p>
+                        <p><strong>Paid Amount:</strong> Ugx {{ sale.paid_amount|floatformat:2 }}</p>
+                        <p>This action will:</p>
+                        <ul class="text-start">
+                            <li>✅ Restore all stock items</li>
+                            <li>❌ Cancel this sale permanently</li>
+                        </ul>
+                        <p class="text-danger"><strong>This action cannot be undone!</strong></p>
+                    </div>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, cancel sale',
+                cancelButtonText: 'No, keep it',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Cancelling Sale...',
+                        text: 'Please wait while we process your request.',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    document.getElementById('cancelForm').submit();
+                }
+            });
+        });
+
+        // Validate payment amount
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            const amount = parseFloat(amountInput.value);
+            const received = parseFloat(amountReceivedInput.value) || 0;
+            
+            if (!amount || amount <= 0) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Amount',
+                    text: 'Please enter a valid payment amount.',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+                return false;
+            }
+            
+            if (amount > balanceDue) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Amount Exceeds Balance',
+                    text: `Payment amount cannot exceed the balance due of Ugx ${balanceDue.toFixed(2)}`,
+                    timer: 4000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+                return false;
+            }
+            
+            if (received < amount) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Insufficient Payment',
+                    text: `Amount received (Ugx ${received.toFixed(2)}) is less than amount due (Ugx ${amount.toFixed(2)})`,
+                    timer: 4000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+                return false;
+            }
+        });
+
+        // Show messages
+        {% if messages %}
+            {% for message in messages %}
+                Swal.fire({
+                    icon: '{% if message.tags == "success" %}success{% elif message.tags == "error" %}error{% else %}info{% endif %}',
+                    title: '{{ message }}',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            {% endfor %}
+        {% endif %}
+    });
+</script>
+{% endblock %}

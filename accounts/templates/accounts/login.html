@@ -1,0 +1,490 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PharmaPro · Sign in</title>
+
+    <!-- Tailwind + Google Fonts + Font Awesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+    <style>
+        /* reset – no rounded edges, no glass, no gradients, no shadows */
+        * {
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef1f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1.5rem;
+        }
+
+        /* plain card – straight corners, solid white, no blur, no hover transform */
+        .login-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 420px;
+            border: 1px solid #d0d7de;
+            box-shadow: none;
+            transition: none;
+        }
+
+        /* brand block – solid dark, no gradient, no rounded */
+        .brand-block {
+            background: #1e293b;
+            padding: 1.8rem 1.5rem;
+            text-align: center;
+            border-bottom: 2px solid #b0b8c4;
+        }
+
+        .brand-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: #334155;
+            padding: 0.4rem 1rem 0.4rem 0.8rem;
+            border: 1px solid #4b5a6f;
+        }
+
+        .brand-icon i {
+            font-size: 1.6rem;
+            color: #cbd5e1;
+        }
+
+        .brand-icon span {
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: -0.02em;
+            color: #f1f5f9;
+        }
+
+        .brand-sub {
+            display: inline-block;
+            margin-top: 0.5rem;
+            background: #334155;
+            padding: 0.15rem 1.2rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #cbd5e1;
+            border: 1px solid #4b5a6f;
+            letter-spacing: 0.3px;
+        }
+
+        /* form body – no rounded, plain spacing */
+        .form-body {
+            padding: 2rem 1.8rem 1.8rem;
+        }
+
+        /* headings – plain */
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.2rem;
+        }
+
+        .form-sub {
+            color: #475569;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* input groups – sharp corners, solid borders, no shadows */
+        .input-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.3rem;
+            letter-spacing: 0.02em;
+        }
+
+        .input-wrap {
+            position: relative;
+            border: 1px solid #b9c2ce;
+            background: #f8fafc;
+            transition: border 0.15s;
+        }
+
+        .input-wrap:focus-within {
+            border-color: #1e293b;
+            background: #ffffff;
+        }
+
+        .input-wrap input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            padding: 0.65rem 0.8rem 0.65rem 2.4rem;
+            font-size: 0.9rem;
+            color: #0f172a;
+            outline: none;
+        }
+
+        .input-wrap .input-icon {
+            position: absolute;
+            left: 0.65rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7a8f;
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+
+        .input-wrap .toggle-pwd {
+            position: absolute;
+            right: 0.4rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6b7a8f;
+            cursor: pointer;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.9rem;
+        }
+
+        .input-wrap .toggle-pwd:hover {
+            color: #0f172a;
+            background: #e9edf2;
+        }
+
+        /* checkbox – plain square */
+        .check-plain {
+            appearance: none;
+            width: 1.1rem;
+            height: 1.1rem;
+            border: 1px solid #94a3b8;
+            background: white;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-right: 0.3rem;
+        }
+
+        .check-plain:checked {
+            background: #1e293b;
+            border-color: #1e293b;
+            position: relative;
+        }
+
+        .check-plain:checked::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 0.65rem;
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* button – flat, sharp, no gradient */
+        .btn-login {
+            background: #1e293b;
+            border: 1px solid #0f172a;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.7rem 1rem;
+            width: 100%;
+            cursor: pointer;
+            transition: background 0.15s;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.25rem;
+        }
+
+        .btn-login:hover {
+            background: #0f172a;
+        }
+
+        .btn-login:active {
+            background: #0b111e;
+        }
+
+        /* error & messages – flat, no rounded */
+        .error-box {
+            background: #fee9e7;
+            border: 1px solid #b91c1c;
+            color: #991b1b;
+            padding: 0.5rem 0.8rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .msg-box {
+            padding: 0.5rem 0.8rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            border: 1px solid;
+        }
+
+        .msg-success {
+            background: #e6f7e6;
+            border-color: #1e7e34;
+            color: #14532d;
+        }
+
+        .msg-error {
+            background: #fee9e7;
+            border-color: #b91c1c;
+            color: #991b1b;
+        }
+
+        .msg-info {
+            background: #e6f0fa;
+            border-color: #1e4b7a;
+            color: #1e3a5f;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* footer – plain */
+        .footer-divider {
+            border-top: 1px solid #d0d7de;
+            margin: 1.8rem 0 1rem;
+        }
+
+        .footer-link {
+            font-weight: 600;
+            color: #1e293b;
+            border-bottom: 1px solid transparent;
+        }
+
+        .footer-link:hover {
+            border-bottom-color: #1e293b;
+        }
+
+        .badge-plain {
+            background: #f1f4f9;
+            border: 1px solid #d0d7de;
+            padding: 0.15rem 0.9rem;
+            font-size: 0.65rem;
+            color: #334155;
+        }
+
+        .flex-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+
+        .text-xs { font-size: 0.7rem; }
+        .text-sm { font-size: 0.85rem; }
+        .text-muted { color: #475569; }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+
+        <!-- brand – flat, no rounded, solid dark -->
+        <div class="brand-block">
+            <div class="brand-icon">
+                <i class="fas fa-pills"></i>
+                <span>PharmaPro</span>
+            </div>
+            <div class="brand-sub">
+                <i class="fas fa-notes-medical mr-1"></i> pharmacy · inventory
+            </div>
+        </div>
+
+        <!-- form body -->
+        <div class="form-body">
+
+            <div class="form-title">Welcome back</div>
+            <div class="form-sub">sign in to your dashboard</div>
+
+            <!-- error container (js) -->
+            <div id="errorMessage" class="error-box hidden">
+                <i class="fas fa-circle-exclamation"></i>
+                <span id="errorText">Invalid credentials. Please try again.</span>
+            </div>
+
+            <!-- django messages -->
+            {% if messages %}
+                {% for message in messages %}
+                <div class="msg-box 
+                    {% if message.tags == 'success' %}msg-success{% elif message.tags == 'error' %}msg-error{% else %}msg-info{% endif %}">
+                    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                    <span>{{ message }}</span>
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- login form -->
+            <form method="post" action="{% url 'accounts:login' %}" id="loginForm">
+                {% csrf_token %}
+
+                <!-- username -->
+                <div class="input-group">
+                    <label for="username"><i class="far fa-user-circle mr-1"></i>Email or username</label>
+                    <div class="input-wrap">
+                        <span class="input-icon"><i class="fas fa-envelope"></i></span>
+                        <input type="text" id="username" name="username" placeholder="you@company.com" required autofocus />
+                    </div>
+                </div>
+
+                <!-- password -->
+                <div class="input-group">
+                    <div class="flex justify-between items-center">
+                        <label for="password"><i class="fas fa-key mr-1"></i>Password</label>
+                        <a href="{% url 'accounts:password_reset' %}" class="text-sm text-muted hover:text-[#0f172a] transition-colors">forgot?</a>
+                    </div>
+                    <div class="input-wrap">
+                        <span class="input-icon"><i class="fas fa-lock"></i></span>
+                        <input type="password" id="password" name="password" placeholder="• • • • • • • •" required />
+                        <button type="button" id="togglePwdBtn" class="toggle-pwd" aria-label="toggle password">
+                            <i class="fas fa-eye" id="pwdIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- remember + ssl -->
+                <div class="flex items-center justify-between mt-1">
+                    <label class="flex items-center text-sm text-muted cursor-pointer select-none">
+                        <input type="checkbox" name="remember_me" class="check-plain" />
+                        <span>Keep me signed in</span>
+                    </label>
+                    <span class="badge-plain flex items-center gap-1">
+                        <i class="fas fa-lock"></i> SSL
+                    </span>
+                </div>
+
+                <!-- submit -->
+                <button type="submit" id="loginBtn" class="btn-login mt-3">
+                    <i class="fas fa-arrow-right-to-bracket"></i>
+                    <span>Sign in</span>
+                </button>
+            </form>
+
+            <!-- footer -->
+            <div class="footer-divider"></div>
+            <div class="text-center text-sm">
+                <span class="text-muted">New here?</span>
+                <a href="{% url 'accounts:register' %}" class="footer-link inline-flex items-center gap-1">
+                    Create Organization <i class="fas fa-arrow-right text-xs"></i>
+                </a>
+                <div class="flex items-center justify-center gap-4 text-xs text-muted mt-3">
+                    <span><i class="fas fa-shield-alt mr-1"></i> 256‑bit</span>
+                    <span class="w-px h-4 bg-[#d0d7de]"></span>
+                    <span><i class="fas fa-headset mr-1"></i> 24/7</span>
+                    <span class="w-px h-4 bg-[#d0d7de]"></span>
+                    <span><i class="fas fa-cloud mr-1"></i> HIPAA</span>
+                </div>
+            </div>
+
+        </div> <!-- end form-body -->
+    </div> <!-- end login-card -->
+
+    <script>
+        (function() {
+            // toggle password visibility
+            const pwdInput = document.getElementById('password');
+            const toggleBtn = document.getElementById('togglePwdBtn');
+            const pwdIcon = document.getElementById('pwdIcon');
+
+            if (toggleBtn && pwdInput) {
+                toggleBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const isPwd = pwdInput.type === 'password';
+                    pwdInput.type = isPwd ? 'text' : 'password';
+                    pwdIcon.className = isPwd ? 'fas fa-eye-slash' : 'fas fa-eye';
+                });
+            }
+
+            // error helper
+            function showError(message) {
+                const errorDiv = document.getElementById('errorMessage');
+                const errorText = document.getElementById('errorText');
+                if (errorDiv && errorText) {
+                    errorText.textContent = message || 'Invalid credentials. Please try again.';
+                    errorDiv.classList.remove('hidden');
+                    clearTimeout(window._errTimer);
+                    window._errTimer = setTimeout(() => {
+                        errorDiv.classList.add('hidden');
+                    }, 6000);
+                }
+            }
+
+            // ajax submit
+            const form = document.getElementById('loginForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const btn = document.getElementById('loginBtn');
+                    const originalHtml = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> signing in…';
+                    btn.disabled = true;
+
+                    const formData = new FormData(form);
+
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = data.redirect_url || '/dashboard/';
+                        } else {
+                            showError(data.message || 'Invalid credentials. Please try again.');
+                            btn.innerHTML = originalHtml;
+                            btn.disabled = false;
+                        }
+                    })
+                    .catch(err => {
+                        showError('Connection error. Please try again.');
+                        btn.innerHTML = originalHtml;
+                        btn.disabled = false;
+                    });
+                });
+            }
+
+            // auto-hide django messages after 6s
+            const msgDivs = document.querySelectorAll('.msg-box');
+            if (msgDivs.length) {
+                setTimeout(() => {
+                    msgDivs.forEach(el => el.style.display = 'none');
+                }, 7000);
+            }
+        })();
+    </script>
+
+</body>
+</html>

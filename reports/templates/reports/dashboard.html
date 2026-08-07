@@ -1,0 +1,622 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    /* ===== FIXED LAYOUT & MOBILE RESPONSIVE ===== */
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }
+        
+        .card-header h5 {
+            font-size: 0.85rem !important;
+        }
+        
+        .card-header .btn {
+            font-size: 0.65rem !important;
+            padding: 0.15rem 0.4rem !important;
+        }
+        
+        .page-header h1 {
+            font-size: 1.1rem !important;
+            word-break: break-word !important;
+        }
+        
+        .page-header p {
+            font-size: 0.75rem !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .page-header .btn {
+            font-size: 0.7rem !important;
+            padding: 0.25rem 0.6rem !important;
+        }
+        
+        /* ===== STATS CARDS GRID - 2 PER ROW ===== */
+        .stats-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 0.5rem !important;
+            padding: 0 0.5rem !important;
+        }
+        
+        .stats-grid .col-xl-3,
+        .stats-grid .col-md-6 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+        
+        .stats-grid .stat-card {
+            border-radius: 8px !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .stats-grid .stat-card .card-body {
+            padding: 0.5rem !important;
+        }
+        
+        .stats-grid .stat-card h3 {
+            font-size: 0.95rem !important;
+        }
+        
+        .stats-grid .stat-card h6 {
+            font-size: 0.55rem !important;
+            margin-bottom: 0.1rem !important;
+        }
+        
+        .stats-grid .stat-card small {
+            font-size: 0.55rem !important;
+        }
+        
+        .stats-grid .stat-icon {
+            width: 32px !important;
+            height: 32px !important;
+        }
+        
+        .stats-grid .stat-icon i {
+            font-size: 1.2rem !important;
+        }
+        
+        .chart-container {
+            height: 180px !important;
+        }
+        
+        .list-group-item {
+            padding: 0.4rem 0.6rem !important;
+            font-size: 0.75rem !important;
+        }
+        
+        .list-group-item .badge {
+            font-size: 0.55rem !important;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .stats-grid {
+            gap: 0.35rem !important;
+            padding: 0 0.3rem !important;
+        }
+        
+        .stats-grid .stat-card h3 {
+            font-size: 0.85rem !important;
+        }
+        
+        .stats-grid .stat-card h6 {
+            font-size: 0.5rem !important;
+        }
+        
+        .stats-grid .stat-icon {
+            width: 28px !important;
+            height: 28px !important;
+        }
+        
+        .stats-grid .stat-icon i {
+            font-size: 1rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .stats-grid .col-xl-3 {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1) !important;
+    }
+    
+    .card-header {
+        background: transparent !important;
+        border-bottom: 2px solid #f0f0f0 !important;
+    }
+    
+    .stat-card {
+        transition: all 0.3s ease;
+        border-radius: 12px !important;
+        cursor: default;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+    .chart-container {
+        position: relative;
+        height: 300px;
+    }
+    
+    /* Toast Custom Styles */
+    .toast-custom {
+        border-radius: 12px !important;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15) !important;
+        min-width: 300px !important;
+        max-width: 400px !important;
+        border: none !important;
+    }
+    
+    .toast-custom .toast-body {
+        padding: 1rem 1.2rem !important;
+        font-weight: 500 !important;
+    }
+    
+    .toast-custom .btn-close {
+        filter: brightness(0) invert(1);
+        opacity: 0.8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- ===== PAGE HEADER - IMPROVED ===== -->
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4" style="padding: 0 0.5rem;">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800 fw-bold">Reports Dashboard</h1>
+            <p class="text-muted small mb-0 mt-1">Overview of your business performance</p>
+        </div>
+        <div class="mt-2 mt-sm-0">
+            <a href="{% url 'reports:generate_report' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> Generate Report
+            </a>
+        </div>
+    </div>
+
+    <!-- ===== STATISTICS CARDS - GRID ON MOBILE ===== -->
+    <div class="row stats-grid g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card shadow-sm stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Total Revenue</h6>
+                            <h3 class="mb-0 text-success">Ugx {{ total_revenue|floatformat:0 }}</h3>
+                            <small class="text-muted">{{ total_sales }} sales</small>
+                        </div>
+                        <div class="stat-icon bg-success bg-opacity-10">
+                            <i class="fas fa-arrow-up text-success fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card shadow-sm stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Today's Sales</h6>
+                            <h3 class="mb-0 text-primary">Ugx {{ today_sales|floatformat:0 }}</h3>
+                            <small class="text-muted">{{ today_count }} transactions</small>
+                        </div>
+                        <div class="stat-icon bg-primary bg-opacity-10">
+                            <i class="fas fa-calendar-day text-primary fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card shadow-sm stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Monthly Sales</h6>
+                            <h3 class="mb-0 text-info">Ugx {{ monthly_sales|floatformat:0 }}</h3>
+                            <small class="text-muted">{{ monthly_count }} transactions</small>
+                        </div>
+                        <div class="stat-icon bg-info bg-opacity-10">
+                            <i class="fas fa-calendar-alt text-info fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card shadow-sm stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Stock Value</h6>
+                            <h3 class="mb-0 text-warning">Ugx {{ total_stock_value|floatformat:0 }}</h3>
+                            <small class="text-muted">{{ total_products }} products</small>
+                        </div>
+                        <div class="stat-icon bg-warning bg-opacity-10">
+                            <i class="fas fa-boxes text-warning fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row g-4 mb-4">
+        <!-- Monthly Trend -->
+        <div class="col-xl-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Monthly Sales Trend</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="monthlyTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sales by Status -->
+        <div class="col-xl-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Sales by Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Second Row of Charts -->
+    <div class="row g-4 mb-4">
+        <!-- Top Products -->
+        <div class="col-xl-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0"><i class="fas fa-crown me-2"></i>Top Selling Products</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="topProductsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Payment Methods -->
+        <div class="col-xl-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0"><i class="fas fa-credit-card me-2"></i>Payment Methods</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="paymentChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Recent Sales</h5>
+                    <a href="{% url 'sales:sale_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for sale in recent_sales %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="badge bg-secondary">{{ sale.invoice_number }}</span>
+                                <span class="ms-2">{{ sale.customer_name|default:"Walk-in Customer" }}</span>
+                            </div>
+                            <div>
+                                <span class="text-success fw-bold">Ugx {{ sale.total_amount|floatformat:2 }}</span>
+                                <span class="badge bg-{% if sale.payment_status == 'paid' %}success{% elif sale.payment_status == 'partial' %}warning{% else %}danger{% endif %} ms-2">
+                                    {{ sale.get_payment_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-shopping-cart fa-2x mb-2 d-block"></i>
+                            No recent sales
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-exchange-alt me-2"></i>Recent Stock Movements</h5>
+                    <a href="{% url 'inventory:stock_movements' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for movement in recent_movements %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="badge bg-{% if movement.movement_type == 'purchase' %}success{% elif movement.movement_type == 'sale' %}danger{% else %}info{% endif %}">
+                                    {{ movement.get_movement_type_display }}
+                                </span>
+                                <span class="ms-2">{{ movement.product.name }}</span>
+                            </div>
+                            <div>
+                                <span class="{% if movement.movement_type == 'purchase' %}text-success{% else %}text-danger{% endif %} fw-bold">
+                                    {% if movement.movement_type == 'purchase' %}+{% else %}-{% endif %}{{ movement.quantity|floatformat:0 }}
+                                </span>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-boxes fa-2x mb-2 d-block"></i>
+                            No recent stock movements
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Monthly Trend Chart
+    const monthlyTrendData = {{ monthly_trend|safe }};
+    if (monthlyTrendData.length > 0) {
+        const ctx = document.getElementById('monthlyTrendChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: monthlyTrendData.map(item => {
+                    const date = new Date(item.month);
+                    return date.toLocaleString('default', { month: 'short', year: 'numeric' });
+                }),
+                datasets: [{
+                    label: 'Revenue',
+                    data: monthlyTrendData.map(item => item.total || 0),
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }, {
+                    label: 'Transactions',
+                    data: monthlyTrendData.map(item => item.count || 0),
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'Ugx ' + value.toLocaleString();
+                            }
+                        }
+                    },
+                    y1: {
+                        position: 'right',
+                        beginAtZero: true,
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Status Chart
+    const statusData = {{ sales_by_status|safe }};
+    if (statusData.length > 0) {
+        const ctx = document.getElementById('statusChart').getContext('2d');
+        const colors = {
+            'paid': '#28a745',
+            'partial': '#ffc107',
+            'unpaid': '#dc3545',
+            'refunded': '#6c757d'
+        };
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: statusData.map(item => item.payment_status.charAt(0).toUpperCase() + item.payment_status.slice(1)),
+                datasets: [{
+                    data: statusData.map(item => item.count),
+                    backgroundColor: statusData.map(item => colors[item.payment_status] || '#6c757d'),
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    // Top Products Chart
+    const topProductsData = {{ top_products|safe }};
+    if (topProductsData.length > 0) {
+        const ctx = document.getElementById('topProductsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: topProductsData.map(item => item.product__name || 'Unknown'),
+                datasets: [{
+                    label: 'Revenue',
+                    data: topProductsData.map(item => item.total_revenue || 0),
+                    backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'Ugx ' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Payment Methods Chart
+    const paymentData = {{ sales_by_payment|safe }};
+    if (paymentData.length > 0) {
+        const ctx = document.getElementById('paymentChart').getContext('2d');
+        const colors = {
+            'cash': '#28a745',
+            'credit_card': '#007bff',
+            'debit_card': '#17a2b8',
+            'mobile_money': '#fd7e14',
+            'bank_transfer': '#6f42c1',
+            'other': '#6c757d'
+        };
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: paymentData.map(item => item.method.replace('_', ' ').charAt(0).toUpperCase() + item.method.replace('_', ' ').slice(1)),
+                datasets: [{
+                    data: paymentData.map(item => item.total || 0),
+                    backgroundColor: paymentData.map(item => colors[item.method] || '#6c757d'),
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                return context.label + ': Ugx ' + context.parsed.toLocaleString() + ' (' + percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

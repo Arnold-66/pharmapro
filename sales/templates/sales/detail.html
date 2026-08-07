@@ -1,0 +1,650 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Sale #{{ sale.invoice_number }} - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Reset all padding/margins on mobile for true edge-to-edge */
+    @media (max-width: 768px) {
+        /* Override container padding completely */
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+        }
+        
+        /* Remove all gutter spacing */
+        .row.g-4 {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        /* Remove padding from all columns */
+        .row.g-4 > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        /* Make cards edge-to-edge */
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        /* Remove body padding */
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        /* Card header adjustments */
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+        }
+        
+        .card-header h5 {
+            font-size: 0.85rem !important;
+        }
+        
+        /* Breadcrumb adjustments */
+        .breadcrumb {
+            padding: 0.5rem 0.875rem !important;
+            margin-bottom: 0.5rem !important;
+            background: transparent !important;
+        }
+        
+        .breadcrumb-item {
+            font-size: 0.7rem !important;
+        }
+        
+        /* Sale header card */
+        .sale-header-card .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .sale-header-card h1 {
+            font-size: 1rem !important;
+        }
+        
+        .sale-header-card .badge {
+            font-size: 0.6rem !important;
+            padding: 0.2rem 0.4rem !important;
+        }
+        
+        .sale-header-card .bg-primary.bg-opacity-10.rounded.p-3 {
+            padding: 0.5rem !important;
+            min-width: 36px !important;
+            min-height: 36px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        
+        .sale-header-card .bg-primary.bg-opacity-10.rounded.p-3 i {
+            font-size: 1.2rem !important;
+        }
+        
+        /* Summary cards - force 2 columns */
+        .row.g-3 > [class*="col-"] {
+            padding-right: 2px !important;
+            padding-left: 2px !important;
+        }
+        
+        .row.g-3 {
+            --bs-gutter-x: 0.25rem !important;
+            --bs-gutter-y: 0.25rem !important;
+            margin-right: -2px !important;
+            margin-left: -2px !important;
+        }
+        
+        /* Financial summary cards */
+        .bg-light.rounded.p-3 {
+            padding: 0.5rem 0.25rem !important;
+            border-radius: 4px !important;
+        }
+        
+        .bg-light.rounded.p-3 .small.text-muted {
+            font-size: 0.55rem !important;
+        }
+        
+        .bg-light.rounded.p-3 .h5 {
+            font-size: 0.8rem !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .bg-light.rounded.p-3 .h5.mb-0 {
+            font-size: 0.8rem !important;
+        }
+        
+        /* Table adjustments */
+        .table-responsive {
+            font-size: 0.7rem !important;
+        }
+        
+        .table-responsive .table td,
+        .table-responsive .table th {
+            padding: 0.3rem 0.3rem !important;
+            white-space: nowrap !important;
+        }
+        
+        .table-responsive .badge {
+            font-size: 0.55rem !important;
+            padding: 0.15rem 0.3rem !important;
+        }
+        
+        .table-responsive .btn-sm {
+            padding: 0.1rem 0.3rem !important;
+            font-size: 0.6rem !important;
+        }
+        
+        .table-responsive code {
+            font-size: 0.6rem !important;
+        }
+        
+        .table-responsive .fw-semibold {
+            font-size: 0.7rem !important;
+        }
+        
+        .table-responsive .text-muted small {
+            font-size: 0.6rem !important;
+        }
+        
+        /* Hide less important columns on mobile */
+        .d-none-mobile {
+            display: none !important;
+        }
+        
+        /* Customer info card */
+        .customer-info .fw-semibold {
+            font-size: 0.85rem !important;
+        }
+        
+        .customer-info .text-muted.small {
+            font-size: 0.7rem !important;
+        }
+        
+        /* Change badge styling */
+        .badge.fs-6.p-2 {
+            font-size: 0.65rem !important;
+            padding: 0.2rem 0.4rem !important;
+        }
+        
+        /* Payment status badges */
+        .sale-header-card .d-flex.flex-wrap.gap-2 {
+            gap: 0.25rem !important;
+        }
+        
+        /* Footer buttons */
+        .btn-group .btn {
+            padding: 0.2rem 0.5rem !important;
+            font-size: 0.7rem !important;
+        }
+    }
+    
+    /* Medium screens - reduce padding */
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .row.g-4 {
+            --bs-gutter-x: 0.5rem !important;
+        }
+        
+        .row.g-4 > [class*="col-"] {
+            padding-right: 0.25rem !important;
+            padding-left: 0.25rem !important;
+        }
+    }
+    
+    /* Desktop - normal spacing */
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 10px !important;
+        }
+    }
+    
+    /* Keep card hover effect */
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+    
+    /* Ensure consistent icon sizing */
+    .icon-wrapper {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+    }
+    
+    /* Financial summary card improvements */
+    .summary-card .bg-light {
+        transition: all 0.2s ease;
+    }
+    
+    .summary-card .bg-light:hover {
+        transform: scale(1.02);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    /* Change card highlight */
+    .change-card {
+        transition: all 0.3s ease;
+    }
+    
+    .change-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'sales:dashboard' %}">Sales</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'sales:sale_list' %}">All Sales</a></li>
+            <li class="breadcrumb-item active">{{ sale.invoice_number }}</li>
+        </ol>
+    </nav>
+
+    <!-- Sale Header -->
+    <div class="card shadow-sm mb-4 sale-header-card">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 rounded p-3 me-3 icon-wrapper">
+                            <i class="fas fa-file-invoice text-primary fa-2x"></i>
+                        </div>
+                        <div>
+                            <h1 class="h3 mb-1">Sale #{{ sale.invoice_number }}</h1>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span class="badge bg-{% if sale.payment_status == 'paid' %}success{% elif sale.payment_status == 'partial' %}warning{% elif sale.payment_status == 'unpaid' %}danger{% else %}secondary{% endif %}">
+                                    {{ sale.get_payment_status_display }}
+                                </span>
+                                <span class="badge bg-{% if sale.delivery_status == 'delivered' %}success{% elif sale.delivery_status == 'shipped' %}info{% elif sale.delivery_status == 'pending' %}warning{% else %}secondary{% endif %}">
+                                    {{ sale.get_delivery_status_display }}
+                                </span>
+                                <span class="badge bg-secondary">{{ sale.sale_date|date:'M d, Y H:i' }}</span>
+                                
+                                <!-- CHANGE DISPLAY - Using stored change_amount from database -->
+                                {% if sale.change_amount > 0 %}
+                                <span class="badge bg-success fs-6 p-2">
+                                    <i class="fas fa-arrow-left me-1"></i>
+                                    Change: Ugx {{ sale.change_amount|floatformat:2 }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <div class="btn-group" role="group">
+                        <a href="{% url 'sales:sale_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Customer Info -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm customer-info">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0"><i class="fas fa-user me-2"></i>Customer</h5>
+                </div>
+                <div class="card-body">
+                    <div class="fw-semibold">{{ sale.customer_name|default:"Walk-in Customer" }}</div>
+                    <div class="text-muted small">{{ sale.customer_phone|default:'No phone provided' }}</div>
+                    <div class="text-muted small">{{ sale.shipping_address|default:'No address provided' }}</div>
+                    <div class="mt-2">
+                        <span class="badge bg-light text-dark">Due: {{ sale.due_date|date:'M d, Y' }}</span>
+                    </div>
+                    {% if sale.notes %}
+                    <div class="mt-2">
+                        <small class="text-muted">Notes: {{ sale.notes }}</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary with All Prices - Shows change from database -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm summary-card">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Financial Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <!-- Subtotal -->
+                        <div class="col-6 col-md-3">
+                            <div class="bg-light rounded p-3 text-center">
+                                <div class="small text-muted">Subtotal</div>
+                                <div class="h5 mb-0 text-primary">Ugx {{ sale.subtotal|floatformat:2 }}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tax -->
+                        <div class="col-6 col-md-3">
+                            <div class="bg-light rounded p-3 text-center">
+                                <div class="small text-muted">Tax</div>
+                                <div class="h5 mb-0 text-info">Ugx {{ sale.tax_amount|floatformat:2 }}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Discount -->
+                        <div class="col-6 col-md-3">
+                            <div class="bg-light rounded p-3 text-center">
+                                <div class="small text-muted">Discount</div>
+                                <div class="h5 mb-0 text-warning">Ugx {{ sale.discount_amount|floatformat:2 }}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Total Amount -->
+                        <div class="col-6 col-md-3">
+                            <div class="bg-light rounded p-3 text-center border border-success">
+                                <div class="small text-muted">Total Amount</div>
+                                <div class="h5 mb-0 text-success fw-bold">Ugx {{ sale.total_amount|floatformat:2 }}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Amount Received -->
+                        <div class="col-6 col-md-3">
+                            <div class="bg-light rounded p-3 text-center">
+                                <div class="small text-muted">Amount Received</div>
+                                <div class="h5 mb-0 text-primary">Ugx {{ sale.paid_amount|floatformat:2 }}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Change Card - ALWAYS SHOWS change_amount from database -->
+                        <div class="col-6 col-md-3">
+                            <div class="{% if sale.change_amount > 0 %}bg-success bg-opacity-10 border border-success{% else %}bg-light{% endif %} rounded p-3 text-center change-card">
+                                <div class="small text-muted">
+                                    <i class="fas fa-arrow-left me-1"></i> Change to Return
+                                </div>
+                                <div class="h5 mb-0 {% if sale.change_amount > 0 %}text-success{% else %}text-muted{% endif %} fw-bold">
+                                    Ugx {{ sale.change_amount|floatformat:2 }}
+                                </div>
+                                <div class="small {% if sale.change_amount > 0 %}text-success{% else %}text-muted{% endif %}">
+                                    <i class="fas fa-money-bill-wave me-1"></i> 
+                                    {% if sale.change_amount > 0 %}Return to customer{% else %}No change{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Items -->
+                        <div class="col-6 col-md-3">
+                            <div class="bg-light rounded p-3 text-center">
+                                <div class="small text-muted">Items</div>
+                                <div class="h5 mb-0">{{ total_items }}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Total Quantity -->
+                        <div class="col-6 col-md-3">
+                            <div class="bg-light rounded p-3 text-center">
+                                <div class="small text-muted">Total Quantity</div>
+                                <div class="h5 mb-0">{{ total_quantity|floatformat:0 }}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tax Rate -->
+                        <div class="col-6 col-md-3">
+                            <div class="bg-light rounded p-3 text-center">
+                                <div class="small text-muted">Tax Rate</div>
+                                <div class="h5 mb-0">{{ sale.tax_rate|default:18 }}%</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Balance Due (only show if there's a balance) -->
+                        {% if sale.balance_due > 0 %}
+                        <div class="col-6 col-md-3">
+                            <div class="bg-danger bg-opacity-10 rounded p-3 text-center border border-danger">
+                                <div class="small text-muted">
+                                    <i class="fas fa-exclamation-triangle me-1"></i> Balance Due
+                                </div>
+                                <div class="h5 mb-0 text-danger fw-bold">
+                                    Ugx {{ sale.balance_due|floatformat:2 }}
+                                </div>
+                                <div class="small text-danger">
+                                    <i class="fas fa-exclamation-circle me-1"></i> 
+                                    Amount due from customer
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Show "Settled" when fully paid with no change -->
+                        {% if sale.balance_due == 0 and sale.change_amount == 0 %}
+                        <div class="col-6 col-md-3">
+                            <div class="bg-light rounded p-3 text-center border border-secondary">
+                                <div class="small text-muted">
+                                    <i class="fas fa-check-circle me-1"></i> Status
+                                </div>
+                                <div class="h5 mb-0 text-muted fw-bold">
+                                    ✅ Settled
+                                </div>
+                                <div class="small text-muted">
+                                    Fully paid
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Overpaid Status -->
+                        {% if sale.balance_due < 0 %}
+                        <div class="col-6 col-md-3">
+                            <div class="bg-success bg-opacity-10 rounded p-3 text-center border border-success">
+                                <div class="small text-muted">
+                                    <i class="fas fa-check-circle me-1"></i> Status
+                                </div>
+                                <div class="h5 mb-0 text-success fw-bold">
+                                    ✅ Overpaid
+                                </div>
+                                <div class="small text-success">
+                                    <i class="fas fa-arrow-left me-1"></i> 
+                                    Change: Ugx {{ sale.change_amount|floatformat:2 }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items with Unit Prices -->
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Items</h5>
+                    <span class="badge bg-primary">{{ total_items }} items</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Product</th>
+                                    <th class="d-none d-sm-table-cell">Unit</th>
+                                    <th class="text-center">Qty</th>
+                                    <th class="text-end d-none d-md-table-cell">Unit Price</th>
+                                    <th class="text-end d-none d-sm-table-cell">Discount</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <span class="fw-semibold">{{ item.product.name }}</span>
+                                        <br>
+                                        <small class="text-muted d-none d-sm-inline">{{ item.product.barcode|default:'' }}</small>
+                                    </td>
+                                    <td class="d-none d-sm-table-cell">{{ item.notes|default:'Unit' }}</td>
+                                    <td class="text-center">{{ item.quantity|floatformat:0 }}</td>
+                                    <td class="text-end d-none d-md-table-cell">Ugx {{ item.unit_price|floatformat:2 }}</td>
+                                    <td class="text-end text-warning d-none d-sm-table-cell">Ugx {{ item.discount|floatformat:2 }}</td>
+                                    <td class="text-end fw-bold">Ugx {{ item.total_price|floatformat:2 }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">No items in this sale.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="bg-light fw-bold">
+                                <tr>
+                                    <td colspan="5" class="text-end d-none d-sm-table-cell">Subtotal:</td>
+                                    <td colspan="4" class="text-end d-sm-none">Subtotal:</td>
+                                    <td class="text-end">Ugx {{ sale.subtotal|floatformat:2 }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5" class="text-end d-none d-sm-table-cell">Discount:</td>
+                                    <td colspan="4" class="text-end d-sm-none">Discount:</td>
+                                    <td class="text-end text-warning">- Ugx {{ sale.discount_amount|floatformat:2 }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5" class="text-end d-none d-sm-table-cell">Tax:</td>
+                                    <td colspan="4" class="text-end d-sm-none">Tax:</td>
+                                    <td class="text-end text-info">+ Ugx {{ sale.tax_amount|floatformat:2 }}</td>
+                                </tr>
+                                <tr class="border-top">
+                                    <td colspan="5" class="text-end fs-5 d-none d-sm-table-cell">Total:</td>
+                                    <td colspan="4" class="text-end fs-5 d-sm-none">Total:</td>
+                                    <td class="text-end fs-5 text-success">Ugx {{ sale.total_amount|floatformat:2 }}</td>
+                                </tr>
+                                <!-- Add change row if there's change -->
+                                {% if sale.change_amount > 0 %}
+                                <tr class="bg-success bg-opacity-10">
+                                    <td colspan="5" class="text-end fw-bold text-success d-none d-sm-table-cell">
+                                        <i class="fas fa-arrow-left me-1"></i> Change to Return:
+                                    </td>
+                                    <td colspan="4" class="text-end fw-bold text-success d-sm-none">
+                                        <i class="fas fa-arrow-left me-1"></i> Change:
+                                    </td>
+                                    <td class="text-end fw-bold text-success fs-5">
+                                        Ugx {{ sale.change_amount|floatformat:2 }}
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payments -->
+        <div class="col-12" id="payments">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Payments</h5>
+                    <div>
+                        <span class="badge bg-success me-2">Paid: Ugx {{ sale.paid_amount|floatformat:2 }}</span>
+                        {% if sale.change_amount > 0 %}
+                        <span class="badge bg-warning text-dark">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Change: Ugx {{ sale.change_amount|floatformat:2 }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Amount</th>
+                                    <th>Method</th>
+                                    <th class="d-none d-md-table-cell">Payer Name</th>
+                                    <th class="d-none d-lg-table-cell">Reference</th>
+                                    <th class="d-none d-sm-table-cell">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in payments %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td class="text-success fw-bold">Ugx {{ payment.amount|floatformat:2 }}</td>
+                                    <td>
+                                        <span class="badge bg-info">{{ payment.get_method_display }}</span>
+                                    </td>
+                                    <td class="d-none d-md-table-cell">{{ payment.payer_name|default:'-' }}</td>
+                                    <td class="d-none d-lg-table-cell">{{ payment.reference|default:'-' }}</td>
+                                    <td class="d-none d-sm-table-cell">{{ payment.created_at|date:'M d, H:i' }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">No payments recorded.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="bg-light fw-bold">
+                                <tr>
+                                    <td colspan="4" class="text-end d-none d-sm-table-cell">Total Paid:</td>
+                                    <td colspan="3" class="text-end d-sm-none">Total Paid:</td>
+                                    <td colspan="2" class="text-success">Ugx {{ sale.paid_amount|floatformat:2 }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="text-end d-none d-sm-table-cell">
+                                        {% if sale.change_amount > 0 %}
+                                            <i class="fas fa-arrow-left me-1"></i> Change to Return:
+                                        {% elif sale.balance_due > 0 %}
+                                            <i class="fas fa-exclamation-triangle me-1"></i> Balance Due:
+                                        {% else %}
+                                            <i class="fas fa-check-circle me-1"></i> Status:
+                                        {% endif %}
+                                    </td>
+                                    <td colspan="3" class="text-end d-sm-none">
+                                        {% if sale.change_amount > 0 %}
+                                            <i class="fas fa-arrow-left me-1"></i> Change:
+                                        {% elif sale.balance_due > 0 %}
+                                            <i class="fas fa-exclamation-triangle me-1"></i> Due:
+                                        {% else %}
+                                            <i class="fas fa-check-circle me-1"></i> Status:
+                                        {% endif %}
+                                    </td>
+                                    <td colspan="2" class="
+                                        {% if sale.change_amount > 0 %}text-success{% elif sale.balance_due > 0 %}text-danger{% else %}text-muted{% endif %}">
+                                        {% if sale.change_amount > 0 %}
+                                            <span class="fw-bold fs-5">Ugx {{ sale.change_amount|floatformat:2 }}</span>
+                                            <small class="d-block text-success d-none d-sm-block">💰 Change to return to customer</small>
+                                        {% elif sale.balance_due > 0 %}
+                                            <span class="fw-bold">Ugx {{ sale.balance_due|floatformat:2 }}</span>
+                                            <small class="d-block text-danger d-none d-sm-block">⚠️ Amount due from customer</small>
+                                        {% else %}
+                                            ✅ Fully Paid
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

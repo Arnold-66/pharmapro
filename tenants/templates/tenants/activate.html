@@ -1,0 +1,43 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-play me-2"></i> Activate Tenant</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        You are about to activate <strong>{{ tenant.name }}</strong>.
+                    </div>
+                    
+                    <p>This will:</p>
+                    <ul>
+                        <li>Allow all users to login again</li>
+                        <li>Set subscription status to active</li>
+                        <li>Create a new 30-day subscription if needed</li>
+                    </ul>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-play"></i> Activate Tenant
+                            </button>
+                            <a href="{% url 'tenants:detail' tenant.id %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

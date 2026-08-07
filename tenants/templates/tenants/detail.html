@@ -1,0 +1,507 @@
+<!-- tenants/templates/tenants/detail.html -->
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Tenant Header -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-building me-2"></i> {{ tenant.name }}
+                    </h5>
+                    <div>
+                        <span class="badge {% if tenant.subscription_status == 'active' %}bg-success{% elif tenant.subscription_status == 'trial' %}bg-info{% elif tenant.subscription_status == 'suspended' %}bg-warning{% elif tenant.subscription_status == 'expired' %}bg-danger{% else %}bg-secondary{% endif %}">
+                            {{ tenant.get_status_display }}
+                        </span>
+                        <a href="{% url 'tenants:list' %}" class="btn btn-light btn-sm ms-2">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Company:</strong> {{ tenant.company_name }}</p>
+                            <p><strong>Email:</strong> {{ tenant.company_email }}</p>
+                            <p><strong>Phone:</strong> {{ tenant.company_phone }}</p>
+                            <p><strong>Address:</strong> {{ tenant.company_address }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Plan:</strong> {{ tenant.get_plan_display }}</p>
+                            <p><strong>Created:</strong> {{ tenant.created_at|date:"M d, Y" }}</p>
+                            <p><strong>Days Left:</strong> {{ tenant.get_days_until_expiry }} days</p>
+                            <p><strong>Storage:</strong> {{ tenant.storage_used|filesizeformat }} / {{ tenant.max_storage|filesizeformat }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Users</h5>
+                    <h2 class="mb-0">{{ total_users }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Products</h5>
+                    <h2 class="mb-0">{{ total_products }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Sales</h5>
+                    <h2 class="mb-0">{{ total_sales }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Revenue</h5>
+                    <h2 class="mb-0">UGX {{ total_revenue|floatformat:0 }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-users me-2"></i> Users ({{ total_users }})</h5>
+                    <div>
+                        <a href="{% url 'accounts:superuser_user_create' %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> Add User
+                        </a>
+                        <button class="btn btn-outline-primary btn-sm" onclick="refreshUsers()">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="usersTable">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Plan/Subscription</th>
+                                    <th>Status</th>
+                                    <th>Last Activity</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if user.profile_picture %}
+                                                <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="rounded-circle me-2" width="40" height="40">
+                                            {% else %}
+                                                <div class="bg-secondary rounded-circle me-2 d-flex align-items-center justify-content-center" style="width:40px;height:40px;color:white;">
+                                                    {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                                                </div>
+                                            {% endif %}
+                                            <div>
+                                                <strong>{{ user.get_full_name }}</strong>
+                                                {% if user.is_online %}
+                                                    <span class="badge bg-success ms-1">Online</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        <span class="badge {% if user.role == 'admin' %}bg-danger{% elif user.role == 'manager' %}bg-primary{% elif user.role == 'staff' %}bg-info{% else %}bg-secondary{% endif %}">
+                                            {{ user.get_role_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if user.tenant %}
+                                            {{ user.tenant.get_plan_display }}
+                                            <small class="d-block text-muted">
+                                                {{ user.tenant.get_subscription_days_left }} days left
+                                            </small>
+                                        {% else %}
+                                            <span class="text-muted">No tenant</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if user.is_active %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small>{{ user.last_activity|timesince }} ago</small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <!-- FIXED: Use superuser URLs for all actions -->
+                                            <a href="{% url 'accounts:superuser_user_detail' user.id %}" class="btn btn-info" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'accounts:superuser_user_create' %}?edit={{ user.id }}" class="btn btn-primary" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button class="btn {% if user.is_active %}btn-warning{% else %}btn-success{% endif %}" 
+                                                    onclick="toggleUserStatus('{{ user.id }}')" title="Toggle Status">
+                                                <i class="fas {% if user.is_active %}fa-pause{% else %}fa-play{% endif %}"></i>
+                                            </button>
+                                            <button class="btn btn-danger" onclick="deleteUser('{{ user.id }}', '{{ user.get_full_name }}')" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">
+                                        <i class="fas fa-users fa-3x text-muted"></i>
+                                        <p class="mt-2">No users found for this tenant.</p>
+                                        <a href="{% url 'accounts:superuser_user_create' %}" class="btn btn-primary">
+                                            <i class="fas fa-plus"></i> Create First User
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscription Logs Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-history me-2"></i> Subscription Logs</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in subscription_logs %}
+                                <tr>
+                                    <td>{{ log.created_at|date:"M d, Y H:i" }}</td>
+                                    <td>
+                                        <span class="badge {% if log.action == 'activated' %}bg-success{% elif log.action == 'suspended' %}bg-warning{% elif log.action == 'cancelled' %}bg-danger{% else %}bg-info{% endif %}">
+                                            {{ log.action }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <pre class="mb-0" style="font-size:12px;">{{ log.details|pprint }}</pre>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">No subscription logs found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions Card -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i> Tenant Management Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-grid gap-2">
+                                {% if tenant.subscription_status == 'suspended' %}
+                                    <a href="{% url 'tenants:activate' tenant.id %}" class="btn btn-success">
+                                        <i class="fas fa-play"></i> Activate Tenant
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'tenants:suspend' tenant.id %}" class="btn btn-warning">
+                                        <i class="fas fa-pause"></i> Suspend Tenant
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-danger" onclick="deleteTenant()">
+                                    <i class="fas fa-trash"></i> Delete Tenant (All Data)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<!-- Delete Tenant Modal -->
+<div class="modal fade" id="deleteTenantModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Delete Tenant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <strong>Warning!</strong> This action cannot be undone.
+                </div>
+                <p>You are about to delete <strong>{{ tenant.name }}</strong> and all associated data including:</p>
+                <ul>
+                    <li>All users</li>
+                    <li>All products</li>
+                    <li>All sales records</li>
+                    <li>All inventory items</li>
+                    <li>All settings</li>
+                    <li>All files and media</li>
+                </ul>
+                <p>Type <strong>{{ tenant.name }}</strong> to confirm:</p>
+                <input type="text" id="deleteConfirmInput" class="form-control" placeholder="Type tenant name here...">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="confirmDelete()" disabled id="deleteConfirmBtn">
+                    <i class="fas fa-trash"></i> Delete Permanently
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Status Toggle Modal -->
+<div class="modal fade" id="userStatusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Status Change</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to change this user's status?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="confirmUserStatus()">Yes, Change</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete User Modal -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Delete User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="deleteUserName"></strong>?</p>
+                <p class="text-muted small">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="confirmUserDelete()">
+                    <i class="fas fa-trash"></i> Delete User
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Delete Tenant Functions
+function deleteTenant() {
+    const modal = new bootstrap.Modal(document.getElementById('deleteTenantModal'));
+    modal.show();
+}
+
+document.getElementById('deleteConfirmInput').addEventListener('input', function() {
+    const btn = document.getElementById('deleteConfirmBtn');
+    btn.disabled = this.value !== '{{ tenant.name }}';
+});
+
+function confirmDelete() {
+    const input = document.getElementById('deleteConfirmInput');
+    if (input.value === '{{ tenant.name }}') {
+        // Submit the delete form
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{% url "tenants:delete" tenant.id %}';
+        const csrf = document.createElement('input');
+        csrf.type = 'hidden';
+        csrf.name = 'csrfmiddlewaretoken';
+        csrf.value = getCookie('csrftoken');
+        form.appendChild(csrf);
+        const confirm = document.createElement('input');
+        confirm.type = 'hidden';
+        confirm.name = 'confirm';
+        confirm.value = '{{ tenant.name }}';
+        form.appendChild(confirm);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Toggle User Status
+let userStatusData = null;
+
+function toggleUserStatus(userId) {
+    userStatusData = userId;
+    const modal = new bootstrap.Modal(document.getElementById('userStatusModal'));
+    modal.show();
+}
+
+function confirmUserStatus() {
+    if (!userStatusData) return;
+    const userId = userStatusData;
+    
+    fetch('/accounts/admin/users/' + userId + '/toggle-active/', {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': getCookie('csrftoken'),
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while changing user status.');
+    });
+}
+
+// Delete User
+let deleteUserData = null;
+
+function deleteUser(userId, userName) {
+    deleteUserData = userId;
+    document.getElementById('deleteUserName').textContent = userName;
+    const modal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
+    modal.show();
+}
+
+function confirmUserDelete() {
+    if (!deleteUserData) return;
+    const userId = deleteUserData;
+    
+    fetch('/accounts/admin/users/' + userId + '/delete/', {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': getCookie('csrftoken'),
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while deleting the user.');
+    });
+}
+
+// Refresh Users
+function refreshUsers() {
+    window.location.reload();
+}
+
+// Auto-refresh online status every 30 seconds
+function updateOnlineStatus() {
+    fetch('/accounts/update-online-status/', {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+        body: new URLSearchParams({
+            'is_online': 'true'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Just update the online indicators silently
+            const onlineBadges = document.querySelectorAll('.badge.bg-success');
+            onlineBadges.forEach(badge => {
+                if (badge.textContent.trim() === 'Online') {
+                    // Keep it
+                }
+            });
+        }
+    })
+    .catch(error => console.error('Error updating online status:', error));
+}
+
+// Update online status every 30 seconds
+setInterval(updateOnlineStatus, 30000);
+</script>
+{% endblock %}

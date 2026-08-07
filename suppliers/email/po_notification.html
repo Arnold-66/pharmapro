@@ -1,0 +1,99 @@
+<!-- suppliers/templates/suppliers/email/po_notification.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Purchase Order {{ po.po_number }} - {{ action|upper }}</title>
+    <style>
+        body { font-family: 'Inter', Arial, sans-serif; line-height: 1.6; color: #0f172a; margin: 0; padding: 0; background: #eef1f5; }
+        .container { max-width: 600px; margin: 20px auto; padding: 0; background: #ffffff; border: 1px solid #d0d7de; }
+        .header { background: #1e293b; padding: 30px 20px; text-align: center; border-bottom: 2px solid #b0b8c4; }
+        .header h1 { margin: 0; font-size: 24px; color: #f1f5f9; font-weight: 700; }
+        .header .brand-icon { display: inline-block; background: #334155; padding: 8px 16px; border: 1px solid #4b5a6f; margin-bottom: 10px; }
+        .header .brand-icon span { color: #cbd5e1; font-size: 20px; font-weight: 600; }
+        .content { padding: 30px; background: #ffffff; }
+        .content h2 { font-size: 20px; color: #0f172a; font-weight: 600; margin-top: 0; }
+        .content p { color: #475569; font-size: 15px; }
+        .status-badge { display: inline-block; padding: 4px 16px; font-weight: 600; border: 1px solid; }
+        .status-badge.submitted { background: #fefce8; border-color: #f59e0b; color: #92400e; }
+        .status-badge.approved { background: #e6f7e6; border-color: #1e7e34; color: #14532d; }
+        .status-badge.rejected { background: #fee9e7; border-color: #b91c1c; color: #991b1b; }
+        .status-badge.ordered { background: #e6f0fa; border-color: #1e4b7a; color: #1e3a5f; }
+        .status-badge.received { background: #e6f7e6; border-color: #1e7e34; color: #14532d; }
+        .details-box { background: #f8fafc; border: 1px solid #d0d7de; padding: 20px; margin: 20px 0; }
+        .details-box p { margin: 8px 0; }
+        .button { display: inline-block; padding: 12px 30px; background: #1e293b; color: white; text-decoration: none; font-weight: 600; border: 1px solid #0f172a; transition: background 0.15s; }
+        .button:hover { background: #0f172a; }
+        .footer { text-align: center; padding: 20px; background: #f8fafc; border-top: 1px solid #d0d7de; }
+        .footer p { margin: 5px 0; color: #94a3b8; font-size: 12px; }
+        .divider { border-top: 1px solid #d0d7de; margin: 25px 0; }
+        .text-center { text-align: center; }
+        .mt-20 { margin-top: 20px; }
+        .mb-20 { margin-bottom: 20px; }
+        .text-muted { color: #475569; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="brand-icon">
+                <span>🏥 PharmaPro</span>
+            </div>
+            <h1>Purchase Order Notification</h1>
+        </div>
+        <div class="content">
+            <h2>Hello{% if po.created_by %}, {{ po.created_by.get_full_name }}{% endif %}</h2>
+            <p>
+                <strong>Purchase Order {{ po.po_number }}</strong> has been 
+                <span class="status-badge {{ action }}">
+                    {{ action|upper }}
+                </span>
+            </p>
+            
+            <div class="details-box">
+                <p><strong>PO Number:</strong> {{ po.po_number }}</p>
+                <p><strong>Supplier:</strong> {{ po.supplier.name }}</p>
+                <p><strong>Total Amount:</strong> Ugx {{ po.total_amount|floatformat:2 }}</p>
+                <p><strong>Status:</strong> {{ po.get_status_display }}</p>
+                <p><strong>Created By:</strong> {{ po.created_by.get_full_name|default:po.created_by.username }}</p>
+                {% if po.approved_by %}
+                    <p><strong>Approved By:</strong> {{ po.approved_by.get_full_name|default:po.approved_by.username }}</p>
+                {% endif %}
+                <p><strong>Created At:</strong> {{ po.created_at|date:"Y-m-d H:i" }}</p>
+                {% if po.expected_delivery_date %}
+                    <p><strong>Expected Delivery:</strong> {{ po.expected_delivery_date|date:"Y-m-d" }}</p>
+                {% endif %}
+            </div>
+            
+            <div class="text-center mt-20 mb-20">
+                <a href="{{ protocol }}://{{ domain }}{{ po_url }}" class="button">
+                    View Purchase Order
+                </a>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <p class="text-muted" style="font-size: 13px;">
+                {% if action == 'submitted' %}
+                    This purchase order requires your review and approval.
+                    Please log in to the system to approve or reject this request.
+                {% elif action == 'approved' %}
+                    This purchase order has been approved and can now be ordered.
+                {% elif action == 'rejected' %}
+                    This purchase order has been rejected. Please review the feedback or create a new PO.
+                {% elif action == 'ordered' %}
+                    This purchase order has been placed with the supplier.
+                {% elif action == 'received' %}
+                    All items for this purchase order have been received.
+                {% endif %}
+            </p>
+            
+            <p><strong>The PharmaPro Team</strong></p>
+        </div>
+        <div class="footer">
+            <p>&copy; {% now "Y" %} PharmaPro. All rights reserved.</p>
+            <p style="font-size: 11px; color: #cbd5e1;">This is an automated message, please do not reply.</p>
+        </div>
+    </div>
+</body>
+</html>

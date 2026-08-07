@@ -1,0 +1,215 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Edit {{ category.name }} - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+        }
+        
+        .col-md-8.col-lg-6 {
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+        
+        .row.justify-content-center {
+            --bs-gutter-x: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row.g-3 {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+        }
+        
+        .row.g-3 > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+        }
+        
+        .card-header h5 {
+            font-size: 0.85rem !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .form-label {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+        
+        .form-text {
+            font-size: 0.6rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+            width: 100% !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .d-flex.gap-2.justify-content-end {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .col-md-6 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+        
+        .form-control-color {
+            padding: 0.25rem 0.5rem !important;
+            height: 38px;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 10px !important;
+        }
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+    
+    .form-control-color::-webkit-color-swatch-wrapper {
+        padding: 4px;
+    }
+    
+    .form-control-color::-webkit-color-swatch {
+        border-radius: 4px;
+        border: 1px solid #ced4da;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h5 class="mb-0">
+                        <i class="fas fa-edit text-primary me-2"></i>Edit Category
+                    </h5>
+                    <a href="{% url 'inventory:category_list' %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> <span class="d-none d-sm-inline">Back</span>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="categoryForm">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Category Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="{{ category.name }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="parent" class="form-label">Parent Category</label>
+                            <select class="form-select" id="parent" name="parent">
+                                <option value="">None (Top Level)</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat.id }}" {% if category.parent.id == cat.id %}selected{% endif %}>
+                                    {{ cat.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3">{{ category.description|default:'' }}</textarea>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="icon" class="form-label">Icon</label>
+                                <input type="text" class="form-control" id="icon" name="icon" 
+                                       value="{{ category.icon|default:'' }}" placeholder="e.g., pills, syringe">
+                                <div class="form-text">Font Awesome icon name (without 'fa-').</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="color" class="form-label">Color</label>
+                                <input type="color" class="form-control form-control-color" id="color" name="color" 
+                                       value="{{ category.color|default:'#3498db' }}">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3 mt-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" 
+                                       {% if category.is_active %}checked{% endif %}>
+                                <label class="form-check-label" for="is_active">
+                                    Active
+                                </label>
+                            </div>
+                        </div>
+
+                        <hr>
+                        <div class="d-flex gap-2 justify-content-end flex-wrap">
+                            <a href="{% url 'inventory:category_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-save me-1"></i> Update Category
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('categoryForm').addEventListener('submit', function(e) {
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Updating...';
+            btn.disabled = true;
+        });
+    });
+</script>
+{% endblock %}

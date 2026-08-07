@@ -1,0 +1,214 @@
+<!-- templates/tenants/subscription.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block page_title %}Subscription{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-crown me-2"></i>Subscription Details
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Plan</h6>
+                        <p class="fw-bold">{{ tenant.get_plan_display }}</p>
+                        
+                        <h6>Status</h6>
+                        <p>
+                            <span class="badge bg-{% if tenant.subscription_status == 'active' %}success{% elif tenant.subscription_status == 'trial' %}warning{% elif tenant.subscription_status == 'expired' %}danger{% elif tenant.subscription_status == 'suspended' %}secondary{% else %}info{% endif %}">
+                                {{ tenant.get_subscription_status_display }}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Start Date</h6>
+                        <p>{{ tenant.subscription_start_date|date:"M d, Y"|default:"N/A" }}</p>
+                        
+                        <h6>End Date</h6>
+                        <p>{{ tenant.subscription_end_date|date:"M d, Y"|default:"N/A" }}</p>
+                        
+                        <h6>Days Remaining</h6>
+                        <p>
+                            {% if tenant.days_until_expiry > 0 %}
+                                <span class="fw-bold {% if tenant.days_until_expiry <= 3 %}text-danger{% endif %}">
+                                    {{ tenant.days_until_expiry }} days
+                                </span>
+                            {% else %}
+                                <span class="text-danger">Expired</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="progress mt-3">
+                    {% if tenant.subscription_end_date %}
+                        {% with total_days=30 remaining_days=tenant.days_until_expiry %}
+                            {% widthratio remaining_days total_days 100 as progress %}
+                            <div class="progress-bar {% if remaining_days <= 3 %}bg-danger{% elif remaining_days <= 7 %}bg-warning{% else %}bg-success{% endif %}" 
+                                 role="progressbar" style="width: {{ progress|default:0 }}%">
+                            </div>
+                        {% endwith %}
+                    {% else %}
+                        <div class="progress-bar bg-info" role="progressbar" style="width: 100%">
+                            Trial Period
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Feature Limits -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <i class="fas fa-chart-bar me-2"></i>Usage & Limits
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Users</h6>
+                        <div class="d-flex justify-content-between">
+                            <span>Used: {{ total_users|default:0 }}</span>
+                            <span>Limit: {{ tenant.max_users }}</span>
+                        </div>
+                        <div class="progress">
+                            {% widthratio total_users tenant.max_users 100 as user_progress %}
+                            <div class="progress-bar bg-info" role="progressbar" style="width: {{ user_progress|default:0 }}%"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Products</h6>
+                        <div class="d-flex justify-content-between">
+                            <span>Used: {{ total_products|default:0 }}</span>
+                            <span>Limit: {{ tenant.max_inventory_items }}</span>
+                        </div>
+                        <div class="progress">
+                            {% widthratio total_products tenant.max_inventory_items 100 as product_progress %}
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ product_progress|default:0 }}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-credit-card me-2"></i>Actions
+            </div>
+            <div class="card-body">
+                {% if tenant.subscription_status == 'active' or tenant.subscription_status == 'trial' %}
+                    <form method="post" action="{% url 'tenants:subscription' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="cancel">
+                        <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to cancel your subscription?')">
+                            <i class="fas fa-times me-1"></i>Cancel Subscription
+                        </button>
+                    </form>
+                {% endif %}
+                
+                {% if tenant.subscription_status == 'expired' or tenant.subscription_status == 'cancelled' %}
+                    <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#renewModal">
+                        <i class="fas fa-sync me-1"></i>Renew Subscription
+                    </button>
+                {% endif %}
+                
+                <hr>
+                
+                <div class="text-center">
+                    <p class="text-muted small">
+                        <i class="fas fa-shield-alt me-1"></i>
+                        Secure payment processing by Stripe
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Renew Modal -->
+<div class="modal fade" id="renewModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Renew Subscription</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'tenants:subscription' %}" id="renewForm">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="action" value="renew">
+                    <input type="hidden" name="payment_method_id" id="paymentMethodId">
+                    
+                    <p>You will be charged for another month.</p>
+                    
+                    <!-- Card Element -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Card Details</label>
+                        <div id="cardElement" class="form-control" style="padding: 0.75rem;">
+                            <!-- Stripe will inject the card element here -->
+                        </div>
+                    </div>
+                    
+                    <div id="cardErrors" class="text-danger small"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="renewBtn">
+                        <i class="fas fa-sync me-1"></i>Renew Now
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const stripe = Stripe('{{ stripe_publishable_key }}');
+    const elements = stripe.elements();
+    
+    const cardElement = elements.create('card', {
+        style: {
+            base: {
+                fontSize: '16px',
+                color: '#424770',
+                '::placeholder': {
+                    color: '#aab7c4',
+                },
+            },
+        },
+    });
+    
+    cardElement.mount('#cardElement');
+    
+    const form = document.getElementById('renewForm');
+    const submitBtn = document.getElementById('renewBtn');
+    
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Processing...';
+        
+        const {error, paymentMethod} = await stripe.createPaymentMethod({
+            type: 'card',
+            card: cardElement,
+        });
+        
+        if (error) {
+            document.getElementById('cardErrors').textContent = error.message;
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-sync me-1"></i>Renew Now';
+        } else {
+            document.getElementById('paymentMethodId').value = paymentMethod.id;
+            form.submit();
+        }
+    });
+});
+</script>
+{% endblock %}

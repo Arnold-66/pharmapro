@@ -1,0 +1,145 @@
+<!-- apps/suppliers/templates/suppliers/delete.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Delete Supplier - {{ supplier.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media (max-width: 768px) {
+        .container.py-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+        }
+        
+        .col-md-6 {
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+        
+        .row.justify-content-center {
+            --bs-gutter-x: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+        }
+        
+        .card-header h5 {
+            font-size: 0.9rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+            width: 100% !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .d-flex.gap-2.mt-4 {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .alert {
+            font-size: 0.8rem !important;
+            padding: 0.5rem !important;
+        }
+        
+        .text-center .fa-4x {
+            font-size: 3rem !important;
+        }
+        
+        .text-center h4 {
+            font-size: 1rem !important;
+        }
+        
+        .text-center p {
+            font-size: 0.85rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container.py-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Delete Supplier
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-truck fa-4x text-danger mb-3 d-block"></i>
+                        <h4>Are you sure you want to delete this supplier?</h4>
+                        <p class="text-muted">
+                            <strong>{{ supplier.name }}</strong>
+                            <br>
+                            <small>Code: {{ supplier.code }}</small>
+                        </p>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Warning:</strong> This action cannot be undone. All data associated with this supplier will be permanently deleted.
+                    </div>
+
+                    {% if supplier.purchase_orders.exists %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <strong>Cannot Delete:</strong> This supplier has purchase orders associated with it.
+                            <br>
+                            <small>Please delete or reassign purchase orders first.</small>
+                        </div>
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex gap-2 mt-4 flex-wrap">
+                            <button type="submit" class="btn btn-danger" {% if supplier.purchase_orders.exists %}disabled{% endif %}>
+                                <i class="fas fa-trash me-2"></i> Delete Supplier
+                            </button>
+                            <a href="{% url 'suppliers:supplier_detail' supplier.id %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

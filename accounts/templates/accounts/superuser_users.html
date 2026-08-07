@@ -1,0 +1,874 @@
+<!-- accounts/templates/accounts/superuser_users.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}All Users - Super Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== MOBILE RESPONSIVE STYLES ===== */
+    @media (max-width: 768px) {
+        .container-fluid.py-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0.25rem !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0.125rem !important;
+            padding-left: 0.125rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .card {
+            border-radius: 4px !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.5rem 0.5rem !important;
+        }
+        
+        .card-header {
+            padding: 0.5rem 0.5rem !important;
+        }
+        
+        .page-header {
+            padding: 0 0.5rem !important;
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+            align-items: stretch !important;
+        }
+        
+        .page-header h1 {
+            font-size: 1rem !important;
+        }
+        
+        .page-header .btn {
+            width: 100% !important;
+            font-size: 0.75rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        /* ===== STATS CARDS - 2 PER ROW ===== */
+        .stats-row .col-md-3 {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+            padding: 0.125rem !important;
+        }
+        
+        .stat-card .card-body {
+            padding: 0.5rem !important;
+        }
+        
+        .stat-card h6 {
+            font-size: 0.55rem !important;
+            margin-bottom: 0.05rem !important;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .stat-card h2 {
+            font-size: 1.1rem !important;
+        }
+        
+        .stat-card .rounded-circle.p-3 {
+            padding: 0.4rem !important;
+            width: 32px !important;
+            height: 32px !important;
+            min-width: 32px !important;
+            min-height: 32px !important;
+        }
+        
+        .stat-card .rounded-circle.p-3 i {
+            font-size: 1.2rem !important;
+        }
+        
+        /* ===== FILTERS ===== */
+        .filter-row .col-md-4,
+        .filter-row .col-md-3,
+        .filter-row .col-md-2 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            padding: 0.2rem 0 !important;
+        }
+        
+        .filter-row .input-group .form-control {
+            font-size: 0.75rem !important;
+        }
+        
+        .filter-row .form-select {
+            font-size: 0.75rem !important;
+            padding: 0.25rem 0.4rem !important;
+        }
+        
+        /* ===== TABLE ===== */
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .table td, .table th {
+            font-size: 0.65rem !important;
+            padding: 0.3rem 0.25rem !important;
+            white-space: nowrap;
+        }
+        
+        .table .badge {
+            font-size: 0.5rem !important;
+            padding: 0.15rem 0.3rem !important;
+        }
+        
+        .table .fw-semibold {
+            font-size: 0.65rem !important;
+        }
+        
+        .table .small {
+            font-size: 0.55rem !important;
+        }
+        
+        .table .btn-group .btn {
+            font-size: 0.55rem !important;
+            padding: 0.15rem 0.25rem !important;
+        }
+        
+        .table .avatar {
+            width: 25px !important;
+            height: 25px !important;
+        }
+        
+        .table .avatar .rounded-circle {
+            width: 25px !important;
+            height: 25px !important;
+            font-size: 0.6rem !important;
+        }
+        
+        /* ===== PAGINATION ===== */
+        .pagination .page-link {
+            font-size: 0.7rem !important;
+            padding: 0.2rem 0.4rem !important;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .stat-card h6 {
+            font-size: 0.45rem !important;
+        }
+        
+        .stat-card h2 {
+            font-size: 0.9rem !important;
+        }
+        
+        .stat-card .rounded-circle.p-3 {
+            padding: 0.3rem !important;
+            width: 28px !important;
+            height: 28px !important;
+            min-width: 28px !important;
+            min-height: 28px !important;
+        }
+        
+        .stat-card .rounded-circle.p-3 i {
+            font-size: 1rem !important;
+        }
+        
+        .table td, .table th {
+            font-size: 0.55rem !important;
+            padding: 0.2rem 0.15rem !important;
+        }
+        
+        .table .btn-group .btn {
+            font-size: 0.5rem !important;
+            padding: 0.1rem 0.2rem !important;
+        }
+    }
+    
+    .card {
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    .card-header {
+        background: transparent;
+        border-bottom: 2px solid #f0f0f0;
+        padding: 1.25rem 1.5rem;
+    }
+    .stat-card {
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        transition: transform 0.2s;
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+    }
+    .table td {
+        vertical-align: middle;
+    }
+    .badge {
+        font-weight: 500;
+        padding: 0.35rem 0.75rem;
+    }
+    .btn-group .btn {
+        border-radius: 6px;
+        margin: 0 1px;
+    }
+    
+    /* Super admin badge */
+    .superadmin-badge {
+        background: #dc3545;
+        color: white;
+        font-size: 0.6rem;
+        padding: 0.15rem 0.4rem;
+        border-radius: 10px;
+        margin-left: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4" style="padding: 0 0.5rem;">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800 fw-bold">
+                <i class="fas fa-users-cog text-danger me-2"></i>All Users
+                <span class="badge bg-danger ms-2">Super Admin</span>
+            </h1>
+            <p class="text-muted small mb-0 mt-1">Manage all users across all organizations</p>
+        </div>
+        <div class="mt-2 mt-sm-0">
+            <a href="{% url 'accounts:superuser_user_create' %}" class="btn btn-danger btn-sm">
+                <i class="fas fa-plus me-1"></i> Add User
+            </a>
+            <a href="{% url 'accounts:superuser_tenant_create' %}" class="btn btn-outline-primary btn-sm mt-2">
+                <i class="fas fa-building me-1"></i> Create Organization
+            </a>
+        </div>
+    </div>
+
+    <!-- ===== STATS CARDS ===== -->
+    <div class="row stats-row mb-4">
+        <div class="col-md-3 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Total Users</h6>
+                            <h2 class="mb-0">{{ total_users }}</h2>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-users text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Online Now</h6>
+                            <h2 class="mb-0 text-success">{{ online_users }}</h2>
+                        </div>
+                        <div class="bg-success bg-opacity-10 rounded-circle p-3 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-circle text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Active</h6>
+                            <h2 class="mb-0 text-info">{{ active_users }}</h2>
+                        </div>
+                        <div class="bg-info bg-opacity-10 rounded-circle p-3 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-check-circle text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Super Admins</h6>
+                            <h2 class="mb-0 text-danger">{{ super_admins }}</h2>
+                        </div>
+                        <div class="bg-danger bg-opacity-10 rounded-circle p-3 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-crown text-danger"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FILTERS ===== -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 filter-row">
+                <div class="col-md-4 col-12">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control form-control-sm" placeholder="Search users..." value="{{ search_query }}">
+                        <button class="btn btn-outline-secondary btn-sm" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-2 col-6">
+                    <select name="role" class="form-select form-select-sm">
+                        <option value="">All Roles</option>
+                        {% for role_code, role_name in roles %}
+                            <option value="{{ role_code }}" {% if role_filter == role_code %}selected{% endif %}>
+                                {{ role_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 col-6">
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="">All Status</option>
+                        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                        <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+                        <option value="online" {% if status_filter == 'online' %}selected{% endif %}>Online</option>
+                        <option value="offline" {% if status_filter == 'offline' %}selected{% endif %}>Offline</option>
+                    </select>
+                </div>
+                <div class="col-md-2 col-6">
+                    <select name="tenant" class="form-select form-select-sm">
+                        <option value="">All Organizations</option>
+                        {% for tenant in tenants %}
+                            <option value="{{ tenant.id }}" {% if tenant_filter == tenant.id|stringformat:"s" %}selected{% endif %}>
+                                {{ tenant.company_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 col-6">
+                    <button type="submit" class="btn btn-primary btn-sm w-100">Apply</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== USERS TABLE ===== -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Organization</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Online</th>
+                            <th>Last Activity</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar avatar-sm me-2">
+                                            {% if user.profile_picture %}
+                                                <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="rounded-circle" width="35" height="35" style="object-fit: cover;">
+                                            {% else %}
+                                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; background: var(--primary-color) !important;">
+                                                    <span class="fw-bold">{{ user.get_full_name|first|upper }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold small">{{ user.get_full_name }}</div>
+                                            <div class="small text-muted">@{{ user.username }}</div>
+                                            {% if user.is_superuser %}
+                                                <span class="superadmin-badge">SA</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="small">{{ user.email }}</td>
+                                <td>
+                                    {% if user.tenant %}
+                                        <span class="badge bg-secondary small">{{ user.tenant.company_name }}</span>
+                                    {% else %}
+                                        <span class="badge bg-danger small">No Tenant</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-{% if user.role == 'admin' %}warning{% elif user.role == 'manager' %}info{% elif user.role == 'staff' %}secondary{% elif user.role == 'super_admin' or user.is_superuser %}danger{% else %}primary{% endif %}">
+                                        {{ user.get_role_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if user.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if user.is_online %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-circle me-1"></i> Online
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-circle me-1"></i> Offline
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        {{ user.last_activity|timesince }} ago
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <!-- View User -->
+                                        <a href="{% url 'accounts:superuser_user_detail' user.id %}" class="btn btn-sm btn-outline-info" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        
+                                        <!-- Edit User -->
+                                        <a href="{% url 'accounts:superuser_user_create' %}?edit={{ user.id }}" class="btn btn-sm btn-outline-primary" title="Edit User">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        
+                                        <!-- Make Admin -->
+                                        {% if not user.is_superuser and user.id != request.user.id %}
+                                            <button type="button" class="btn btn-sm btn-outline-warning make-admin-btn" 
+                                                    data-user-id="{{ user.id }}" 
+                                                    data-user-name="{{ user.get_full_name }}"
+                                                    title="Make Admin">
+                                                <i class="fas fa-user-tie"></i>
+                                            </button>
+                                        {% endif %}
+                                        
+                                        <!-- Make Super Admin -->
+                                        {% if not user.is_superuser and user.id != request.user.id %}
+                                            <button type="button" class="btn btn-sm btn-outline-danger make-superadmin-btn" 
+                                                    data-user-id="{{ user.id }}" 
+                                                    data-user-name="{{ user.get_full_name }}"
+                                                    title="Make Super Admin">
+                                                <i class="fas fa-crown"></i>
+                                            </button>
+                                        {% endif %}
+                                        
+                                        <!-- Toggle Active -->
+                                        <button type="button" class="btn btn-sm btn-outline-{% if user.is_active %}danger{% else %}success{% endif %} toggle-user-btn" 
+                                                data-user-id="{{ user.id }}" 
+                                                data-is-active="{{ user.is_active|lower }}"
+                                                data-url="/accounts/admin/users/{{ user.id }}/toggle-active/"
+                                                {% if user.id == request.user.id %}disabled{% endif %}
+                                                title="{% if user.is_active %}Deactivate{% else %}Activate{% endif %} User">
+                                            <i class="fas fa-{% if user.is_active %}ban{% else %}check{% endif %}"></i>
+                                        </button>
+                                        
+                                        <!-- Delete User -->
+                                        {% if user.id != request.user.id and not user.is_superuser %}
+                                            <button type="button" class="btn btn-sm btn-outline-danger delete-user-btn" 
+                                                    data-user-id="{{ user.id }}" 
+                                                    data-user-name="{{ user.get_full_name }}"
+                                                    data-url="/accounts/admin/users/{{ user.id }}/delete/"
+                                                    title="Delete User">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="fas fa-users fa-4x mb-3 d-block"></i>
+                                        <h5>No users found</h5>
+                                        <p class="small">Try adjusting your search or filters.</p>
+                                        <a href="{% url 'accounts:superuser_user_create' %}" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-user-plus me-1"></i> Add User
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% if users.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-end mb-0 flex-wrap">
+                        {% if users.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ users.previous_page_number }}"><i class="fas fa-chevron-left"></i></a>
+                            </li>
+                        {% endif %}
+                        {% for num in users.paginator.page_range %}
+                            <li class="page-item {% if users.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endfor %}
+                        {% if users.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ users.next_page_number }}"><i class="fas fa-chevron-right"></i></a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Include SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+// Get CSRF token from cookie
+function getCSRFToken() {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, 'csrftoken'.length + 1) === ('csrftoken' + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring('csrftoken'.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// ===== TOGGLE USER STATUS =====
+document.querySelectorAll('.toggle-user-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        const userId = this.dataset.userId;
+        const isActive = this.dataset.isActive === 'true';
+        const url = this.dataset.url;
+        
+        const action = isActive ? 'deactivate' : 'activate';
+        const actionDisplay = isActive ? 'Deactivate' : 'Activate';
+        const icon = isActive ? 'fa-ban' : 'fa-check';
+        const color = isActive ? '#dc3545' : '#28a745';
+        
+        Swal.fire({
+            title: `${actionDisplay} User?`,
+            text: `Are you sure you want to ${action} this user?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: color,
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: `<i class="fas ${icon} me-2"></i>${actionDisplay}`,
+            cancelButtonText: '<i class="fas fa-times me-2"></i>Cancel',
+            showLoaderOnConfirm: true,
+            preConfirm: () => {
+                return fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCSRFToken(),
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.error || 'Error toggling user status'); });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data.success) {
+                        throw new Error(data.error || 'Error toggling user status');
+                    }
+                    return data;
+                });
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    icon: 'success',
+                    title: `${actionDisplay}d!`,
+                    text: `User has been ${action}d successfully.`,
+                    timer: 2000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            }
+        }).catch((error) => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'An error occurred while toggling user status.',
+                confirmButtonColor: '#dc3545'
+            });
+        });
+    });
+});
+
+// ===== DELETE USER =====
+document.querySelectorAll('.delete-user-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        const userId = this.dataset.userId;
+        const userName = this.dataset.userName;
+        const url = this.dataset.url;
+        
+        Swal.fire({
+            title: 'Delete User?',
+            html: `
+                <p>Are you sure you want to delete <strong>${userName}</strong>?</p>
+                <p class="text-muted small">
+                    <i class="fas fa-info-circle me-1"></i>
+                    This action cannot be undone. All data associated with this user will be permanently removed.
+                </p>
+            `,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="fas fa-trash me-2"></i>Delete User',
+            cancelButtonText: '<i class="fas fa-times me-2"></i>Cancel',
+            showLoaderOnConfirm: true,
+            preConfirm: () => {
+                return fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCSRFToken(),
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.error || 'Error deleting user'); });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data.success) {
+                        throw new Error(data.error || 'Error deleting user');
+                    }
+                    return data;
+                });
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Deleted!',
+                    text: 'User has been deleted successfully.',
+                    timer: 2000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+                setTimeout(() => {
+                    window.location.href = "{% url 'accounts:superuser_users' %}";
+                }, 1500);
+            }
+        }).catch((error) => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Error deleting user',
+                confirmButtonColor: '#dc3545'
+            });
+        });
+    });
+});
+
+// ===== MAKE ADMIN =====
+document.querySelectorAll('.make-admin-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        const userId = this.dataset.userId;
+        const userName = this.dataset.userName;
+        
+        Swal.fire({
+            title: 'Make Admin?',
+            html: `
+                <p>Are you sure you want to make <strong>${userName}</strong> an admin?</p>
+                <p class="text-muted small">This will give the user admin privileges for their organization.</p>
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#ffc107',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="fas fa-user-tie me-2"></i>Make Admin',
+            cancelButtonText: '<i class="fas fa-times me-2"></i>Cancel',
+            showLoaderOnConfirm: true,
+            preConfirm: () => {
+                return fetch(`/accounts/admin/users/${userId}/make-admin/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCSRFToken(),
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.error || 'Error making user admin'); });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data.success) {
+                        throw new Error(data.error || 'Error making user admin');
+                    }
+                    return data;
+                });
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Done!',
+                    text: `${userName} is now an admin.`,
+                    timer: 2000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            }
+        }).catch((error) => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Error making user admin',
+                confirmButtonColor: '#dc3545'
+            });
+        });
+    });
+});
+
+// ===== MAKE SUPER ADMIN =====
+document.querySelectorAll('.make-superadmin-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        const userId = this.dataset.userId;
+        const userName = this.dataset.userName;
+        
+        Swal.fire({
+            title: 'Make Super Admin?',
+            html: `
+                <p>Are you sure you want to make <strong>${userName}</strong> a Super Admin?</p>
+                <p class="text-danger small">
+                    <i class="fas fa-exclamation-triangle me-1"></i>
+                    This gives full system control across all organizations.
+                </p>
+            `,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="fas fa-crown me-2"></i>Make Super Admin',
+            cancelButtonText: '<i class="fas fa-times me-2"></i>Cancel',
+            showLoaderOnConfirm: true,
+            preConfirm: () => {
+                return fetch(`/accounts/admin/users/${userId}/make-superadmin/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCSRFToken(),
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.error || 'Error making user super admin'); });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data.success) {
+                        throw new Error(data.error || 'Error making user super admin');
+                    }
+                    return data;
+                });
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Done!',
+                    text: `${userName} is now a Super Admin.`,
+                    timer: 2000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            }
+        }).catch((error) => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Error making user super admin',
+                confirmButtonColor: '#dc3545'
+            });
+        });
+    });
+});
+
+// ===== SHOW MESSAGES WITH SWEETALERT =====
+{% if messages %}
+    {% for message in messages %}
+        (function() {
+            let icon = 'info';
+            let color = '#17a2b8';
+            {% if message.tags == 'success' %}
+                icon = 'success';
+                color = '#28a745';
+            {% elif message.tags == 'error' %}
+                icon = 'error';
+                color = '#dc3545';
+            {% elif message.tags == 'warning' %}
+                icon = 'warning';
+                color = '#ffc107';
+            {% endif %}
+            
+            Swal.fire({
+                icon: icon,
+                title: '{{ message|escapejs }}',
+                timer: 3000,
+                showConfirmButton: true,
+                confirmButtonColor: color,
+                timerProgressBar: true,
+                toast: true,
+                position: 'top-end'
+            });
+        })();
+    {% endfor %}
+{% endif %}
+</script>
+{% endblock %}

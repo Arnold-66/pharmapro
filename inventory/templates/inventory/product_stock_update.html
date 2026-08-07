@@ -1,0 +1,375 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Update Stock - {{ product.name }} - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+        }
+        
+        .col-12 {
+            padding: 0 !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+        }
+        
+        .card-header h5 {
+            font-size: 0.85rem !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .form-label {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+        
+        .form-text {
+            font-size: 0.6rem !important;
+        }
+        
+        .input-group-text {
+            font-size: 0.75rem !important;
+            padding: 0.25rem 0.4rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+            width: 100% !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .d-flex.gap-2.justify-content-end {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .col-md-6 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+        
+        .card.bg-light .d-flex.align-items-center {
+            flex-direction: column !important;
+            text-align: center !important;
+        }
+        
+        .card.bg-light img {
+            margin-right: 0 !important;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        .alert-info {
+            font-size: 0.8rem !important;
+            padding: 0.5rem !important;
+        }
+        
+        .bg-light.rounded.p-3 {
+            padding: 0.5rem !important;
+        }
+        
+        .badge.ms-1 {
+            margin-left: 0.25rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 10px !important;
+        }
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h5 class="mb-0">
+                        <i class="fas fa-boxes text-primary me-2"></i>Update Stock
+                    </h5>
+                    <a href="{% url 'inventory:product_detail' product.id %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> <span class="d-none d-sm-inline">Back to Product</span>
+                        <span class="d-inline d-sm-none">Back</span>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <!-- Product Info -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-center">
+                                        {% if product.image %}
+                                        <img src="{{ product.image.url }}" alt="{{ product.name }}" 
+                                             class="rounded me-3" width="64" height="64" style="object-fit: cover;">
+                                        {% endif %}
+                                        <div>
+                                            <h5 class="mb-0">{{ product.name }}</h5>
+                                            <div class="small text-muted">SKU: {{ product.sku }}</div>
+                                            <div class="mt-1">
+                                                <span class="badge bg-{% if product.quantity == 0 %}danger{% elif product.quantity <= product.reorder_point %}warning{% else %}success{% endif %}">
+                                                    Current Stock: {{ product.quantity|floatformat:0 }}
+                                                    {% if product.unit %}
+                                                    {{ product.unit.abbreviation }}
+                                                    {% endif %}
+                                                </span>
+                                                <span class="badge bg-secondary ms-1 d-none d-sm-inline">Reorder: {{ product.reorder_point|floatformat:0 }}</span>
+                                            </div>
+                                            <div class="mt-2 d-none d-sm-block">
+                                                <small class="text-muted">Available as:</small>
+                                                {% for item in product.get_available_in_units %}
+                                                    {% if item.available > 0 %}
+                                                    <span class="badge bg-success ms-1">
+                                                        {{ item.available }} {{ item.unit.name }}s
+                                                    </span>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mt-3 mt-md-0 text-md-end">
+                                    <span class="badge bg-{% if product.status == 'active' %}success{% elif product.status == 'inactive' %}secondary{% elif product.status == 'out_of_stock' %}danger{% else %}warning{% endif %}">
+                                        {{ product.get_status_display }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post" id="stockForm">
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="movement_type" class="form-label">Movement Type <span class="text-danger">*</span></label>
+                                <select class="form-select" id="movement_type" name="movement_type" required>
+                                    <option value="in">Stock In (Add)</option>
+                                    <option value="out">Stock Out (Remove)</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="unit_type" class="form-label">Unit Type <span class="text-danger">*</span></label>
+                                <select class="form-select" id="unit_type" name="unit_type" required>
+                                    <option value="base">Base Unit ({{ product.unit.abbreviation|default:'units' }})</option>
+                                    {% for unit in product.sale_units.all %}
+                                    <option value="{{ unit.id }}">{{ unit.name }} ({{ unit.quantity_per_unit|floatformat:0 }} {{ product.unit.abbreviation|default:'units' }})</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">Choose the unit you're adding/removing.</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="quantity" class="form-label">Quantity <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" 
+                                       placeholder="Enter quantity" required min="1" step="1">
+                                <div class="form-text" id="quantityHelp">Enter the number of units to add or remove.</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Resulting Stock</label>
+                                <div class="bg-light rounded p-3" id="resultStock">
+                                    <span class="fw-bold">Will become: </span>
+                                    <span id="newStockDisplay">{{ product.quantity|floatformat:0 }} {{ product.unit.abbreviation|default:'units' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="reference" class="form-label">Reference</label>
+                                <input type="text" class="form-control" id="reference" name="reference" 
+                                       placeholder="e.g., Purchase Order #123, Return, Adjustment">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="unit_price" class="form-label">Unit Price</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Ugx</span>
+                                    <input type="number" class="form-control" id="unit_price" name="unit_price" 
+                                           placeholder="0.00" step="0.01" min="0" value="{{ product.purchase_price|floatformat:2 }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                      placeholder="Additional notes about this stock movement"></textarea>
+                        </div>
+
+                        <div class="alert alert-info d-flex align-items-center">
+                            <i class="fas fa-info-circle me-2 fa-lg"></i>
+                            <div>
+                                <strong>Note:</strong> 
+                                If you add 1 box (contains {{ product.get_default_sale_unit.quantity_per_unit|default:'10' }} tablets), 
+                                the stock will increase by {{ product.get_default_sale_unit.quantity_per_unit|default:'10' }} tablets.
+                            </div>
+                        </div>
+
+                        <hr>
+                        <div class="d-flex gap-2 justify-content-end flex-wrap">
+                            <a href="{% url 'inventory:product_detail' product.id %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-save me-1"></i> Update Stock
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const movementType = document.getElementById('movement_type');
+        const unitType = document.getElementById('unit_type');
+        const quantityInput = document.getElementById('quantity');
+        const quantityHelp = document.getElementById('quantityHelp');
+        const newStockDisplay = document.getElementById('newStockDisplay');
+        const currentStock = parseFloat('{{ product.quantity|floatformat:0 }}');
+        
+        const unitConversions = {};
+        {% for unit in product.sale_units.all %}
+        unitConversions['{{ unit.id }}'] = parseFloat('{{ unit.quantity_per_unit|floatformat:0 }}');
+        {% endfor %}
+        unitConversions['base'] = 1;
+
+        function calculateNewStock() {
+            const quantity = parseFloat(quantityInput.value) || 0;
+            const unitId = unitType.value;
+            const multiplier = unitConversions[unitId] || 1;
+            const baseQuantity = quantity * multiplier;
+            
+            let newStock = currentStock;
+            if (movementType.value === 'in') {
+                newStock = currentStock + baseQuantity;
+            } else {
+                newStock = currentStock - baseQuantity;
+            }
+            
+            newStockDisplay.textContent = newStock.toFixed(0) + ' {{ product.unit.abbreviation|default:"units" }}';
+            
+            if (movementType.value === 'out') {
+                const maxRemove = Math.floor(currentStock / multiplier);
+                quantityHelp.textContent = `Maximum removable: ${maxRemove} ${unitType.options[unitType.selectedIndex].text} (${currentStock} base units)`;
+                quantityHelp.className = 'form-text text-warning';
+                quantityInput.max = maxRemove;
+            } else {
+                quantityHelp.textContent = `Adding 1 ${unitType.options[unitType.selectedIndex].text} = ${multiplier} base units`;
+                quantityHelp.className = 'form-text';
+                quantityInput.removeAttribute('max');
+            }
+        }
+
+        movementType.addEventListener('change', calculateNewStock);
+        unitType.addEventListener('change', calculateNewStock);
+        quantityInput.addEventListener('input', calculateNewStock);
+
+        quantityInput.addEventListener('input', function() {
+            const value = parseFloat(this.value);
+            const unitId = unitType.value;
+            const multiplier = unitConversions[unitId] || 1;
+            
+            if (movementType.value === 'out' && !isNaN(value)) {
+                const maxRemove = Math.floor(currentStock / multiplier);
+                if (value > maxRemove) {
+                    this.classList.add('is-invalid');
+                    quantityHelp.textContent = `⚠️ Cannot remove more than ${maxRemove} ${unitType.options[unitType.selectedIndex].text} (${currentStock} base units available).`;
+                    quantityHelp.className = 'form-text text-danger';
+                } else {
+                    this.classList.remove('is-invalid');
+                }
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+
+        calculateNewStock();
+
+        document.getElementById('stockForm').addEventListener('submit', function(e) {
+            const quantity = parseFloat(quantityInput.value);
+            
+            if (!quantity || quantity < 1) {
+                e.preventDefault();
+                alert('Please enter a valid quantity (minimum 1).');
+                return false;
+            }
+            
+            const unitId = unitType.value;
+            const multiplier = unitConversions[unitId] || 1;
+            const baseQuantity = quantity * multiplier;
+            
+            if (movementType.value === 'out' && baseQuantity > currentStock) {
+                e.preventDefault();
+                alert(`Cannot remove more than current stock (${currentStock} base units).`);
+                return false;
+            }
+
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Updating...';
+            btn.disabled = true;
+        });
+    });
+</script>
+{% endblock %}

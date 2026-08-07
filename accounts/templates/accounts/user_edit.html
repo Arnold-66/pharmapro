@@ -1,0 +1,418 @@
+<!-- accounts/templates/accounts/user_edit.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Edit User - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== RESET ALL PADDING/MARGINS ON MOBILE ===== */
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0 !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }
+        
+        .card-header h4, .card-header h6 {
+            font-size: 0.85rem !important;
+        }
+        
+        .page-header h1 {
+            font-size: 1.1rem !important;
+        }
+        
+        .page-header p {
+            font-size: 0.75rem !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .page-header .btn {
+            font-size: 0.65rem !important;
+            padding: 0.2rem 0.4rem !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .form-label {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+        
+        .form-text {
+            font-size: 0.6rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .badge {
+            font-size: 0.6rem !important;
+            padding: 0.2rem 0.35rem !important;
+        }
+        
+        .alert {
+            padding: 0.75rem !important;
+            border-radius: 0 !important;
+        }
+        
+        .alert .d-flex {
+            flex-direction: column !important;
+            text-align: center !important;
+        }
+        
+        .alert .fa-2x {
+            font-size: 1.5rem !important;
+            margin: 0 0 0.5rem 0 !important;
+        }
+        
+        .d-flex.gap-2 {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .d-flex.gap-2 .btn {
+            width: 100% !important;
+        }
+        
+        /* Card header with actions */
+        .card-header.d-flex {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .card-header.d-flex .btn {
+            width: 100% !important;
+        }
+        
+        /* User info grid on mobile */
+        .user-info-grid .col-md-4 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            padding: 0.25rem 0 !important;
+        }
+        
+        .form-check {
+            padding: 0.25rem 0 !important;
+        }
+        
+        .form-check .form-check-label {
+            font-size: 0.8rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0.5rem !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0.25rem !important;
+            padding-left: 0.25rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+    
+    /* ===== COMMON STYLES ===== */
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+    
+    .card-header {
+        background: transparent !important;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .card-header.bg-light {
+        background-color: #f8f9fa !important;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+    
+    .form-control:disabled {
+        background-color: #f8f9fa;
+        cursor: not-allowed;
+    }
+    
+    .btn-primary {
+        background: #2c3e50;
+        border-color: #2c3e50;
+    }
+    
+    .btn-primary:hover {
+        background: #1a2a3a;
+        border-color: #1a2a3a;
+    }
+    
+    .alert {
+        border-radius: 10px;
+        border: none;
+    }
+    
+    .badge {
+        padding: 0.4rem 0.8rem;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4" style="padding: 0 0.5rem;">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800 fw-bold">
+                <i class="fas fa-user-edit text-primary me-2"></i>Edit User
+            </h1>
+            <p class="text-muted small mb-0 mt-1">{{ user.get_full_name }} ({{ user.username }})</p>
+        </div>
+        <div class="mt-2 mt-sm-0">
+            <a href="{% url 'accounts:user_list' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left me-1"></i> Back to Users
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+            <h4 class="mb-0">
+                <i class="fas fa-user-edit me-2"></i>Edit User: {{ user.get_full_name }}
+            </h4>
+        </div>
+        <div class="card-body">
+            <form method="post" novalidate id="editUserForm">
+                {% csrf_token %}
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="first_name" class="form-label fw-bold">First Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="last_name" class="form-label fw-bold">Last Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}" required>
+                    </div>
+                </div>
+                
+                <div class="row g-3 mt-1">
+                    <div class="col-md-8">
+                        <label for="email" class="form-label fw-bold">Email Address</label>
+                        <input type="email" class="form-control" id="email" value="{{ user.email }}" disabled>
+                        <div class="form-text">Email cannot be changed.</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="phone" class="form-label fw-bold">Phone Number</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" value="{{ user.phone }}">
+                    </div>
+                </div>
+                
+                <div class="row g-3 mt-1">
+                    <div class="col-md-6">
+                        <label for="role" class="form-label fw-bold">Role <span class="text-danger">*</span></label>
+                        <select class="form-select" id="role" name="role" required>
+                            {% for role_code, role_name in roles %}
+                                <option value="{{ role_code }}" {% if user.role == role_code %}selected{% endif %}>
+                                    {{ role_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text text-muted">
+                            <i class="fas fa-info-circle"></i>
+                            Super Admin role is reserved for system administrators.
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="password" class="form-label fw-bold">New Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Leave blank to keep current">
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i>
+                            If changed, the user will receive a notification email.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Permissions -->
+                <div class="card mb-3 mt-3">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">
+                            <i class="fas fa-lock me-2"></i>Permissions
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="can_create" name="can_create" {% if user.can_create %}checked{% endif %}>
+                                    <label class="form-check-label" for="can_create">
+                                        <i class="fas fa-plus-circle text-success me-1"></i> Create
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="can_edit" name="can_edit" {% if user.can_edit %}checked{% endif %}>
+                                    <label class="form-check-label" for="can_edit">
+                                        <i class="fas fa-edit text-primary me-1"></i> Edit
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="can_delete" name="can_delete" {% if user.can_delete %}checked{% endif %}>
+                                    <label class="form-check-label" for="can_delete">
+                                        <i class="fas fa-trash text-danger me-1"></i> Delete
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- User Info -->
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>User Information
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row user-info-grid">
+                            <div class="col-md-4">
+                                <div class="text-muted small">Account Status</div>
+                                <div>
+                                    {% if user.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-muted small">Online Status</div>
+                                <div>
+                                    {% if user.is_online %}
+                                        <span class="badge bg-success">Online</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Offline</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-muted small">Last Activity</div>
+                                <div>{{ user.last_activity|timesince }} ago</div>
+                            </div>
+                        </div>
+                        <div class="row user-info-grid mt-2">
+                            <div class="col-md-4">
+                                <div class="text-muted small">Joined</div>
+                                <div>{{ user.created_at|date:"M d, Y" }}</div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-muted small">Email Verified</div>
+                                <div>
+                                    {% if user.email_verified %}
+                                        <span class="badge bg-success">Verified</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Pending</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-muted small">Tenant</div>
+                                <div>{{ user.tenant.name|default:"None" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                    <div>
+                        <strong>Password Change Notification:</strong>
+                        <p class="mb-0">If you change the password, the user will receive an email with their new credentials.</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="fas fa-save me-2"></i> Update User
+                    </button>
+                    <a href="{% url 'accounts:user_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Form submission
+        document.getElementById('editUserForm').addEventListener('submit', function(e) {
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Updating...';
+            btn.disabled = true;
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,1354 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PharmaPro - Multi-Tenant Pharmaceutical System{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="{% if tenant and tenant.favicon %}{{ tenant.favicon.url }}{% else %}{% static 'images/favicon.ico' %}{% endif %}" type="image/x-icon">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: {% if tenant %}{{ tenant.primary_color }}{% else %}#2c3e50{% endif %};
+            --secondary-color: {% if tenant %}{{ tenant.secondary_color }}{% else %}#3498db{% endif %};
+            --accent-color: {% if tenant %}{{ tenant.accent_color }}{% else %}#e74c3c{% endif %};
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 250px;
+            background: var(--primary-color);
+            color: white;
+            transition: all 0.3s ease;
+            z-index: 1050;
+            overflow-y: auto;
+        }
+        
+        .sidebar-brand {
+            padding: 1.5rem 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-brand img {
+            max-height: 60px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .sidebar-brand h3 {
+            margin: 0;
+            font-weight: 300;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-menu {
+            padding: 1.5rem 0;
+        }
+        
+        .sidebar-menu .nav-item {
+            margin: 0.25rem 0;
+        }
+        
+        .sidebar-menu .nav-link {
+            color: rgba(255,255,255,0.7);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        
+        .sidebar-menu .nav-link:hover {
+            color: white;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-menu .nav-link.active {
+            color: white;
+            background: rgba(255,255,255,0.2);
+            border-right: 3px solid var(--secondary-color);
+        }
+        
+        .sidebar-menu .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+        }
+        
+        /* Sub-menu */
+        .sidebar-menu .nav-link.has-submenu {
+            cursor: pointer;
+        }
+        
+        .sidebar-menu .nav-link.has-submenu::after {
+            content: '\f078';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            margin-left: auto;
+            font-size: 0.75rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar-menu .nav-link.has-submenu.collapsed::after {
+            transform: rotate(-90deg);
+        }
+        
+        .sidebar-menu .sub-menu {
+            padding-left: 2.5rem;
+        }
+        
+        .sidebar-menu .sub-menu .nav-link {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .sidebar-menu .sub-menu .nav-link i {
+            width: 16px;
+            font-size: 0.8rem;
+        }
+        
+        /* Online Status Badge */
+        .status-badge {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-online { background: #28a745; }
+        .status-offline { background: #6c757d; }
+        .status-idle { background: #ffc107; }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            transition: all 0.3s ease;
+        }
+        
+        /* Top Navigation */
+        .top-nav {
+            background: white;
+            padding: 0.75rem 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1040;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-content {
+            padding: 1.5rem;
+        }
+        
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            background: transparent;
+            border-bottom: 1px solid #eee;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+        
+        .stat-icon {
+            font-size: 2rem;
+            color: var(--secondary-color);
+        }
+        
+        /* Alert Boxes */
+        .alert-custom {
+            border: none;
+            border-radius: 10px;
+            padding: 1.25rem;
+        }
+        
+        /* Subscription Banner */
+        .subscription-banner {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .subscription-banner.bg-danger {
+            background: linear-gradient(135deg, #dc3545, #b02a37) !important;
+        }
+        
+        .subscription-banner .banner-content {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .subscription-banner .banner-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .subscription-banner a {
+            color: white !important;
+            text-decoration: underline;
+        }
+        
+        .subscription-banner a:hover {
+            color: #ffd700 !important;
+        }
+        
+        /* Access Denied Page */
+        .access-denied {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            text-align: center;
+        }
+        
+        .access-denied i {
+            font-size: 5rem;
+            color: var(--accent-color);
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-toggle {
+                display: block !important;
+            }
+            
+            .subscription-banner {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .mobile-toggle {
+                display: none !important;
+            }
+        }
+        
+        /* Loading Spinner */
+        .spinner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.8);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .spinner-overlay.show {
+            display: flex;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary-color);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+        }
+        
+        /* Badge styles for sidebar */
+        .sidebar-menu .badge {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        /* Fixed notification dropdown - prevent overflow */
+        .notification-dropdown {
+            max-height: 400px;
+            overflow-y: auto;
+            width: 350px;
+            max-width: 90vw;
+            position: absolute;
+            right: 0;
+            left: auto !important;
+        }
+        
+        .notification-dropdown .dropdown-item {
+            white-space: normal;
+            word-wrap: break-word;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .notification-dropdown .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .notification-dropdown .dropdown-item .notification-message {
+            font-size: 0.8rem;
+            color: #6c757d;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .notification-dropdown .dropdown-header {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 1;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        /* Superadmin badge in sidebar */
+        .superadmin-badge {
+            background: #dc3545;
+            color: white;
+            font-size: 0.6rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            margin-left: 8px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        
+        .superadmin-menu .nav-link {
+            color: #faf8f8 !important;
+        }
+        
+        .superadmin-menu .nav-link:hover {
+            color: #ff0000 !important;
+            background: rgba(255, 0, 0, 0.1) !important;
+        }
+        
+        .superadmin-menu .nav-link.active {
+            color: white !important;
+            background: rgba(220, 53, 69, 0.3) !important;
+        }
+        
+        /* Divider in sidebar */
+        .sidebar-divider {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin: 0.5rem 1.5rem;
+        }
+        
+        .sidebar-divider.text {
+            color: rgba(255,255,255,0.4);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0.5rem 1.5rem;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div class="spinner-overlay" id="loadingSpinner">
+        <div class="spinner-border text-primary" style="width: 4rem; height: 4rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    
+    <!-- Sidebar -->
+   <!-- Replace the sidebar section in your base.html -->
+
+<!-- Sidebar -->
+<nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        {% if tenant and tenant.logo %}
+            <img src="{{ tenant.logo.url }}" alt="{{ tenant.name }}" class="img-fluid">
+        {% else %}
+            <i class="fas fa-capsules fa-3x mb-2"></i>
+        {% endif %}
+        <h3>{% if tenant %}{{ tenant.company_name }}{% else %}PharmaPro{% endif %}</h3>
+        {% if user.is_superuser %}
+            <span class="badge bg-danger">Super Admin</span>
+        {% else %}
+            {% if tenant.plan == 'free' %}
+                <small class="text-white">Free Trial</small>
+            {% elif tenant.plan == 'starter' %}
+                <small class="text-white">Starter</small>
+            {% elif tenant.plan == 'professional' %}
+                <small class="text-white">Professional</small>
+            {% elif tenant.plan == 'enterprise' %}
+                <small class="text-white">Enterprise</small>
+            {% else %}
+                <small class="text-white">{{ tenant.get_plan_display }}</small>
+            {% endif %}
+        {% endif %}
+    </div>
+    
+    <div class="sidebar-menu">
+        <ul class="nav flex-column">
+            <!-- ========== SUPER ADMIN SECTION ========== -->
+            {% if user.is_superuser %}
+            <!-- Dashboard - Super Admin goes to tenant management -->
+            <li class="nav-item superadmin-menu">
+                <a class="nav-link {% if '/tenants/manage' in request.path %}active{% endif %}" 
+                   href="/tenants/manage/">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                    <span class="badge bg-danger ms-auto">SA</span>
+                </a>
+            </li>
+            
+            <li class="sidebar-divider text">Super Admin</li>
+            
+            <!-- All Organizations -->
+            <li class="nav-item superadmin-menu">
+                <a class="nav-link {% if '/tenants/manage' in request.path and not '/tenants/manage/'|add:tenant.id|stringformat:'s' in request.path %}active{% endif %}" 
+                   href="/tenants/manage/">
+                    <i class="fas fa-building"></i> All Organizations
+                    <span class="badge bg-danger ms-auto">SA</span>
+                </a>
+            </li>
+            
+            <!-- Super Admin User Management -->
+            <li class="nav-item superadmin-menu">
+                <a class="nav-link has-submenu {% if 'admin/users' in request.path %}active{% endif %}" 
+                   data-bs-toggle="collapse" href="#superAdminUsersMenu" role="button" aria-expanded="false" aria-controls="superAdminUsersMenu">
+                    <i class="fas fa-user-shield"></i> All Users
+                    <span class="badge bg-danger ms-auto">SA</span>
+                </a>
+                <div class="collapse {% if 'admin/users' in request.path %}show{% endif %}" id="superAdminUsersMenu">
+                    <ul class="nav flex-column sub-menu">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'superuser_users' %}active{% endif %}" 
+                               href="{% url 'accounts:superuser_users' %}">
+                                <i class="fas fa-list"></i> All Users
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'accounts:superuser_tenant_create' %}" class="nav-link">
+                                <i class="fas fa-building me-2"></i> Create Organization
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            
+            <!-- Subscription Management -->
+            <li class="nav-item superadmin-menu">
+                <a class="nav-link {% if 'admin/subscriptions' in request.path %}active{% endif %}" 
+                   href="{% url 'accounts:superuser_subscription' %}">
+                    <i class="fas fa-credit-card"></i> Subscriptions
+                </a>
+            </li>
+            
+            <!-- System Settings -->
+            <li class="nav-item superadmin-menu">
+                <a class="nav-link {% if 'admin/settings' in request.path %}active{% endif %}" 
+                   href="{% url 'accounts:superuser_settings' %}">
+                    <i class="fas fa-cogs"></i> System Settings
+                </a>
+            </li>
+            
+            <!-- System Logs -->
+            <li class="nav-item superadmin-menu">
+                <a class="nav-link {% if 'admin/logs' in request.path %}active{% endif %}" 
+                   href="{% url 'accounts:superuser_logs' %}">
+                    <i class="fas fa-history"></i> System Logs
+                </a>
+            </li>
+            
+            <li class="sidebar-divider"></li>
+            {% endif %}
+            
+            <!-- ========== TENANT SPECIFIC MENUS ========== -->
+            <!-- Only show tenant menus if NOT superuser OR if superuser but NOT on admin pages -->
+            {% if not user.is_superuser or not '/admin/' in request.path %}
+            
+            <!-- Dashboard - Regular Users -->
+            {% if not user.is_superuser %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' or request.resolver_match.url_name == 'tenant_dashboard' %}active{% endif %}" 
+                   href="{% if tenant %}/accounts/{{ tenant.slug }}/dashboard/{% else %}{% url 'accounts:dashboard' %}{% endif %}">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+            {% endif %}
+            
+            <!-- User Management - Only Admins -->
+            {% if user.role == 'admin' and not user.is_superuser %}
+            <li class="nav-item">
+                <a class="nav-link has-submenu {% if 'users' in request.path %}active{% endif %}" 
+                data-bs-toggle="collapse" href="#usersMenu" role="button" aria-expanded="false" aria-controls="usersMenu">
+                    <i class="fas fa-users"></i> User Management
+                </a>
+                <div class="collapse {% if 'users' in request.path %}show{% endif %}" id="usersMenu">
+                    <ul class="nav flex-column sub-menu">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'user_list' %}active{% endif %}" 
+                            href="{% url 'accounts:user_list' %}">
+                                <i class="fas fa-list"></i> All Users
+                                <span class="badge bg-info ms-auto" id="onlineCount">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'online_users' %}active{% endif %}" 
+                            href="{% url 'accounts:online_users' %}">
+                                <i class="fas fa-circle text-success"></i> Online Users
+                                <span class="badge bg-success ms-auto" id="onlineUsersCount">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'user_create' %}active{% endif %}" 
+                            href="{% url 'accounts:user_create' %}">
+                                <i class="fas fa-user-plus"></i> Add User
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            {% endif %}
+            
+            <!-- Inventory -->
+            {% if user.role == 'admin' or user.role == 'manager' or user.role == 'viewer' %}
+            <li class="nav-item">
+                <a class="nav-link has-submenu {% if 'inventory' in request.path %}active{% endif %}" 
+                   data-bs-toggle="collapse" href="#inventoryMenu" role="button" aria-expanded="false" aria-controls="inventoryMenu">
+                    <i class="fas fa-boxes"></i> Inventory
+                </a>
+                <div class="collapse {% if 'inventory' in request.path %}show{% endif %}" id="inventoryMenu">
+                    <ul class="nav flex-column sub-menu">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'inventory:dashboard' %}">
+                                <i class="fas fa-chart-pie"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'inventory:product_list' %}">
+                                <i class="fas fa-list"></i> Products
+                            </a>
+                        </li>
+                        {% if perms.inventory.can_manage_inventory or user.role == 'admin' or user.role == 'manager' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'inventory:product_create' %}">
+                                <i class="fas fa-plus-circle"></i> Add Product
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'inventory:category_list' %}">
+                                <i class="fas fa-tags"></i> Categories
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'inventory:unit_list' %}">
+                                <i class="fas fa-ruler"></i> Units
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'inventory:stock_movements' %}">
+                                <i class="fas fa-exchange-alt"></i> Stock Movements
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'inventory:alerts' %}">
+                                <i class="fas fa-bell"></i> Alerts
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            {% endif %}
+            
+            <!-- Sales -->
+            {% if user.role == 'admin' or user.role == 'manager' or user.role == 'viewer' or user.role == 'staff' %}
+            <li class="nav-item">
+                <a class="nav-link has-submenu {% if 'sales' in request.path %}active{% endif %}" 
+                   data-bs-toggle="collapse" href="#salesMenu" role="button" aria-expanded="false" aria-controls="salesMenu">
+                    <i class="fas fa-shopping-cart"></i> Sales
+                </a>
+                <div class="collapse {% if 'sales' in request.path %}show{% endif %}" id="salesMenu">
+                    <ul class="nav flex-column sub-menu">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'sales:dashboard' %}">
+                                <i class="fas fa-chart-pie"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'sales:sale_list' %}">
+                                <i class="fas fa-list"></i> All Sales
+                            </a>
+                        </li>
+                        {% if perms.sales.can_create_sale or user.role == 'staff' or user.role == 'admin' or user.role == 'manager' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'sales:sale_create' %}">
+                                <i class="fas fa-plus-circle"></i> New Sale
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </li>
+            {% endif %}
+
+            <!-- Suppliers -->
+            {% if user.role == 'admin' or user.role == 'manager' %}
+            <li class="nav-item">
+                <a class="nav-link has-submenu {% if 'suppliers' in request.path %}active{% endif %}" 
+                   data-bs-toggle="collapse" href="#suppliersMenu" role="button" aria-expanded="false" aria-controls="suppliersMenu">
+                    <i class="fas fa-truck"></i> Suppliers
+                </a>
+                <div class="collapse {% if 'suppliers' in request.path %}show{% endif %}" id="suppliersMenu">
+                    <ul class="nav flex-column sub-menu">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'suppliers:supplier_list' %}">
+                                <i class="fas fa-list"></i> All Suppliers
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'suppliers:supplier_create' %}">
+                                <i class="fas fa-plus"></i> Add Supplier
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'approvals' in request.path %}active{% endif %}" 
+                            href="{% url 'suppliers:supplier_approvals' %}">
+                                <i class="fas fa-user-check text-warning"></i> Supplier Approvals
+                                {% if total_pending > 0 %}
+                                    <span class="badge bg-warning ms-2">{{ total_pending }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            {% endif %}
+
+            <!-- Purchase Orders -->
+            {% if user.role == 'admin' or user.role == 'manager' %}
+            <li class="nav-item">
+                <a class="nav-link has-submenu {% if 'purchase-orders' in request.path %}active{% endif %}" 
+                   data-bs-toggle="collapse" href="#poMenu" role="button" aria-expanded="false" aria-controls="poMenu">
+                    <i class="fas fa-shopping-cart"></i> Purchase Orders
+                </a>
+                <div class="collapse {% if 'purchase-orders' in request.path %}show{% endif %}" id="poMenu">
+                    <ul class="nav flex-column sub-menu">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'suppliers:purchase_order_list' %}">
+                                <i class="fas fa-list"></i> All POs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'suppliers:purchase_order_create' %}">
+                                <i class="fas fa-plus"></i> Create PO
+                            </a>
+                        </li>
+                        {% if user.is_superuser or user.role == 'admin' %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'approvals' in request.path %}active{% endif %}" 
+                               href="{% url 'suppliers:purchase_order_approvals' %}">
+                                <i class="fas fa-check-double text-warning"></i> PO Approvals
+                                {% if total_pending > 0 %}
+                                    <span class="badge bg-warning ms-2">{{ total_pending }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </li>
+            {% endif %}
+            
+            <!-- Reports -->
+            {% if user.role == 'admin' or user.role == 'manager' %}
+            <li class="nav-item">
+                <a class="nav-link has-submenu {% if 'reports' in request.path %}active{% endif %}" 
+                   data-bs-toggle="collapse" href="#reportsMenu" role="button" aria-expanded="false" aria-controls="reportsMenu">
+                    <i class="fas fa-chart-bar"></i> Reports
+                </a>
+                <div class="collapse {% if 'reports' in request.path %}show{% endif %}" id="reportsMenu">
+                    <ul class="nav flex-column sub-menu">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'reports:dashboard' %}">
+                                <i class="fas fa-chart-pie"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'reports:sales_report' %}">
+                                <i class="fas fa-shopping-cart"></i> Sales Report
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'reports:inventory_report' %}">
+                                <i class="fas fa-boxes"></i> Inventory Report
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'reports:financial_report' %}">
+                                <i class="fas fa-dollar-sign"></i> Financial Report
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'reports:report_list' %}">
+                                <i class="fas fa-save"></i> Saved Reports
+                            </a>
+                        </li>
+                        {% if perms.reports.can_generate_reports or user.is_superuser %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'reports:generate_report' %}">
+                                <i class="fas fa-plus-circle"></i> Generate Report
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </li>
+            {% endif %}
+            
+            <!-- Settings -->
+            {% if user.role == 'admin' and not user.is_superuser %}
+            <li class="nav-item">
+                <a class="nav-link {% if 'settings' in request.path %}active{% endif %}" href="{% url 'accounts:settings' %}">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+            </li>
+            {% endif %}
+            
+            {% endif %} <!-- End tenant specific menus -->
+            
+            <!-- ========== MY PROFILE ========== -->
+            <!-- All users -->
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" href="{% url 'accounts:profile' %}">
+                    <i class="fas fa-user-circle"></i> My Profile
+                </a>
+            </li>
+            
+            <!-- ========== LOGOUT ========== -->
+            <li class="nav-item mt-3">
+                <a class="nav-link text-danger" href="#" onclick="showLogoutModal(event)">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+    
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Top Navigation -->
+        <nav class="top-nav">
+            <div>
+                <button class="btn btn-link mobile-toggle" id="mobileToggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <!-- <span class="ms-2 fw-bold">{% block page_title %}Dashboard{% endblock %}</span> -->
+                {% if user.is_superuser %}
+                    <span class="badge bg-danger ms-2">Super Admin</span>
+                {% endif %}
+            </div>
+            
+            <div class="d-flex align-items-center">
+                <!-- User Status Indicator -->
+                <div class="me-3 d-none d-md-block">
+                    <span class="status-badge {% if user.is_online %}status-online{% else %}status-offline{% endif %}" id="userStatusDot"></span>
+                    <span class="small" id="userStatusText">{% if user.is_online %}Online{% else %}Offline{% endif %}</span>
+                </div>
+                
+                <!-- Notification Bell with Sound -->
+                <div class="dropdown me-3">
+                    <button class="btn btn-link position-relative" id="notificationDropdown" data-bs-toggle="dropdown" onclick="loadNotifications()">
+                        <i class="fas fa-bell"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notificationCount">
+                            0
+                        </span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end notification-dropdown" id="notificationList">
+                        <li><h6 class="dropdown-header d-flex justify-content-between align-items-center">
+                            <span>Notifications</span>
+                            <a href="{% url 'accounts:notifications' %}" class="small">View All</a>
+                        </h6></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li id="notificationItems">
+                            <div class="text-center text-muted py-3">
+                                <i class="fas fa-spinner fa-spin"></i> Loading...
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- User Profile -->
+                <div class="dropdown">
+                    <button class="btn btn-link d-flex align-items-center" id="userDropdown" data-bs-toggle="dropdown">
+                        {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="rounded-circle" style="width: 35px; height: 35px; object-fit: cover;">
+                        {% else %}
+                            <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; background: var(--primary-color) !important;">
+                                <span class="fw-bold">{{ user.get_full_name|first|upper }}</span>
+                            </div>
+                        {% endif %}
+                        <span class="ms-2 d-none d-md-block">
+                            {{ user.get_full_name }}
+                            <small class="d-block text-muted">
+                                {% if user.is_superuser %}
+                                    Super Admin
+                                {% else %}
+                                    {{ user.get_role_display }}
+                                {% endif %}
+                            </small>
+                        </span>
+                        {% if user.is_superuser %}
+                            <span class="badge bg-danger ms-1 d-none d-md-block">SA</span>
+                        {% endif %}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="fas fa-user me-2"></i>Profile</a></li>
+                        {% if not user.is_superuser and user.role == 'admin' %}
+                        <li><a class="dropdown-item" href="{% url 'accounts:settings' %}"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                        {% endif %}
+                        {% if user.is_superuser %}
+                        <li><a class="dropdown-item" href="/tenants/manage/"><i class="fas fa-building me-2"></i>All Organizations</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        {% endif %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#" onclick="showLogoutModal(event)"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Page Content -->
+        <div class="page-content">
+            <!-- Subscription Banners -->
+            {% if tenant and tenant.days_until_expiry <= 3 and tenant.days_until_expiry > 0 %}
+            <div class="subscription-banner">
+                <div class="banner-content">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Subscription Expiring Soon!</strong>
+                    <span>Your subscription will expire in {{ tenant.days_until_expiry }} days.</span>
+                </div>
+                <div class="banner-actions">
+                    <span class="badge bg-warning text-dark">{{ tenant.days_until_expiry }} days left</span>
+                    <a href="{% url 'tenants:subscription' %}" class="fw-bold">Renew Now →</a>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    {% block breadcrumb %}
+                    <li class="breadcrumb-item"><a href="{% url 'accounts:dashboard' %}">Home</a></li>
+                    {% endblock %}
+                </ol>
+            </nav>
+            
+            <!-- Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <!-- Main Content Block -->
+            {% block content %}
+            {% endblock %}
+        </div>
+        
+        <!-- Footer -->
+        <footer class="text-center text-muted py-3">
+            <small>&copy; {% now "Y" %} PharmaPro. All rights reserved. | Version 1.0.0</small>
+            {% if user.is_superuser %}
+                <span class="ms-2 text-danger">| Super Admin</span>
+            {% endif %}
+        </footer>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">
+                        <i class="fas fa-sign-out-alt text-danger me-2"></i>
+                        Confirm Logout
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3">
+                        <div class="rounded-circle bg-danger bg-opacity-10 d-inline-flex 
+                                    align-items-center justify-content-center"
+                             style="width:80px;height:80px;">
+                            <i class="fas fa-power-off text-danger fa-2x"></i>
+                        </div>
+                    </div>
+                    <h5>Are you sure you want to logout?</h5>
+                    <p class="text-muted mb-0">
+                        You will need to sign in again to access PharmaPro.
+                    </p>
+                </div>
+                <div class="modal-footer border-0 justify-content-center">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
+                    <a href="{% url 'accounts:logout' %}" class="btn btn-danger px-4">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        // ===== NOTIFICATION SOUND =====
+        let notificationSound = null;
+        let previousNotificationCount = 0;
+
+        function playNotificationSound() {
+            try {
+                // Try to load the sound from media directory
+                const audio = new Audio('{% static "media/notification/beep.mp3" %}');
+                audio.volume = 0.7;
+                audio.play().catch(function(error) {
+                    console.log('Audio play failed, using fallback:', error);
+                    playFallbackBeep();
+                });
+            } catch (e) {
+                playFallbackBeep();
+            }
+        }
+
+        function playFallbackBeep() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // First beep
+                const oscillator1 = audioContext.createOscillator();
+                const gainNode1 = audioContext.createGain();
+                oscillator1.connect(gainNode1);
+                gainNode1.connect(audioContext.destination);
+                oscillator1.frequency.value = 800;
+                oscillator1.type = 'sine';
+                gainNode1.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode1.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                oscillator1.start(audioContext.currentTime);
+                oscillator1.stop(audioContext.currentTime + 0.2);
+                
+                // Second beep (higher pitch)
+                setTimeout(() => {
+                    const oscillator2 = audioContext.createOscillator();
+                    const gainNode2 = audioContext.createGain();
+                    oscillator2.connect(gainNode2);
+                    gainNode2.connect(audioContext.destination);
+                    oscillator2.frequency.value = 1000;
+                    oscillator2.type = 'sine';
+                    gainNode2.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+                    oscillator2.start(audioContext.currentTime);
+                    oscillator2.stop(audioContext.currentTime + 0.15);
+                }, 200);
+            } catch (e) {
+                console.log('Could not play sound');
+            }
+        }
+
+        // ===== LOAD NOTIFICATIONS =====
+        function loadNotifications() {
+            $.ajax({
+                url: '{% url "accounts:get_notifications_api" %}',
+                method: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        const currentCount = response.unread_count;
+                        
+                        // Update badge count
+                        $('#notificationCount').text(currentCount);
+                        if (currentCount === 0) {
+                            $('#notificationCount').hide();
+                        } else {
+                            $('#notificationCount').show();
+                        }
+                        
+                        // Play sound if new notification arrived
+                        if (response.has_new_notifications && currentCount > 0) {
+                            playNotificationSound();
+                        }
+                        
+                        // Store current count for next comparison
+                        previousNotificationCount = currentCount;
+                        
+                        // Render notifications
+                        const container = $('#notificationItems');
+                        if (response.notifications.length === 0) {
+                            container.html(`
+                                <div class="text-center text-muted py-3">
+                                    <i class="fas fa-bell-slash fa-2x mb-2"></i>
+                                    <p class="mb-0">No new notifications</p>
+                                </div>
+                            `);
+                        } else {
+                            let html = '';
+                            response.notifications.forEach(function(notif) {
+                                const iconClass = notif.icon || 'fa-bell';
+                                const typeClass = notif.notification_type === 'success' ? 'text-success' :
+                                                notif.notification_type === 'warning' ? 'text-warning' :
+                                                notif.notification_type === 'error' ? 'text-danger' : 'text-info';
+                                
+                                // Truncate message if too long
+                                let message = notif.message;
+                                if (message.length > 100) {
+                                    message = message.substring(0, 100) + '...';
+                                }
+                                
+                                html += `
+                                    <li class="dropdown-item ${!notif.is_read ? 'bg-light' : ''}">
+                                        <div class="d-flex align-items-start">
+                                            <i class="fas ${iconClass} ${typeClass} me-2 mt-1"></i>
+                                            <div class="flex-grow-1">
+                                                <div class="fw-${!notif.is_read ? 'bold' : 'normal'}">${notif.title}</div>
+                                                <small class="text-muted notification-message">${message}</small>
+                                                <div class="mt-1">
+                                                    <small class="text-muted">${new Date(notif.created_at).toLocaleDateString()}</small>
+                                                    ${notif.link ? `<a href="${notif.link}" class="ms-2 small">${notif.link_text || 'View'}</a>` : ''}
+                                                </div>
+                                            </div>
+                                            ${!notif.is_read ? `<span class="badge bg-primary rounded-circle ms-1 mt-1" style="width:8px;height:8px;padding:0;"></span>` : ''}
+                                        </div>
+                                    </li>
+                                `;
+                            });
+                            container.html(html);
+                        }
+                    }
+                }
+            });
+        }
+
+        // ===== UPDATE NOTIFICATION COUNT PERIODICALLY =====
+        function updateNotificationCount() {
+            $.ajax({
+                url: '{% url "accounts:get_notifications_api" %}',
+                method: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        const currentCount = response.unread_count;
+                        $('#notificationCount').text(currentCount);
+                        if (currentCount === 0) {
+                            $('#notificationCount').hide();
+                        } else {
+                            $('#notificationCount').show();
+                        }
+                        
+                        // Play sound if new notification arrived
+                        if (response.has_new_notifications && currentCount > 0) {
+                            playNotificationSound();
+                        }
+                    }
+                }
+            });
+        }
+
+        // ===== INITIALIZE =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load initial notification count
+            setTimeout(function() {
+                $.ajax({
+                    url: '{% url "accounts:get_notifications_api" %}',
+                    method: 'GET',
+                    success: function(response) {
+                        if (response.success) {
+                            const count = response.unread_count;
+                            $('#notificationCount').text(count);
+                            if (count === 0) {
+                                $('#notificationCount').hide();
+                            } else {
+                                $('#notificationCount').show();
+                            }
+                            previousNotificationCount = count;
+                        }
+                    }
+                });
+            }, 1000);
+            
+            // Auto-hide alerts
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.alert:not(.subscription-banner)');
+                alerts.forEach(function(alert) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
+            
+            // Load online users count
+            loadOnlineUsersCount();
+            
+            // Update user status periodically
+            updateUserStatus();
+        });
+
+        // ===== PERIODIC CHECK FOR NEW NOTIFICATIONS =====
+        // Check every 15 seconds for new notifications (more frequent)
+        setInterval(function() {
+            updateNotificationCount();
+        }, 15000);
+
+        // ===== LOAD NOTIFICATIONS WHEN DROPDOWN OPENS =====
+        $('#notificationDropdown').on('shown.bs.dropdown', function() {
+            loadNotifications();
+        });
+
+        // ===== SIDEBAR TOGGLE =====
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        // ===== LOADING SPINNER =====
+        function showLoading() {
+            document.getElementById('loadingSpinner').classList.add('show');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingSpinner').classList.remove('show');
+        }
+
+        // ===== LOAD ONLINE USERS COUNT =====
+        function loadOnlineUsersCount() {
+            {% if perms.accounts.can_manage_users or user.role == 'admin' or user.is_superuser %}
+            $.ajax({
+                url: '{% url "accounts:get_online_users" %}',
+                method: 'GET',
+                timeout: 5000,
+                success: function(response) {
+                    if (response.success) {
+                        $('#onlineCount').text(response.count);
+                        $('#onlineUsersCount').text(response.count);
+                    }
+                },
+                error: function(xhr, status) {
+                    if (status !== 'abort') {
+                        console.warn('Error loading online users count:', status);
+                    }
+                }
+            });
+            {% endif %}
+        }
+
+        // ===== LOGOUT MODAL =====
+        function showLogoutModal(event) {
+            event.preventDefault();
+            const modal = new bootstrap.Modal(document.getElementById('logoutModal'));
+            modal.show();
+        }
+
+        // ===== UPDATE USER STATUS =====
+        function updateUserStatus() {
+            const statusDot = document.getElementById('userStatusDot');
+            const statusText = document.getElementById('userStatusText');
+            
+            if (statusDot) {
+                {% if user.is_online %}
+                statusDot.className = 'status-badge status-online';
+                if (statusText) statusText.textContent = 'Online';
+                {% else %}
+                statusDot.className = 'status-badge status-offline';
+                if (statusText) statusText.textContent = 'Offline';
+                {% endif %}
+            }
+            
+            setInterval(loadOnlineUsersCount, 30000);
+        }
+
+        // ===== CLOSE SIDEBAR ON CLICK OUTSIDE =====
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.getElementById('mobileToggle');
+            
+            if (window.innerWidth <= 768 && 
+                sidebar.classList.contains('active') &&
+                !sidebar.contains(event.target) &&
+                !toggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // ===== HANDLE WINDOW RESIZE =====
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.remove('active');
+            }
+        });
+
+        // ===== AJAX REQUEST HELPER =====
+        function makeAjaxRequest(url, method, data, successCallback, errorCallback) {
+            showLoading();
+            $.ajax({
+                url: url,
+                method: method,
+                data: data,
+                headers: {
+                    'X-CSRFToken': getCsrfToken()
+                },
+                success: function(response) {
+                    hideLoading();
+                    if (successCallback) successCallback(response);
+                },
+                error: function(xhr, status, error) {
+                    hideLoading();
+                    if (errorCallback) {
+                        errorCallback(xhr, status, error);
+                    } else {
+                        console.error('AJAX Error:', error);
+                        alert('An error occurred. Please try again.');
+                    }
+                }
+            });
+        }
+
+        function getCsrfToken() {
+            return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+        }
+
+        // ===== UPDATE ONLINE STATUS =====
+        function updateOnlineStatus(isOnline) {
+            if (document.hidden) return;
+            
+            $.ajax({
+                url: '{% url "accounts:update_user_online_status" %}',
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCsrfToken()
+                },
+                data: {
+                    is_online: isOnline
+                },
+                timeout: 5000,
+                success: function(response) {
+                    if (response.success) {
+                        const statusDot = document.getElementById('userStatusDot');
+                        const statusText = document.getElementById('userStatusText');
+                        
+                        if (statusDot) {
+                            statusDot.className = `status-badge ${isOnline ? 'status-online' : 'status-offline'}`;
+                        }
+                        if (statusText) {
+                            statusText.textContent = isOnline ? 'Online' : 'Offline';
+                        }
+                        
+                        {% if perms.accounts.can_manage_users or user.role == 'admin' or user.is_superuser %}
+                        loadOnlineUsersCount();
+                        {% endif %}
+                    }
+                },
+                error: function(xhr, status) {
+                    if (status !== 'abort') {
+                        console.warn('Error updating status:', status);
+                    }
+                }
+            });
+        }
+
+        // ===== PAGE VISIBILITY FOR STATUS UPDATES =====
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                return;
+            }
+            updateOnlineStatus(true);
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,240 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Create Stock Movement - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+        }
+        
+        .col-md-8.col-lg-6 {
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+        
+        .row.justify-content-center {
+            --bs-gutter-x: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+        }
+        
+        .card-header h5 {
+            font-size: 0.85rem !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .form-label {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+        
+        .form-text {
+            font-size: 0.6rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+            width: 100% !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .d-flex.gap-2.justify-content-end {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .alert-info {
+            font-size: 0.8rem !important;
+            padding: 0.5rem !important;
+        }
+        
+        textarea {
+            font-size: 0.85rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 10px !important;
+        }
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exchange-alt text-primary me-2"></i>Create Stock Movement
+                    </h5>
+                    <a href="{% url 'inventory:stock_movements' %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> <span class="d-none d-sm-inline">Back</span>
+                        <span class="d-inline d-sm-none">←</span>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="movementForm">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="product" class="form-label">Product <span class="text-danger">*</span></label>
+                            <select class="form-select" id="product" name="product" required>
+                                <option value="">Select Product</option>
+                                {% for product in products %}
+                                <option value="{{ product.id }}">
+                                    {{ product.name }} ({{ product.sku }}) - Stock: {{ product.quantity|floatformat:0 }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="movement_type" class="form-label">Movement Type <span class="text-danger">*</span></label>
+                            <select class="form-select" id="movement_type" name="movement_type" required>
+                                <option value="purchase">Purchase</option>
+                                <option value="sale">Sale</option>
+                                <option value="return">Return</option>
+                                <option value="adjustment">Adjustment</option>
+                                <option value="transfer">Transfer</option>
+                                <option value="waste">Waste</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label">Quantity <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="quantity" name="quantity" 
+                                   placeholder="Enter quantity" required min="1" step="1">
+                            <div class="form-text" id="stockInfo">Enter the quantity for this movement.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="reference" class="form-label">Reference</label>
+                            <input type="text" class="form-control" id="reference" name="reference" 
+                                   placeholder="e.g., PO-123, Invoice #456">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                      placeholder="Additional notes about this movement"></textarea>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Note:</strong> This will create a permanent record of this stock movement and update the product quantity.
+                        </div>
+
+                        <hr>
+                        <div class="d-flex gap-2 justify-content-end flex-wrap">
+                            <a href="{% url 'inventory:stock_movements' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-save me-1"></i> Create Movement
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const productSelect = document.getElementById('product');
+        const movementTypeSelect = document.getElementById('movement_type');
+        const quantityInput = document.getElementById('quantity');
+        const stockInfo = document.getElementById('stockInfo');
+        
+        productSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption.value) {
+                const text = selectedOption.text;
+                const match = text.match(/Stock: (\d+)/);
+                if (match) {
+                    stockInfo.textContent = `Current stock: ${match[1]} units. Enter the quantity for this movement.`;
+                }
+            } else {
+                stockInfo.textContent = 'Enter the quantity for this movement.';
+            }
+        });
+        
+        movementTypeSelect.addEventListener('change', function() {
+            if (this.value === 'sale' || this.value === 'waste') {
+                stockInfo.textContent = '⚠️ This will reduce stock. Ensure you have enough quantity.';
+                stockInfo.className = 'form-text text-warning';
+            } else {
+                stockInfo.className = 'form-text';
+                stockInfo.textContent = 'This will increase stock.';
+            }
+        });
+        
+        document.getElementById('movementForm').addEventListener('submit', function(e) {
+            const product = productSelect.value;
+            const quantity = parseInt(quantityInput.value);
+            
+            if (!product) {
+                e.preventDefault();
+                alert('Please select a product.');
+                return false;
+            }
+            
+            if (!quantity || quantity < 1) {
+                e.preventDefault();
+                alert('Please enter a valid quantity (minimum 1).');
+                return false;
+            }
+            
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Creating...';
+            btn.disabled = true;
+        });
+    });
+</script>
+{% endblock %}

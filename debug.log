@@ -1,0 +1,64 @@
+Product creation error: NOT NULL constraint failed: inventory_products.tenant_id
+Category creation error: NOT NULL constraint failed: inventory_categories.tenant_id
+Unit creation error: Unit() got unexpected keyword arguments: 'created_by'
+Unit creation error: Unit() got unexpected keyword arguments: 'created_by'
+Product creation error: StockMovement() got unexpected keyword arguments: 'performed_by'
+Product creation error: NOT NULL constraint failed: inventory_stock_movements.unit_price
+Product creation error: NOT NULL constraint failed: inventory_stock_movements.unit_price
+Product update error: unsupported operand type(s) for -: 'float' and 'decimal.Decimal'
+Product update error: unsupported operand type(s) for -: 'str' and 'datetime.date'
+Product update error: InventoryAlert() got unexpected keyword arguments: 'severity'
+Sale creation error: StockMovement() got unexpected keyword arguments: 'sale_unit_name'
+Sale creation error: UNIQUE constraint failed: sales_sales.invoice_number
+Report generation error: Object of type Decimal is not JSON serializable
+Report generation error: ['“” value has an invalid date format. It must be in YYYY-MM-DD format.']
+Report generation error: ['“” value has an invalid date format. It must be in YYYY-MM-DD format.']
+Report generation error: Object of type Decimal is not JSON serializable
+Report generation error: name 'generate_sales_pdf' is not defined
+Traceback (most recent call last):
+  File "E:\phamacy\pharma\reports\views.py", line 460, in generate_report_view
+    file_content = generate_sales_pdf(tenant, date_from, date_to)
+                   ^^^^^^^^^^^^^^^^^^
+NameError: name 'generate_sales_pdf' is not defined. Did you mean: 'export_sales_pdf'?
+
+Error sending welcome email to opioarnoldoku@gmail.com: accounts/email/user_welcome.txt
+Error sending welcome email to opioarnoldoku@gmail.com: accounts/email/user_welcome.html
+Failed to render text template: accounts/email/user_welcome.txt
+Sending welcome email to opioarnoldoku@gmail.com
+Welcome email sent successfully to opioarnoldoku@gmail.com
+Failed to render HTML template: accounts/email/user_welcome.html
+Sending welcome email to opioarnoldoku@gmail.com
+Welcome email sent successfully to opioarnoldoku@gmail.com
+Failed to render text template: accounts/email/user_welcome.txt
+Sending welcome email to opioarnoldoku@gmail.com
+Welcome email sent successfully to opioarnoldoku@gmail.com
+Sending welcome email to opioarnoldoku@gmail.com
+Welcome email sent successfully to opioarnoldoku@gmail.com
+Sending welcome email to opioarnoldoku@gmail.com
+Welcome email sent successfully to opioarnoldoku@gmail.com
+Sending welcome email to arnold.okullo@example.com
+Welcome email sent successfully to arnold.okullo@example.com
+Sending welcome email to orokentech@gmail.com
+Welcome email sent successfully to orokentech@gmail.com
+Sending welcome email to arnoldsabirexy1234@gmail.com
+Welcome email sent successfully to arnoldsabirexy1234@gmail.com
+Sending welcome email to arnoldsabirexy76@gmail.com
+Welcome email sent successfully to arnoldsabirexy76@gmail.com
+Sending welcome email to arnoldsabirexy69@gmail.com
+Welcome email sent successfully to arnoldsabirexy69@gmail.com
+Supplier creation error: NOT NULL constraint failed: suppliers_supplier.tenant_id
+Supplier creation error: NOT NULL constraint failed: suppliers_supplier.tenant_id
+Error sending PO notification email: suppliers/email/po_notification.html
+Error sending PO notification email: suppliers/email/po_notification.html
+Error sending PO notification email: suppliers/email/po_notification.html
+Error sending PO notification email: suppliers/email/po_notification.html
+Error sending PO notification email: suppliers/email/po_notification.html
+Subscription notification sent to arnoldokulloopio@gmail.com for tenant baylor
+Subscription expiry email sent to 1 recipients
+Subscription expiry notification sent for tenant baylor - 0 days left
+Subscription notification sent to arnoldokulloopio@gmail.com for tenant baylor
+Subscription expiry email sent to 1 recipients
+Subscription expiry notification sent for tenant baylor - 0 days left
+Subscription notification sent to arnoldokulloopio@gmail.com for tenant baylor
+Subscription expiry email sent to 1 recipients
+Subscription expiry notification sent for tenant baylor - 0 days left

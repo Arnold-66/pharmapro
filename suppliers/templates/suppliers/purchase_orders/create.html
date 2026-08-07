@@ -1,0 +1,416 @@
+<!-- suppliers/templates/suppliers/purchase_orders/create.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Create Purchase Order - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== MOBILE RESPONSIVE STYLES ===== */
+    @media (max-width: 768px) {
+        .container-fluid.py-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }
+        
+        .card-header h4 {
+            font-size: 0.95rem !important;
+        }
+        
+        .card-header .btn {
+            font-size: 0.7rem !important;
+            padding: 0.2rem 0.5rem !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .form-label {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+            width: 100% !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .d-flex.gap-2.mt-4 {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .col-md-6, .col-md-5, .col-md-3, .col-md-2 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+        
+        .table {
+            font-size: 0.75rem !important;
+        }
+        
+        .table td, .table th {
+            padding: 0.3rem 0.2rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.py-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1) !important;
+    }
+    
+    .card-header {
+        background: transparent !important;
+        border-bottom: 2px solid #f0f0f0 !important;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--secondary-color, #3498db) !important;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25) !important;
+    }
+    
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+    }
+    
+    .btn-secondary {
+        border-radius: 8px;
+    }
+    
+    .btn-danger {
+        border-radius: 8px;
+    }
+    
+    .table thead {
+        background-color: #f8f9fa;
+    }
+    
+    /* Toast Custom Styles */
+    .toast-custom {
+        border-radius: 12px !important;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15) !important;
+        min-width: 300px !important;
+        max-width: 400px !important;
+        border: none !important;
+    }
+    
+    .toast-custom .toast-body {
+        padding: 1rem 1.2rem !important;
+        font-weight: 500 !important;
+    }
+    
+    .toast-custom .btn-close {
+        filter: brightness(0) invert(1);
+        opacity: 0.8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h4 class="mb-0">
+                        <i class="fas fa-plus me-2"></i>Create Purchase Order
+                    </h4>
+                    <a href="{% url 'suppliers:purchase_order_list' %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> <span class="d-none d-sm-inline">Back</span>
+                        <span class="d-inline d-sm-none">Back</span>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="poForm" onsubmit="return validateForm()">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="supplier" class="form-label fw-bold">Supplier <span class="text-danger">*</span></label>
+                                <select class="form-select" id="supplier" name="supplier" required>
+                                    <option value="">Select Supplier</option>
+                                    {% for supplier in suppliers %}
+                                        <option value="{{ supplier.id }}">{{ supplier.name }} ({{ supplier.code }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="expected_delivery_date" class="form-label fw-bold">Expected Delivery Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="expected_delivery_date" name="expected_delivery_date" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notes" class="form-label fw-bold">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
+                        </div>
+
+                        <hr>
+
+                        <h5 class="mb-3"><i class="fas fa-boxes me-2"></i>Items</h5>
+                        <div id="itemsContainer">
+                            <div class="row item-row mb-3">
+                                <div class="col-md-5">
+                                    <label class="form-label fw-bold">Product</label>
+                                    <select class="form-select product-select" name="product_ids[]" onchange="updateTotals()">
+                                        <option value="">Select Product</option>
+                                        {% for product in products %}
+                                            <option value="{{ product.id }}">{{ product.name }} ({{ product.sku }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold">Quantity</label>
+                                    <input type="number" class="form-control quantity" name="quantities[]" step="0.01" value="1" onchange="updateTotals()" onkeyup="updateTotals()">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">Unit Price (Ugx)</label>
+                                    <input type="number" class="form-control unit-price" name="unit_prices[]" step="0.01" onchange="updateTotals()" onkeyup="updateTotals()">
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="button" class="btn btn-danger remove-item-btn" style="display:none;" onclick="removeItem(this)">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn btn-secondary" onclick="addItem()">
+                            <i class="fas fa-plus me-1"></i> Add Item
+                        </button>
+
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-md-6 offset-md-6">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <tr>
+                                            <td><strong>Subtotal:</strong></td>
+                                            <td class="text-end" id="subtotal">Ugx 0.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Tax (0%):</strong></td>
+                                            <td class="text-end" id="tax">Ugx 0.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Total:</strong></td>
+                                            <td class="text-end fw-bold" id="total">Ugx 0.00</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4 flex-wrap">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i> Create PO
+                            </button>
+                            <a href="{% url 'suppliers:purchase_order_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+<script>
+// ===== TOAST NOTIFICATION FUNCTION =====
+function showToast(message, type = 'success') {
+    const container = document.querySelector('div[style*="position: fixed; top: 20px; right: 20px; z-index: 9999;"]');
+    
+    const toastHTML = `
+        <div class="toast toast-custom align-items-center border-0 mb-3 bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : type === 'warning' ? 'warning' : 'info'} text-white" role="alert" aria-live="assertive" aria-atomic="true" style="display:block;">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'} me-2"></i>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    
+    container.insertAdjacentHTML('beforeend', toastHTML);
+    const toastElement = container.lastElementChild;
+    const toast = new bootstrap.Toast(toastElement, {
+        autohide: true,
+        delay: 5000
+    });
+    toast.show();
+    
+    toastElement.addEventListener('hidden.bs.toast', function() {
+        toastElement.remove();
+    });
+}
+
+// Function to update totals
+function updateTotals() {
+    var rows = document.querySelectorAll('.item-row');
+    var subtotal = 0;
+    
+    rows.forEach(function(row) {
+        var quantity = parseFloat(row.querySelector('.quantity').value) || 0;
+        var unitPrice = parseFloat(row.querySelector('.unit-price').value) || 0;
+        subtotal += quantity * unitPrice;
+    });
+    
+    var tax = subtotal * 0; // 0% tax
+    var total = subtotal + tax;
+    
+    document.getElementById('subtotal').textContent = 'Ugx ' + subtotal.toFixed(2);
+    document.getElementById('tax').textContent = 'Ugx ' + tax.toFixed(2);
+    document.getElementById('total').textContent = 'Ugx ' + total.toFixed(2);
+}
+
+// Add item row
+function addItem() {
+    var container = document.getElementById('itemsContainer');
+    var lastRow = container.querySelector('.item-row:last-child');
+    var newRow = lastRow.cloneNode(true);
+    
+    // Clear input values
+    newRow.querySelector('.product-select').value = '';
+    newRow.querySelector('.quantity').value = '1';
+    newRow.querySelector('.unit-price').value = '';
+    
+    // Show remove button
+    var removeBtn = newRow.querySelector('.remove-item-btn');
+    removeBtn.style.display = 'block';
+    
+    // Update event listeners
+    newRow.querySelector('.product-select').onchange = updateTotals;
+    newRow.querySelector('.quantity').onchange = updateTotals;
+    newRow.querySelector('.quantity').onkeyup = updateTotals;
+    newRow.querySelector('.unit-price').onchange = updateTotals;
+    newRow.querySelector('.unit-price').onkeyup = updateTotals;
+    
+    container.appendChild(newRow);
+    updateTotals();
+}
+
+// Remove item row
+function removeItem(button) {
+    var rows = document.querySelectorAll('.item-row');
+    if (rows.length > 1) {
+        var row = button.closest('.item-row');
+        row.remove();
+        updateTotals();
+    } else {
+        showToast('You need at least one item.', 'warning');
+    }
+}
+
+// Validate form before submit
+function validateForm() {
+    var rows = document.querySelectorAll('.item-row');
+    var hasItems = false;
+    var supplier = document.getElementById('supplier').value;
+    var deliveryDate = document.getElementById('expected_delivery_date').value;
+    
+    if (!supplier) {
+        showToast('Please select a supplier.', 'warning');
+        return false;
+    }
+    
+    if (!deliveryDate) {
+        showToast('Please select an expected delivery date.', 'warning');
+        return false;
+    }
+    
+    rows.forEach(function(row) {
+        var product = row.querySelector('.product-select').value;
+        var quantity = row.querySelector('.quantity').value;
+        var unitPrice = row.querySelector('.unit-price').value;
+        
+        if (product && quantity && unitPrice) {
+            hasItems = true;
+        }
+    });
+    
+    if (!hasItems) {
+        showToast('Please add at least one item with product, quantity, and unit price.', 'warning');
+        return false;
+    }
+    
+    return true;
+}
+
+// Update totals on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateTotals();
+    
+    // Add initial event listeners for the first row
+    var firstRow = document.querySelector('.item-row');
+    if (firstRow) {
+        firstRow.querySelector('.product-select').onchange = updateTotals;
+        firstRow.querySelector('.quantity').onchange = updateTotals;
+        firstRow.querySelector('.quantity').onkeyup = updateTotals;
+        firstRow.querySelector('.unit-price').onchange = updateTotals;
+        firstRow.querySelector('.unit-price').onkeyup = updateTotals;
+    }
+});
+</script>
+{% endblock %}

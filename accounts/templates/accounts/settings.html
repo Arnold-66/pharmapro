@@ -1,0 +1,753 @@
+<!-- accounts/templates/accounts/settings.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Settings - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== RESET ALL PADDING/MARGINS ON MOBILE ===== */
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0 !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }
+        
+        .card-header h5 {
+            font-size: 0.85rem !important;
+        }
+        
+        /* Page header */
+        .page-header h1 {
+            font-size: 1.1rem !important;
+        }
+        
+        .page-header p {
+            font-size: 0.75rem !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .page-header .btn {
+            font-size: 0.65rem !important;
+            padding: 0.2rem 0.4rem !important;
+        }
+        
+        .page-header .d-flex.gap-2 {
+            gap: 0.3rem !important;
+        }
+        
+        /* Form adjustments */
+        .form-control, .form-select {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .form-label {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.2rem !important;
+            font-weight: 600 !important;
+        }
+        
+        .form-text, .help-text {
+            font-size: 0.6rem !important;
+        }
+        
+        .form-control-color {
+            height: 40px !important;
+            padding: 3px !important;
+        }
+        
+        /* Logo preview */
+        .logo-preview img {
+            max-height: 60px !important;
+        }
+        
+        /* Info items */
+        .info-item {
+            flex-direction: column !important;
+            gap: 0.15rem !important;
+            padding: 0.5rem 0 !important;
+        }
+        
+        .info-item .value {
+            font-size: 0.9rem !important;
+        }
+        
+        .info-item .label {
+            font-size: 0.75rem !important;
+        }
+        
+        /* Buttons */
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .btn-save {
+            width: 100% !important;
+            justify-content: center !important;
+        }
+        
+        /* Badges */
+        .badge-plan, .badge-status {
+            font-size: 0.7rem !important;
+            padding: 0.25rem 0.5rem !important;
+        }
+        
+        /* Section divider */
+        .section-divider {
+            margin: 1rem 0 !important;
+        }
+        
+        .section-title {
+            font-size: 0.9rem !important;
+            margin-bottom: 0.75rem !important;
+        }
+        
+        /* Color picker row on mobile - stack */
+        .color-picker-row .col-md-4 {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+            padding: 0.25rem !important;
+        }
+        
+        /* Progress bar */
+        .progress {
+            height: 6px !important;
+        }
+        
+        /* Sidebar cards - remove margin on mobile */
+        .mt-3 {
+            margin-top: 0 !important;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .color-picker-row .col-md-4 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0.5rem !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0.25rem !important;
+            padding-left: 0.25rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+    
+    /* ===== COMMON STYLES ===== */
+    .settings-container {
+        padding: 0;
+    }
+    
+    .settings-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .settings-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+    
+    .settings-card .card-header {
+        background: transparent !important;
+        border-bottom: 2px solid #f0f0f0;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .settings-card .card-header h5 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    .settings-card .card-header i {
+        font-size: 1.1rem;
+    }
+    
+    .settings-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .settings-card .card-body .form-label {
+        font-weight: 600;
+        font-size: 0.875rem;
+        margin-bottom: 0.35rem;
+        color: #2c3e50;
+    }
+    
+    .settings-card .card-body .form-control,
+    .settings-card .card-body .form-select {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    .settings-card .card-body .form-control:focus,
+    .settings-card .card-body .form-select:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+    
+    .settings-card .card-body .form-control:disabled {
+        background-color: #f8f9fa;
+        cursor: not-allowed;
+    }
+    
+    .settings-card .card-body .help-text {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+    
+    .settings-card .card-body .logo-preview {
+        margin-bottom: 0.75rem;
+    }
+    
+    .settings-card .card-body .logo-preview img {
+        max-height: 80px;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        padding: 4px;
+        background: #fff;
+        object-fit: contain;
+    }
+    
+    /* ===== BUTTONS ===== */
+    .btn-save {
+        background: #2c3e50;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.625rem 2rem;
+        font-weight: 600;
+        transition: background 0.2s, transform 0.1s;
+    }
+    
+    .btn-save:hover {
+        background: #1a2a3a;
+        color: #fff;
+    }
+    
+    .btn-save:active {
+        transform: scale(0.97);
+    }
+    
+    .btn-save:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+    
+    /* ===== SIDEBAR INFO ===== */
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .info-item .label {
+        color: #6c757d;
+        font-size: 0.85rem;
+    }
+    
+    .info-item .value {
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    /* ===== BADGES ===== */
+    .badge-plan {
+        background: #3498db;
+        color: #fff;
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .badge-status {
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .badge-status.active {
+        background: #28a745;
+        color: #fff;
+    }
+    
+    .badge-status.trial {
+        background: #17a2b8;
+        color: #fff;
+    }
+    
+    .badge-status.inactive {
+        background: #ffc107;
+        color: #212529;
+    }
+    
+    .badge-status.expired {
+        background: #dc3545;
+        color: #fff;
+    }
+    
+    /* ===== SECTION DIVIDER ===== */
+    .section-divider {
+        border: none;
+        border-top: 2px solid #f0f0f0;
+        margin: 1.5rem 0;
+    }
+    
+    .section-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .section-title i {
+        color: #3498db;
+    }
+    
+    /* ===== PROGRESS BAR ===== */
+    .progress {
+        border-radius: 10px;
+        overflow: hidden;
+        height: 8px;
+    }
+    
+    .progress-bar {
+        transition: width 0.6s ease;
+    }
+    
+    /* ===== COLOR PICKER ===== */
+    .form-control-color {
+        height: 50px;
+        padding: 5px;
+        cursor: pointer;
+    }
+    
+    /* ===== CARD HEADER ICONS ===== */
+    .card-header .text-primary { color: #3498db !important; }
+    .card-header .text-info { color: #17a2b8 !important; }
+    .card-header .text-success { color: #28a745 !important; }
+    .card-header .text-warning { color: #ffc107 !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 settings-container">
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4" style="padding: 0 0.5rem;">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800 fw-bold">
+                <i class="fas fa-cog text-primary me-2"></i>Settings
+            </h1>
+            <p class="text-muted small mb-0 mt-1">Manage your organization settings and preferences</p>
+        </div>
+        <div class="mt-2 mt-sm-0">
+            <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left me-1"></i> Back to Profile
+            </a>
+        </div>
+    </div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="row g-4">
+        <!-- Main Settings Form -->
+        <div class="col-lg-8">
+            <div class="settings-card">
+                <div class="card-header">
+                    <i class="fas fa-building text-primary"></i>
+                    <h5>Organization Details</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" id="settingsForm">
+                        {% csrf_token %}
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Company Name</label>
+                                <input type="text" name="company_name" class="form-control" 
+                                       value="{{ tenant.company_name }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Organization Slug</label>
+                                <input type="text" class="form-control" value="{{ tenant.slug }}" disabled>
+                                <div class="help-text">Slug cannot be changed</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <label class="form-label">Address</label>
+                            <textarea name="company_address" class="form-control" rows="2" required>{{ tenant.company_address }}</textarea>
+                        </div>
+                        
+                        <div class="row g-3 mt-1">
+                            <div class="col-md-6">
+                                <label class="form-label">Phone</label>
+                                <input type="tel" name="company_phone" class="form-control" 
+                                       value="{{ tenant.company_phone }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="company_email" class="form-control" 
+                                       value="{{ tenant.company_email }}" required>
+                            </div>
+                        </div>
+                        
+                        <hr class="section-divider">
+                        
+
+                        <!-- ===== TAX SETTINGS ===== -->
+                        <div class="section-title">
+                            <i class="fas fa-percent text-warning"></i> Tax & Financial Settings
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Default Tax Rate (%)</label>
+                                <div class="input-group">
+                                   <input type="number" name="tax_rate" class="form-control" 
+    value="{{ settings.tax_rate|floatformat:2|default:'18.00' }}" min="0" max="100" step="0.5">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <div class="help-text">Default tax rate applied to all new sales. Can be overridden per sale.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Tax Inclusive</label>
+                                <div class="form-check mt-2">
+                                    <input type="checkbox" name="tax_inclusive" class="form-check-input" 
+                                        id="taxInclusive" {% if settings.tax_inclusive %}checked{% endif %}>
+                                    <label class="form-check-label" for="taxInclusive">
+                                        Prices are tax inclusive
+                                    </label>
+                                </div>
+                                <div class="help-text">When enabled, product prices already include tax.</div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-6">
+                                <label class="form-label">Invoice Prefix</label>
+                                <input type="text" name="invoice_prefix" class="form-control" 
+                                    value="{{ settings.invoice_prefix|default:'INV' }}">
+                                <div class="help-text">Prefix for invoice numbers (e.g., INV-2024-001)</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Invoice Footer Text</label>
+                                <input type="text" name="invoice_footer" class="form-control" 
+                                    value="{{ settings.invoice_footer|default:'' }}" placeholder="e.g., Terms & Conditions">
+                                <div class="help-text">Text that appears at the bottom of all invoices</div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-6">
+                                <label class="form-label">Payment Terms</label>
+                                <input type="text" name="payment_terms" class="form-control" 
+                                    value="{{ settings.payment_terms|default:'Due on receipt' }}">
+                                <div class="help-text">Default payment terms for invoices</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Late Fee (%)</label>
+                                <div class="input-group">
+                                    <input type="number" name="late_fee_percent" class="form-control" 
+                                        value="{{ settings.late_fee_percent|default:0 }}" min="0" max="100" step="0.5">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <div class="help-text">Late fee percentage applied to overdue invoices</div>
+                            </div>
+                        </div>
+                        
+                        
+                        <hr class="section-divider">
+                        
+                        <div class="section-title">
+                            <i class="fas fa-palette"></i> Branding
+                        </div>
+                        
+                        <div class="row g-3 color-picker-row">
+                            <div class="col-md-4">
+                                <label class="form-label">Primary Color</label>
+                                <input type="color" name="primary_color" class="form-control form-control-color" 
+                                       value="{{ tenant.primary_color|default:'#3498db' }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Secondary Color</label>
+                                <input type="color" name="secondary_color" class="form-control form-control-color" 
+                                       value="{{ tenant.secondary_color|default:'#2ecc71' }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Accent Color</label>
+                                <input type="color" name="accent_color" class="form-control form-control-color" 
+                                       value="{{ tenant.accent_color|default:'#e74c3c' }}">
+                            </div>
+                        </div>
+                        
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-6">
+                                <label class="form-label">Logo</label>
+                                {% if tenant.logo %}
+                                    <div class="logo-preview">
+                                        <img src="{{ tenant.logo.url }}" alt="Logo">
+                                    </div>
+                                {% endif %}
+                                <input type="file" name="logo" class="form-control" accept="image/*">
+                                <div class="help-text">Recommended: 200x50px, PNG or JPG</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Favicon</label>
+                                {% if tenant.favicon %}
+                                    <div class="logo-preview">
+                                        <img src="{{ tenant.favicon.url }}" alt="Favicon" style="max-height: 32px;">
+                                    </div>
+                                {% endif %}
+                                <input type="file" name="favicon" class="form-control" accept="image/*">
+                                <div class="help-text">Recommended: 16x16px, ICO or PNG</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-save" id="saveSettingsBtn">
+                                <i class="fas fa-save me-2"></i>Save Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar Info -->
+        <div class="col-lg-4">
+            <div class="settings-card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle text-info"></i>
+                    <h5>Organization Info</h5>
+                </div>
+                <div class="card-body">
+                    <div class="info-item">
+                        <span class="label">Plan</span>
+                        <span class="value">
+                            <span class="badge-plan">{{ tenant.get_plan_display }}</span>
+                        </span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="label">Status</span>
+                        <span class="value">
+                            <span class="badge-status {{ tenant.subscription_status }}">
+                                {{ tenant.get_status_display }}
+                            </span>
+                        </span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="label">Created</span>
+                        <span class="value">{{ tenant.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="label">Users</span>
+                        <span class="value">
+                            <span class="fw-bold">{{ total_users|default:0 }}</span>
+                            {% if tenant.max_users > 0 %}
+                                / {{ tenant.max_users }}
+                            {% else %}
+                                / Unlimited
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-card mt-3">
+                <div class="card-header">
+                    <i class="fas fa-database text-success"></i>
+                    <h5>Storage Usage</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Used: {{ tenant.storage_used|filesizeformat }}</span>
+                        <span class="text-muted small">
+                            Limit: 
+                            {% if tenant.max_storage == 0 %}
+                                Unlimited
+                            {% else %}
+                                {{ tenant.max_storage|filesizeformat }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="progress">
+                        {% if tenant.max_storage > 0 %}
+                            {% widthratio tenant.storage_used tenant.max_storage 100 as storage_progress %}
+                            <div class="progress-bar {% if storage_progress > 90 %}bg-danger{% elif storage_progress > 70 %}bg-warning{% else %}bg-info{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ storage_progress|default:0 }}%"
+                                 aria-valuenow="{{ storage_progress|default:0 }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                            </div>
+                        {% else %}
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mt-2">
+                        {% if tenant.max_storage > 0 %}
+                            {% widthratio tenant.storage_used tenant.max_storage 100 as storage_progress %}
+                            <small class="text-muted">{{ storage_progress|default:0 }}% used</small>
+                        {% else %}
+                            <small class="text-muted"><i class="fas fa-infinity me-1"></i>Unlimited storage</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-card mt-3">
+                <div class="card-header">
+                    <i class="fas fa-crown text-warning"></i>
+                    <h5>Subscription</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'tenants:subscription' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-crown me-2"></i>Manage Subscription
+                        </a>
+                    </div>
+                    {% if tenant.subscription_status == 'trial' %}
+                        <div class="mt-2 text-center">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>
+                                {% if tenant.trial_ends_at %}
+                                    Trial ends: {{ tenant.trial_ends_at|date:"M d, Y" }}
+                                {% endif %}
+                            </small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Show toast messages from Django
+        {% if messages %}
+            {% for message in messages %}
+                Swal.fire({
+                    icon: '{% if message.tags == "success" %}success{% elif message.tags == "error" %}error{% elif message.tags == "warning" %}warning{% else %}info{% endif %}',
+                    title: '{{ message }}',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            {% endfor %}
+        {% endif %}
+        
+        // Form validation before submit
+        const form = document.getElementById('settingsForm');
+        const saveBtn = document.getElementById('saveSettingsBtn');
+        
+        form.addEventListener('submit', function(e) {
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Saving...';
+        });
+        
+        // Color preview on change
+        document.querySelectorAll('input[type="color"]').forEach(function(input) {
+            input.addEventListener('change', function() {
+                // Optional: preview color change in real-time
+                console.log('Color changed to:', this.value);
+            });
+        });
+        
+        // File input preview
+        document.querySelectorAll('input[type="file"]').forEach(function(input) {
+            input.addEventListener('change', function(e) {
+                const preview = this.closest('.col-md-6').querySelector('.logo-preview img');
+                if (preview && this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        preview.src = event.target.result;
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

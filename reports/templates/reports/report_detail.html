@@ -1,0 +1,662 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}{{ report.name }} - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== FIXED LAYOUT & MOBILE RESPONSIVE ===== */
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }
+        
+        .card-header h5 {
+            font-size: 0.85rem !important;
+        }
+        
+        .card-header .btn {
+            font-size: 0.65rem !important;
+            padding: 0.15rem 0.4rem !important;
+        }
+        
+        .page-header h1 {
+            font-size: 1.1rem !important;
+            word-break: break-word !important;
+        }
+        
+        .page-header p {
+            font-size: 0.75rem !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .page-header .btn {
+            font-size: 0.65rem !important;
+            padding: 0.2rem 0.4rem !important;
+        }
+        
+        .page-header .d-flex.gap-2 {
+            gap: 0.3rem !important;
+        }
+        
+        .col-md-6 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            padding: 0.2rem 0 !important;
+        }
+        
+        .preview-grid {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 0.5rem !important;
+        }
+        
+        .preview-grid-item {
+            padding: 0.5rem !important;
+        }
+        
+        .preview-grid-item .number {
+            font-size: 1.1rem !important;
+        }
+        
+        .preview-grid-item .label {
+            font-size: 0.6rem !important;
+        }
+        
+        .preview-stat {
+            padding: 0.4rem 0.6rem !important;
+        }
+        
+        .preview-stat .label {
+            font-size: 0.7rem !important;
+        }
+        
+        .preview-stat .value {
+            font-size: 0.85rem !important;
+        }
+        
+        .preview-card {
+            padding: 0.75rem !important;
+        }
+        
+        .filters-display {
+            padding: 0.5rem !important;
+        }
+        
+        .filter-item {
+            padding: 0.3rem 0 !important;
+            font-size: 0.8rem !important;
+        }
+        
+        .dl-horizontal dt {
+            font-size: 0.75rem !important;
+        }
+        
+        .dl-horizontal dd {
+            font-size: 0.8rem !important;
+        }
+        
+        .alert-status {
+            padding: 0.6rem !important;
+        }
+        
+        .alert-status i {
+            font-size: 1.2rem !important;
+        }
+        
+        .alert-status .fw-bold {
+            font-size: 0.85rem !important;
+        }
+        
+        .btn-lg {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .preview-grid {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 0.3rem !important;
+        }
+        
+        .preview-grid-item .number {
+            font-size: 0.95rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1) !important;
+    }
+    
+    .card-header {
+        background: transparent !important;
+        border-bottom: 2px solid #f0f0f0 !important;
+    }
+    
+    .status-badge {
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+    }
+    .preview-card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 1rem;
+        border: 1px solid #e9ecef;
+    }
+    .preview-stat {
+        background: white;
+        padding: 1rem 1.25rem;
+        border-radius: 10px;
+        margin-bottom: 0.75rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        transition: all 0.2s ease;
+    }
+    .preview-stat:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    }
+    .preview-stat .label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    .preview-stat .label i {
+        margin-right: 8px;
+        width: 20px;
+        color: #3498db;
+    }
+    .preview-stat .value {
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #2c3e50;
+    }
+    .preview-stat .value.text-success {
+        color: #28a745 !important;
+    }
+    .preview-stat .value.text-danger {
+        color: #dc3545 !important;
+    }
+    .preview-stat .value.text-warning {
+        color: #ffc107 !important;
+    }
+    .preview-stat .value.text-info {
+        color: #17a2b8 !important;
+    }
+    .preview-stat .value.text-primary {
+        color: #007bff !important;
+    }
+    .filters-display {
+        background: white;
+        padding: 1rem;
+        border-radius: 10px;
+        border: 1px solid #e9ecef;
+    }
+    .filter-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f1f3f5;
+    }
+    .filter-item:last-child {
+        border-bottom: none;
+    }
+    .filter-item .label {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    .filter-item .value {
+        font-weight: 500;
+        color: #2c3e50;
+    }
+    .preview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    .preview-grid-item {
+        background: white;
+        padding: 1rem;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        border: 1px solid #e9ecef;
+    }
+    .preview-grid-item .number {
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+    .preview-grid-item .label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+    .preview-grid-item .number.text-success {
+        color: #28a745;
+    }
+    .preview-grid-item .number.text-primary {
+        color: #007bff;
+    }
+    .preview-grid-item .number.text-warning {
+        color: #ffc107;
+    }
+    .preview-grid-item .number.text-info {
+        color: #17a2b8;
+    }
+    .preview-grid-item .number.text-danger {
+        color: #dc3545;
+    }
+    .alert-status {
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+    }
+    .alert-status i {
+        font-size: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- ===== PAGE HEADER - IMPROVED ===== -->
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4" style="padding: 0 0.5rem;">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800 fw-bold">
+                <i class="fas fa-file-alt text-primary me-2"></i>{{ report.name }}
+            </h1>
+            <p class="text-muted small mb-0 mt-1">Report details and preview</p>
+        </div>
+        <div class="mt-2 mt-sm-0">
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'reports:report_list' %}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Back
+                </a>
+                {% if report.file %}
+                <a href="{% url 'reports:download_report' report.id %}" class="btn btn-sm btn-success">
+                    <i class="fas fa-download me-1"></i> Download {{ report.format|upper }}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <!-- Status Alert -->
+            <div class="alert alert-status {% if report.file %}alert-success{% else %}alert-warning{% endif %} d-flex align-items-center">
+                <i class="fas {% if report.file %}fa-check-circle{% else %}fa-clock{% endif %} me-3 fa-2x"></i>
+                <div>
+                    <div class="fw-bold fs-5">
+                        {% if report.file %}
+                        <span class="text-success">✅ Report Ready</span>
+                        {% else %}
+                        <span class="text-warning">⏳ Processing Report</span>
+                        {% endif %}
+                    </div>
+                    <div class="text-muted">
+                        {% if report.file %}
+                        Your report has been generated and is ready for download.
+                        {% else %}
+                        Your report is currently being generated. Please refresh in a few moments.
+                        {% endif %}
+                    </div>
+                </div>
+                {% if report.file %}
+                <div class="ms-auto">
+                    <span class="badge bg-success rounded-pill px-3 py-2 shadow-sm">
+                        <i class="fas fa-check-circle me-1"></i> Ready
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="row g-4">
+                <!-- Report Details -->
+                <div class="col-md-6">
+                    <h6 class="text-muted fw-bold mb-3">
+                        <i class="fas fa-info-circle me-2"></i>Report Details
+                    </h6>
+                    <dl class="row mb-0 dl-horizontal">
+                        <dt class="col-sm-4 text-muted">Name</dt>
+                        <dd class="col-sm-8 fw-semibold">{{ report.name }}</dd>
+                        
+                        <dt class="col-sm-4 text-muted">Type</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge bg-{% if report.type == 'sales' %}info{% elif report.type == 'inventory' %}success{% elif report.type == 'financial' %}warning{% else %}secondary{% endif %}">
+                                {{ report.get_type_display }}
+                            </span>
+                        </dd>
+                        
+                        <dt class="col-sm-4 text-muted">Format</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge bg-secondary">{{ report.format|upper }}</span>
+                        </dd>
+                        
+                        <dt class="col-sm-4 text-muted">Created By</dt>
+                        <dd class="col-sm-8">
+                            {% if report.created_by %}
+                                {{ report.created_by.get_full_name|default:report.created_by.username }}
+                            {% else %}
+                                <span class="text-muted">System</span>
+                            {% endif %}
+                        </dd>                                
+                        <dt class="col-sm-4 text-muted">Created At</dt>
+                        <dd class="col-sm-8">{{ report.created_at|date:"M d, Y H:i" }}</dd>
+                        
+                        {% if report.last_generated %}
+                        <dt class="col-sm-4 text-muted">Last Generated</dt>
+                        <dd class="col-sm-8">{{ report.last_generated|date:"M d, Y H:i" }}</dd>
+                        {% endif %}
+                        
+                        {% if report.file %}
+                        <dt class="col-sm-4 text-muted">File Size</dt>
+                        <dd class="col-sm-8">{{ report.file.size|filesizeformat }}</dd>
+                        {% endif %}
+                    </dl>
+                </div>
+                
+                <!-- Report Filters -->
+                <div class="col-md-6">
+                    <h6 class="text-muted fw-bold mb-3">
+                        <i class="fas fa-sliders-h me-2"></i>Report Filters
+                    </h6>
+                    <div class="filters-display">
+                        <div class="filter-item">
+                            <span class="label"><i class="fas fa-calendar-alt me-2"></i>Date From</span>
+                            <span class="value">{{ report.filters.date_from|default:"N/A" }}</span>
+                        </div>
+                        <div class="filter-item">
+                            <span class="label"><i class="fas fa-calendar-alt me-2"></i>Date To</span>
+                            <span class="value">{{ report.filters.date_to|default:"N/A" }}</span>
+                        </div>
+                        {% if report.filters.status %}
+                        <div class="filter-item">
+                            <span class="label"><i class="fas fa-tag me-2"></i>Status</span>
+                            <span class="value"><span class="badge bg-secondary">{{ report.filters.status|title }}</span></span>
+                        </div>
+                        {% endif %}
+                        {% if report.filters.payment_method %}
+                        <div class="filter-item">
+                            <span class="label"><i class="fas fa-credit-card me-2"></i>Payment Method</span>
+                            <span class="value"><span class="badge bg-info">{{ report.filters.payment_method|title }}</span></span>
+                        </div>
+                        {% endif %}
+                        {% if report.filters.category %}
+                        <div class="filter-item">
+                            <span class="label"><i class="fas fa-tags me-2"></i>Category</span>
+                            <span class="value"><span class="badge bg-success">{{ report.filters.category|title }}</span></span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Preview Section -->
+            <div class="preview-card mt-4">
+                <h6 class="fw-bold mb-3">
+                    <i class="fas fa-eye me-2"></i>Report Preview
+                    <span class="badge bg-{% if report.file %}success{% else %}warning{% endif %} ms-2">
+                        {% if report.file %}Live{% else %}Preview{% endif %}
+                    </span>
+                </h6>
+                
+                <!-- Summary Statistics -->
+                {% if report.parameters %}
+                <div class="preview-grid">
+                    {% if report.parameters.total_revenue is not None %}
+                    <div class="preview-grid-item">
+                        <div class="number text-success">Ugx {{ report.parameters.total_revenue|floatformat:2 }}</div>
+                        <div class="label">Total Revenue</div>
+                    </div>
+                    {% endif %}
+                    {% if report.parameters.total_sales is not None %}
+                    <div class="preview-grid-item">
+                        <div class="number text-primary">{{ report.parameters.total_sales }}</div>
+                        <div class="label">Total Sales</div>
+                    </div>
+                    {% endif %}
+                    {% if report.parameters.total_products is not None %}
+                    <div class="preview-grid-item">
+                        <div class="number text-info">{{ report.parameters.total_products }}</div>
+                        <div class="label">Total Products</div>
+                    </div>
+                    {% endif %}
+                    {% if report.parameters.total_stock_value is not None %}
+                    <div class="preview-grid-item">
+                        <div class="number text-warning">Ugx {{ report.parameters.total_stock_value|floatformat:2 }}</div>
+                        <div class="label">Stock Value</div>
+                    </div>
+                    {% endif %}
+                    {% if report.parameters.total_tax is not None %}
+                    <div class="preview-grid-item">
+                        <div class="number text-danger">Ugx {{ report.parameters.total_tax|floatformat:2 }}</div>
+                        <div class="label">Total Tax</div>
+                    </div>
+                    {% endif %}
+                    {% if report.parameters.total_discount is not None %}
+                    <div class="preview-grid-item">
+                        <div class="number text-warning">Ugx {{ report.parameters.total_discount|floatformat:2 }}</div>
+                        <div class="label">Total Discount</div>
+                    </div>
+                    {% endif %}
+                    {% if report.parameters.average_sale is not None %}
+                    <div class="preview-grid-item">
+                        <div class="number text-primary">Ugx {{ report.parameters.average_sale|floatformat:2 }}</div>
+                        <div class="label">Average Sale</div>
+                    </div>
+                    {% endif %}
+                    {% if report.parameters.total_quantity is not None %}
+                    <div class="preview-grid-item">
+                        <div class="number text-info">{{ report.parameters.total_quantity|floatformat:0 }}</div>
+                        <div class="label">Total Quantity</div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Top Products Section -->
+                {% if report.parameters.top_products %}
+                <div class="mt-3">
+                    <h6 class="text-muted fw-bold mb-2">
+                        <i class="fas fa-crown me-2"></i>Top Products
+                    </h6>
+                    <div class="row">
+                        {% for product in report.parameters.top_products|slice:":5" %}
+                        <div class="col-md-6">
+                            <div class="preview-stat">
+                                <span class="label">
+                                    <i class="fas fa-box me-2"></i>{{ product.product__name|default:"Unknown" }}
+                                </span>
+                                <span class="value text-success">Ugx {{ product.total_revenue|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Low Stock Products -->
+                {% if report.parameters.low_stock %}
+                <div class="mt-3">
+                    <h6 class="text-muted fw-bold mb-2">
+                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>Low Stock Products
+                    </h6>
+                    <div class="row">
+                        {% for product in report.parameters.low_stock|slice:":5" %}
+                        <div class="col-md-6">
+                            <div class="preview-stat">
+                                <span class="label">
+                                    <i class="fas fa-box me-2"></i>{{ product.name }}
+                                </span>
+                                <span class="value text-danger">{{ product.quantity }} / {{ product.reorder_point }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Payment Breakdown -->
+                {% if report.parameters.payment_breakdown %}
+                <div class="mt-3">
+                    <h6 class="text-muted fw-bold mb-2">
+                        <i class="fas fa-credit-card me-2"></i>Payment Breakdown
+                    </h6>
+                    <div class="row">
+                        {% for payment in report.parameters.payment_breakdown %}
+                        <div class="col-md-4">
+                            <div class="preview-stat">
+                                <span class="label">
+                                    <i class="fas fa-credit-card me-2"></i>{{ payment.method|title }}
+                                </span>
+                                <span class="value text-info">Ugx {{ payment.total|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Stock by Category -->
+                {% if report.parameters.stock_by_category %}
+                <div class="mt-3">
+                    <h6 class="text-muted fw-bold mb-2">
+                        <i class="fas fa-tags me-2"></i>Stock by Category
+                    </h6>
+                    <div class="row">
+                        {% for category in report.parameters.stock_by_category|slice:":5" %}
+                        <div class="col-md-4">
+                            <div class="preview-stat">
+                                <span class="label">
+                                    <i class="fas fa-folder me-2"></i>{{ category.category__name|default:"Uncategorized" }}
+                                </span>
+                                <span class="value text-primary">{{ category.total_quantity }} items</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="fas fa-chart-bar fa-3x mb-3 d-block"></i>
+                    <p>No preview data available for this report.</p>
+                    <p class="small">The report is still being processed or may not contain data.</p>
+                    {% if not report.file %}
+                    <button class="btn btn-primary btn-sm mt-2" onclick="location.reload()">
+                        <i class="fas fa-sync me-1"></i> Refresh
+                    </button>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <div class="mt-3 text-muted small">
+                    <i class="fas fa-info-circle me-1"></i>
+                    This preview shows a summary of your report data. Download the full report for complete details.
+                </div>
+            </div>
+
+            <hr>
+            <div class="d-flex gap-2 justify-content-end flex-wrap">
+                {% if report.file %}
+                <a href="{% url 'reports:download_report' report.id %}" class="btn btn-success btn-lg">
+                    <i class="fas fa-download me-2"></i> Download {{ report.format|upper }}
+                </a>
+                {% endif %}
+                <button type="button" class="btn btn-danger" onclick="deleteReport()">
+                    <i class="fas fa-trash-alt me-1"></i> Delete Report
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="deleteForm" method="post" action="{% url 'reports:report_delete' report.id %}">
+    {% csrf_token %}
+</form>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function deleteReport() {
+    Swal.fire({
+        title: 'Delete Report',
+        text: 'Are you sure you want to delete "{{ report.name }}"? This action cannot be undone.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('deleteForm').submit();
+        }
+    });
+}
+
+// Auto-refresh if report is still processing
+{% if not report.file %}
+setTimeout(function() {
+    location.reload();
+}, 5000);
+{% endif %}
+</script>
+{% endblock %}

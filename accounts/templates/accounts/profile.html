@@ -1,0 +1,769 @@
+<!-- accounts/templates/accounts/profile.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Profile - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== RESET ALL PADDING/MARGINS ON MOBILE ===== */
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0 !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }
+        
+        .card-header h5 {
+            font-size: 0.85rem !important;
+        }
+        
+        .page-header h1 {
+            font-size: 1.1rem !important;
+        }
+        
+        .page-header p {
+            font-size: 0.75rem !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .page-header .btn {
+            font-size: 0.65rem !important;
+            padding: 0.2rem 0.4rem !important;
+        }
+        
+        .page-header .d-flex.gap-2 {
+            gap: 0.3rem !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .form-label {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+        
+        .form-text {
+            font-size: 0.6rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .input-group .btn {
+            padding: 0.3rem 0.5rem !important;
+        }
+        
+        .badge {
+            font-size: 0.65rem !important;
+            padding: 0.25rem 0.4rem !important;
+        }
+        
+        /* Profile header on mobile */
+        .profile-header .d-flex {
+            flex-direction: column !important;
+            text-align: center !important;
+        }
+        
+        .profile-header .ms-3 {
+            margin-left: 0 !important;
+            margin-top: 0.75rem !important;
+        }
+        
+        .profile-header .ms-auto {
+            margin-left: 0 !important;
+            margin-top: 0.5rem !important;
+        }
+        
+        .profile-header .rounded-circle {
+            width: 60px !important;
+            height: 60px !important;
+            font-size: 1.5rem !important;
+        }
+        
+        .profile-header h3 {
+            font-size: 1.1rem !important;
+        }
+        
+        .profile-header .text-muted {
+            font-size: 0.8rem !important;
+        }
+        
+        .d-flex.gap-2 {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .d-flex.gap-2 .btn {
+            width: 100% !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0.5rem !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0.25rem !important;
+            padding-left: 0.25rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+    
+    /* ===== COMMON STYLES ===== */
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+    
+    .card-header {
+        background: transparent !important;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+    
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+    }
+    
+    .btn-primary {
+        background: #2c3e50;
+        border-color: #2c3e50;
+    }
+    
+    .btn-primary:hover {
+        background: #1a2a3a;
+        border-color: #1a2a3a;
+    }
+    
+    .input-group .btn {
+        padding: 0.625rem 0.875rem;
+    }
+    
+    .badge {
+        font-weight: 500;
+        padding: 0.35rem 0.75rem;
+    }
+    
+    #usernameStatus {
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+    
+    .profile-header .rounded-circle {
+        object-fit: cover;
+        border: 3px solid #fff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4" style="padding: 0 0.5rem;">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800 fw-bold">
+                <i class="fas fa-user-circle text-primary me-2"></i>My Profile
+            </h1>
+            <p class="text-muted small mb-0 mt-1">View and manage your profile information</p>
+        </div>
+        <div class="mt-2 mt-sm-0">
+            <a href="{% url 'accounts:settings' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-cog me-1"></i> Settings
+            </a>
+        </div>
+    </div>
+
+    <!-- ===== PROFILE HEADER ===== -->
+    <div class="card shadow-sm mb-4 profile-header">
+        <div class="card-body p-4">
+            <div class="d-flex align-items-center flex-wrap">
+                <div class="position-relative">
+                    {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" 
+                             class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                    {% else %}
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" 
+                             style="width: 80px; height: 80px; font-size: 2rem;">
+                            {{ user.get_full_name|first|upper }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="ms-3">
+                    <h3 class="mb-0">{{ user.get_full_name }}</h3>
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-user me-1"></i> @{{ user.username }}
+                    </p>
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-envelope me-1"></i> {{ user.email }}
+                    </p>
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-user-tag me-1"></i> {{ user.get_role_display }}
+                    </p>
+                </div>
+                <div class="ms-auto mt-2 mt-sm-0">
+                    <span class="badge {% if user.is_online %}bg-success{% else %}bg-secondary{% endif %}">
+                        <i class="fas fa-circle me-1"></i> {% if user.is_online %}Online{% else %}Offline{% endif %}
+                    </span>
+                    <span class="badge {% if user.email_verified %}bg-success{% else %}bg-warning{% endif %} ms-1">
+                        {% if user.email_verified %}Verified{% else %}Pending{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Profile Update Form -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-edit text-primary me-2"></i>Update Profile
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" id="profileForm">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="username" class="form-label fw-bold">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input type="text" class="form-control" id="username" name="username" 
+                                       value="{{ user.username }}" required>
+                            </div>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                This is your login username. It must be unique.
+                                <span id="usernameStatus" class="text-muted"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="first_name" class="form-label fw-bold">First Name</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" 
+                                       value="{{ user.first_name }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="last_name" class="form-label fw-bold">Last Name</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" 
+                                       value="{{ user.last_name }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3 mt-3">
+                            <label for="email" class="form-label fw-bold">Email Address</label>
+                            <input type="email" class="form-control" id="email" value="{{ user.email }}" disabled>
+                            <div class="form-text">Email cannot be changed.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="phone" class="form-label fw-bold">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" value="{{ user.phone }}">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="bio" class="form-label fw-bold">Bio</label>
+                            <textarea class="form-control" id="bio" name="bio" rows="3" 
+                                      placeholder="Tell us about yourself">{{ user.bio }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="profile_picture" class="form-label fw-bold">Profile Picture</label>
+                            <input type="file" class="form-control" id="profile_picture" name="profile_picture" 
+                                   accept="image/*">
+                            <div class="form-text">Upload a new profile picture (JPG, PNG, GIF).</div>
+                        </div>
+                        
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="submit" class="btn btn-primary" id="updateProfileBtn">
+                                <i class="fas fa-save me-1"></i> Update Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Password Change & Account Info -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">
+                        <i class="fas fa-key text-danger me-2"></i>Change Password
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="passwordForm">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="current_password" class="form-label fw-bold">Current Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="current_password" name="current_password" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('current_password', 'currentToggle')">
+                                    <i class="fas fa-eye" id="currentToggle"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label fw-bold">New Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="new_password" name="new_password" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('new_password', 'newToggle')">
+                                    <i class="fas fa-eye" id="newToggle"></i>
+                                </button>
+                            </div>
+                            <div class="form-text">
+                                <span id="passwordStrength" class="badge bg-secondary">Weak</span>
+                                Password must be at least 8 characters long.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label fw-bold">Confirm New Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('confirm_password', 'confirmToggle')">
+                                    <i class="fas fa-eye" id="confirmToggle"></i>
+                                </button>
+                            </div>
+                            <div id="passwordMatch" class="form-text" style="display: none;">
+                                <i class="fas fa-check-circle text-success"></i> <span class="text-success">Passwords match</span>
+                            </div>
+                            <div id="passwordMismatch" class="form-text" style="display: none;">
+                                <i class="fas fa-exclamation-circle text-danger"></i> <span class="text-danger">Passwords do not match</span>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-danger" id="changePasswordBtn">
+                            <i class="fas fa-key me-1"></i> Change Password
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Account Information -->
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle text-info me-2"></i>Account Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <small class="text-muted d-block">Username</small>
+                            <span class="fw-bold">@{{ user.username }}</span>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block">Member Since</small>
+                            <span class="fw-bold">{{ user.created_at|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block">Last Activity</small>
+                            <span class="fw-bold">{{ user.last_activity|timesince }} ago</span>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block">Organization</small>
+                            <span class="fw-bold">{{ user.tenant.name|default:"None" }}</span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-12">
+                            <small class="text-muted d-block">Permissions</small>
+                            <div class="d-flex flex-wrap gap-1 mt-1">
+                                {% if user.can_view %}
+                                    <span class="badge bg-primary">View</span>
+                                {% endif %}
+                                {% if user.can_create %}
+                                    <span class="badge bg-success">Create</span>
+                                {% endif %}
+                                {% if user.can_edit %}
+                                    <span class="badge bg-info">Edit</span>
+                                {% endif %}
+                                {% if user.can_delete %}
+                                    <span class="badge bg-danger">Delete</span>
+                                {% endif %}
+                                {% if user.is_superuser %}
+                                    <span class="badge bg-warning text-dark">Super Admin</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // Toggle password visibility
+    function togglePassword(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'fas fa-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'fas fa-eye';
+        }
+    }
+
+    // Username availability check
+    let usernameTimeout;
+    const usernameInput = document.getElementById('username');
+    const usernameStatus = document.getElementById('usernameStatus');
+    const originalUsername = usernameInput?.value || '';
+
+    usernameInput?.addEventListener('input', function() {
+        clearTimeout(usernameTimeout);
+        const username = this.value.trim();
+        
+        if (username === originalUsername) {
+            usernameStatus.textContent = '';
+            usernameStatus.className = 'text-muted';
+            return;
+        }
+        
+        if (username.length < 3) {
+            usernameStatus.textContent = '⚠️ Username must be at least 3 characters';
+            usernameStatus.className = 'text-warning';
+            return;
+        }
+        
+        usernameStatus.textContent = '⏳ Checking availability...';
+        usernameStatus.className = 'text-muted';
+        
+        usernameTimeout = setTimeout(function() {
+            fetch('/accounts/check-username/?username=' + encodeURIComponent(username))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        usernameStatus.textContent = '❌ Username is already taken';
+                        usernameStatus.className = 'text-danger';
+                    } else {
+                        usernameStatus.textContent = '✅ Username is available';
+                        usernameStatus.className = 'text-success';
+                    }
+                })
+                .catch(() => {
+                    usernameStatus.textContent = '⚠️ Error checking username';
+                    usernameStatus.className = 'text-warning';
+                });
+        }, 500);
+    });
+
+    // Password strength checker
+    document.getElementById('new_password')?.addEventListener('input', function() {
+        const password = this.value;
+        const strength = document.getElementById('passwordStrength');
+        
+        if (password.length === 0) {
+            strength.textContent = 'Weak';
+            strength.className = 'badge bg-secondary';
+            return;
+        }
+        
+        let score = 0;
+        if (password.length >= 8) score++;
+        if (password.match(/[a-z]/)) score++;
+        if (password.match(/[A-Z]/)) score++;
+        if (password.match(/[0-9]/)) score++;
+        if (password.match(/[^a-zA-Z0-9]/)) score++;
+        
+        if (score <= 2) {
+            strength.textContent = 'Weak';
+            strength.className = 'badge bg-danger';
+        } else if (score <= 3) {
+            strength.textContent = 'Medium';
+            strength.className = 'badge bg-warning';
+        } else if (score <= 4) {
+            strength.textContent = 'Strong';
+            strength.className = 'badge bg-info';
+        } else {
+            strength.textContent = 'Very Strong';
+            strength.className = 'badge bg-success';
+        }
+    });
+
+    // Password match checker
+    document.addEventListener('DOMContentLoaded', function() {
+        const newPassword = document.getElementById('new_password');
+        const confirmPassword = document.getElementById('confirm_password');
+        const matchDiv = document.getElementById('passwordMatch');
+        const mismatchDiv = document.getElementById('passwordMismatch');
+
+        function checkPasswordMatch() {
+            const newPwd = newPassword.value;
+            const confirmPwd = confirmPassword.value;
+            
+            matchDiv.style.display = 'none';
+            mismatchDiv.style.display = 'none';
+            
+            if (newPwd.length > 0 && confirmPwd.length > 0) {
+                if (newPwd === confirmPwd) {
+                    matchDiv.style.display = 'block';
+                } else {
+                    mismatchDiv.style.display = 'block';
+                }
+            }
+        }
+
+        newPassword.addEventListener('input', checkPasswordMatch);
+        confirmPassword.addEventListener('input', checkPasswordMatch);
+    });
+
+    // Handle profile form submission
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = this;
+        const btn = document.getElementById('updateProfileBtn');
+        
+        const username = document.getElementById('username').value.trim();
+        if (username.length < 3) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Username',
+                text: 'Username must be at least 3 characters long.',
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+            return;
+        }
+        
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Updating...';
+        btn.disabled = true;
+        
+        const formData = new FormData(form);
+        
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.message || 'Update failed');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            btn.innerHTML = '<i class="fas fa-save me-1"></i> Update Profile';
+            btn.disabled = false;
+            
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Profile Updated!',
+                    text: data.message || 'Your profile has been updated successfully.',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Update Failed',
+                    text: data.message || 'Failed to update profile.',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            }
+        })
+        .catch(error => {
+            btn.innerHTML = '<i class="fas fa-save me-1"></i> Update Profile';
+            btn.disabled = false;
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'An error occurred while updating your profile.',
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        });
+    });
+
+    // Handle password change form submission
+    document.getElementById('passwordForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const currentPassword = document.getElementById('current_password').value;
+        const newPassword = document.getElementById('new_password').value;
+        const confirmPassword = document.getElementById('confirm_password').value;
+        
+        if (newPassword !== confirmPassword) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Password Mismatch',
+                text: 'New passwords do not match.',
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+            return;
+        }
+        
+        if (newPassword.length < 8) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Password Too Short',
+                text: 'Password must be at least 8 characters long.',
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+            return;
+        }
+        
+        const btn = document.getElementById('changePasswordBtn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Changing...';
+        btn.disabled = true;
+        
+        fetch('{% url "accounts:change_password" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                current_password: currentPassword,
+                new_password: newPassword,
+                confirm_password: confirmPassword
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            btn.innerHTML = '<i class="fas fa-key me-1"></i> Change Password';
+            btn.disabled = false;
+            
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Password Changed!',
+                    text: 'Your password has been changed successfully.',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+                
+                document.getElementById('current_password').value = '';
+                document.getElementById('new_password').value = '';
+                document.getElementById('confirm_password').value = '';
+                document.getElementById('passwordStrength').textContent = 'Weak';
+                document.getElementById('passwordStrength').className = 'badge bg-secondary';
+                document.getElementById('passwordMatch').style.display = 'none';
+                document.getElementById('passwordMismatch').style.display = 'none';
+                
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Password Change Failed',
+                    text: data.message || 'Failed to change password.',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            }
+        })
+        .catch(error => {
+            btn.innerHTML = '<i class="fas fa-key me-1"></i> Change Password';
+            btn.disabled = false;
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred while changing your password.',
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        });
+    });
+</script>
+{% endblock %}

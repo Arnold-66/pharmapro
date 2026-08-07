@@ -1,0 +1,772 @@
+<!-- accounts/templates/accounts/online_users.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Online Users - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== RESET ALL PADDING/MARGINS ON MOBILE ===== */
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0 !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0.25rem !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0.125rem !important;
+            padding-left: 0.125rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .card {
+            border-radius: 4px !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.5rem 0.5rem !important;
+        }
+        
+        .card-header {
+            padding: 0.5rem 0.5rem !important;
+        }
+        
+        .card-header h4, .card-header h5, .card-header h6 {
+            font-size: 0.7rem !important;
+        }
+        
+        .page-header {
+            padding: 0 0.5rem !important;
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+            align-items: stretch !important;
+        }
+        
+        .page-header h1 {
+            font-size: 1rem !important;
+        }
+        
+        .page-header .btn {
+            width: 100% !important;
+            font-size: 0.75rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .badge {
+            font-size: 0.6rem !important;
+            padding: 0.2rem 0.35rem !important;
+        }
+        
+        /* ===== STATS CARDS - 2 PER ROW WITH VISIBLE TEXT ===== */
+        .row.g-3.mb-4 {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0.25rem !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row.g-3.mb-4 > .col-6 {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+            padding-right: 0.125rem !important;
+            padding-left: 0.125rem !important;
+        }
+        
+        .stat-card {
+            border-radius: 4px !important;
+            margin-bottom: 0 !important;
+            height: 100% !important;
+        }
+        
+        .stat-card .card-body {
+            padding: 0.5rem 0.5rem !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+        
+        .stat-card .stat-icon {
+            width: 32px !important;
+            height: 32px !important;
+            min-width: 32px !important;
+            min-height: 32px !important;
+            padding: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 50% !important;
+            flex-shrink: 0 !important;
+        }
+        
+        .stat-card .stat-icon i {
+            font-size: 0.9rem !important;
+        }
+        
+        .stat-card .stat-content {
+            flex: 1 !important;
+            min-width: 0 !important;
+            overflow: visible !important;
+        }
+        
+        .stat-card .stat-content h6 {
+            font-size: 0.55rem !important;
+            margin-bottom: 0.05rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.3px !important;
+            color: #6c757d !important;
+            font-weight: 600 !important;
+            white-space: normal !important;
+            word-wrap: break-word !important;
+            line-height: 1.2 !important;
+        }
+        
+        .stat-card .stat-content h2 {
+            font-size: 0.85rem !important;
+            margin-bottom: 0 !important;
+            font-weight: 700 !important;
+            line-height: 1.2 !important;
+            word-wrap: break-word !important;
+        }
+        
+        .stat-card .stat-content h6.text-muted {
+            font-size: 0.55rem !important;
+        }
+        
+        /* Table on mobile */
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .table td, .table th {
+            font-size: 0.75rem !important;
+            padding: 0.4rem 0.3rem !important;
+        }
+        
+        .table .btn-group .btn {
+            font-size: 0.6rem !important;
+            padding: 0.15rem 0.3rem !important;
+        }
+        
+        .table .avatar-sm {
+            width: 25px !important;
+            height: 25px !important;
+            font-size: 0.6rem !important;
+        }
+        
+        .table .fw-semibold {
+            font-size: 0.75rem !important;
+        }
+        
+        .table .d-flex.flex-column small {
+            font-size: 0.6rem !important;
+        }
+        
+        .card-header .d-flex {
+            flex-direction: column !important;
+            gap: 0.3rem !important;
+            align-items: flex-start !important;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .stat-card .card-body {
+            padding: 0.25rem 0.25rem !important;
+            gap: 0.3rem !important;
+        }
+        
+        .stat-card .stat-icon {
+            width: 26px !important;
+            height: 26px !important;
+            min-width: 26px !important;
+            min-height: 26px !important;
+        }
+        
+        .stat-card .stat-icon i {
+            font-size: 0.7rem !important;
+        }
+        
+        .stat-card .stat-content h6 {
+            font-size: 0.45rem !important;
+        }
+        
+        .stat-card .stat-content h2 {
+            font-size: 0.75rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0.5rem !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0.25rem !important;
+            padding-left: 0.25rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+    
+    /* ===== COMMON STYLES ===== */
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+    
+    .card-header {
+        background: transparent !important;
+        border-bottom: 2px solid #f0f0f0 !important;
+    }
+    
+    /* ===== STAT CARD STYLES ===== */
+    .stat-card {
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        transition: transform 0.2s;
+        overflow: hidden;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .stat-card .card-body {
+        display: flex !important;
+        align-items: center !important;
+        gap: 1rem !important;
+        padding: 0.5rem !important;
+    }
+    
+    .stat-card .stat-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+    
+    .stat-card .stat-icon i {
+        font-size: 1.5rem;
+    }
+    
+    .stat-card .stat-content {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .stat-card .stat-content h6 {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #6c757d;
+        margin-bottom: 0.15rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .stat-card .stat-content h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0;
+        line-height: 1.2;
+    }
+    
+    /* ===== COLOR VARIATIONS ===== */
+    .bg-primary-soft {
+        background-color: rgba(52, 152, 219, 0.12);
+        color: #3498db;
+    }
+    
+    .bg-success-soft {
+        background-color: rgba(46, 204, 113, 0.12);
+        color: #28a745;
+    }
+    
+    .bg-info-soft {
+        background-color: rgba(23, 162, 184, 0.12);
+        color: #17a2b8;
+    }
+    
+    .bg-warning-soft {
+        background-color: rgba(255, 193, 7, 0.12);
+        color: #ffc107;
+    }
+    
+    .text-primary-dark {
+        color: #2c3e50;
+    }
+    
+    .text-success-dark {
+        color: #1e7e34;
+    }
+    
+    /* ===== TABLE STYLES ===== */
+    .table th {
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .table td {
+        vertical-align: middle;
+    }
+    
+    .avatar-sm {
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .avatar-sm img {
+        width: 35px;
+        height: 35px;
+        object-fit: cover;
+    }
+    
+    .btn-primary {
+        background: #2c3e50;
+        border-color: #2c3e50;
+    }
+    
+    .btn-primary:hover {
+        background: #1a2a3a;
+        border-color: #1a2a3a;
+    }
+    
+    .btn-outline-secondary {
+        color: #6c757d;
+        border-color: #6c757d;
+    }
+    
+    .btn-outline-secondary:hover {
+        background: #6c757d;
+        color: #fff;
+    }
+    
+    .badge {
+        font-weight: 500;
+    }
+    
+    .text-success {
+        color: #28a745 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4" style="padding: 0 0.5rem;">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800 fw-bold">
+                <i class="fas fa-circle text-success me-2"></i>Online Users
+            </h1>
+            <p class="text-muted small mb-0 mt-1">Users currently active in your organization</p>
+        </div>
+        <div class="mt-2 mt-sm-0 d-flex gap-2">
+            <a href="{% url 'accounts:user_list' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left me-1"></i> Back to Users
+            </a>
+            <button class="btn btn-primary btn-sm" onclick="refreshOnlineUsers()">
+                <i class="fas fa-sync-alt me-1"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== STATS CARDS ===== -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="stat-icon bg-success-soft">
+                        <i class="fas fa-circle text-success"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h6>Online Now</h6>
+                        <h2 class="text-success-dark" id="onlineCountDisplay">{{ online_count }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="stat-icon bg-primary-soft">
+                        <i class="fas fa-users text-primary"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h6>Total Users</h6>
+                        <h2 class="text-primary-dark">{{ total_users }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="stat-icon bg-info-soft">
+                        <i class="fas fa-percentage text-info"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h6>Online %</h6>
+                        <h2 class="text-info">
+                            {% if total_users > 0 %}
+                                {% widthratio online_count total_users 100 %}%
+                            {% else %}
+                                0%
+                            {% endif %}
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="stat-icon bg-warning-soft">
+                        <i class="fas fa-clock text-warning"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h6>Last Updated</h6>
+                        <h6 class="text-muted" id="lastUpdated">Just now</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ONLINE USERS TABLE ===== -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+            <h5 class="mb-0">
+                <i class="fas fa-users me-2"></i>Currently Online
+                <span class="badge bg-success ms-2" id="onlineBadge">{{ online_count }}</span>
+            </h5>
+            <div>
+                <span class="text-muted small">
+                    <i class="fas fa-sync-alt fa-fw"></i> Auto-refreshes every 30s
+                </span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Last Activity</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="onlineUsersTable">
+                        {% for user in online_users %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm me-2">
+                                            {% if user.profile_picture %}
+                                                <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="rounded-circle">
+                                            {% else %}
+                                                <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; background: #28a745 !important;">
+                                                    <span class="fw-bold">{{ user.get_full_name|first|upper }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold">{{ user.get_full_name }}</div>
+                                            <div class="small text-muted">@{{ user.username }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    <span class="badge bg-{% if user.role == 'admin' %}warning{% elif user.role == 'manager' %}info{% elif user.role == 'staff' %}secondary{% elif user.role == 'super_admin' %}danger{% else %}primary{% endif %}">
+                                        {{ user.get_role_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock me-1"></i>
+                                            {{ user.last_activity|timesince }} ago
+                                        </small>
+                                        {% if user.last_action %}
+                                            <small class="text-muted">
+                                                <i class="fas fa-activity me-1"></i>
+                                                {{ user.last_action }}
+                                            </small>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-circle me-1"></i> Online
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'accounts:user_detail' user.id %}" class="btn btn-sm btn-outline-info" title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'accounts:user_edit' user.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="fas fa-user-slash fa-4x mb-3 d-block"></i>
+                                        <h5>No users currently online</h5>
+                                        <p>Users will appear here when they are actively using the system.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // Auto-refresh online users every 30 seconds
+    let refreshInterval;
+    let isPageVisible = true;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Start auto-refresh
+        startAutoRefresh();
+        
+        // Update last updated time
+        updateLastUpdated();
+        
+        // Handle page visibility change
+        document.addEventListener('visibilitychange', function() {
+            isPageVisible = !document.hidden;
+            if (isPageVisible) {
+                refreshOnlineUsers();
+                startAutoRefresh();
+            } else {
+                stopAutoRefresh();
+            }
+        });
+    });
+    
+    function startAutoRefresh() {
+        stopAutoRefresh();
+        refreshInterval = setInterval(function() {
+            if (isPageVisible) {
+                refreshOnlineUsers();
+            }
+        }, 30000);
+    }
+    
+    function stopAutoRefresh() {
+        if (refreshInterval) {
+            clearInterval(refreshInterval);
+            refreshInterval = null;
+        }
+    }
+    
+    function refreshOnlineUsers() {
+        if (!isPageVisible) return;
+        
+        // Get CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+        
+        fetch('{% url "accounts:get_online_users" %}', {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateOnlineUsersTable(data.online_users, data.count);
+                updateStats(data.count);
+                updateLastUpdated();
+            }
+        })
+        .catch(error => {
+            // Silent fail for auto-refresh
+            console.warn('Error refreshing online users:', error);
+        });
+    }
+    
+    function updateOnlineUsersTable(users, count) {
+        const tableBody = document.getElementById('onlineUsersTable');
+        const badge = document.getElementById('onlineBadge');
+        
+        if (!tableBody) return;
+        
+        if (badge) {
+            badge.textContent = count;
+        }
+        
+        if (users.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center py-5">
+                        <div class="text-muted">
+                            <i class="fas fa-user-slash fa-4x mb-3 d-block"></i>
+                            <h5>No users currently online</h5>
+                            <p>Users will appear here when they are actively using the system.</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        let html = '';
+        const roleColors = {
+            'admin': 'warning',
+            'manager': 'info',
+            'staff': 'secondary',
+            'super_admin': 'danger'
+        };
+        
+        users.forEach(function(user) {
+            const roleColor = roleColors[user.role] || 'primary';
+            const avatarInitial = user.full_name ? user.full_name.charAt(0).toUpperCase() : 'U';
+            
+            html += `
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-sm me-2">
+                                ${user.profile_picture ? 
+                                    `<img src="${user.profile_picture}" alt="${user.full_name}" class="rounded-circle">` :
+                                    `<div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; background: #28a745 !important;">
+                                        <span class="fw-bold">${avatarInitial}</span>
+                                    </div>`
+                                }
+                            </div>
+                            <div>
+                                <div class="fw-semibold">${user.full_name}</div>
+                                <div class="small text-muted">@${user.username}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${user.email}</td>
+                    <td>
+                        <span class="badge bg-${roleColor}">
+                            ${user.role_display}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="d-flex flex-column">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>
+                                ${user.last_activity} ago
+                            </small>
+                            ${user.last_action ? 
+                                `<small class="text-muted">
+                                    <i class="fas fa-activity me-1"></i>
+                                    ${user.last_action}
+                                </small>` : ''
+                            }
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-success">
+                            <i class="fas fa-circle me-1"></i> Online
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a href="/accounts/users/${user.id}/" class="btn btn-sm btn-outline-info" title="View">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="/accounts/users/${user.id}/edit/" class="btn btn-sm btn-outline-primary" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        tableBody.innerHTML = html;
+    }
+    
+    function updateStats(count) {
+        const display = document.getElementById('onlineCountDisplay');
+        if (display) {
+            display.textContent = count;
+        }
+        
+        const badge = document.getElementById('onlineBadge');
+        if (badge) {
+            badge.textContent = count;
+        }
+    }
+    
+    function updateLastUpdated() {
+        const element = document.getElementById('lastUpdated');
+        if (element) {
+            const now = new Date();
+            element.textContent = now.toLocaleTimeString();
+        }
+    }
+    
+    // Clean up interval on page unload
+    window.addEventListener('beforeunload', function() {
+        stopAutoRefresh();
+    });
+</script>
+{% endblock %}

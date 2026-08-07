@@ -1,0 +1,420 @@
+<!-- tenants/templates/tenants/subscription_expired.html -->
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Subscription Expired - PharmaPro</title>
+
+    <!-- Tailwind + Google Fonts + Font Awesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+    <style>
+        /* reset – no rounded edges, no glass, no gradients, no shadows */
+        * {
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef1f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1.5rem;
+        }
+
+        /* plain card – straight corners, solid white, no blur, no hover transform */
+        .expired-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 520px;
+            border: 1px solid #d0d7de;
+            box-shadow: none;
+            transition: none;
+        }
+
+        /* brand block – solid dark, no gradient, no rounded */
+        .brand-block {
+            background: #1e293b;
+            padding: 1.8rem 1.5rem;
+            text-align: center;
+            border-bottom: 2px solid #b0b8c4;
+        }
+
+        .brand-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: #334155;
+            padding: 0.4rem 1rem 0.4rem 0.8rem;
+            border: 1px solid #4b5a6f;
+        }
+
+        .brand-icon i {
+            font-size: 1.6rem;
+            color: #cbd5e1;
+        }
+
+        .brand-icon span {
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: -0.02em;
+            color: #f1f5f9;
+        }
+
+        .brand-sub {
+            display: inline-block;
+            margin-top: 0.5rem;
+            background: #334155;
+            padding: 0.15rem 1.2rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #cbd5e1;
+            border: 1px solid #4b5a6f;
+            letter-spacing: 0.3px;
+        }
+
+        /* form body – no rounded, plain spacing */
+        .form-body {
+            padding: 2rem 1.8rem 1.8rem;
+            text-align: center;
+        }
+
+        /* headings – plain */
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.2rem;
+        }
+
+        .form-sub {
+            color: #475569;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* icon circle */
+        .icon-circle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            border: 2px solid #b91c1c;
+            background: #fee9e7;
+            margin-bottom: 1.25rem;
+        }
+
+        .icon-circle i {
+            font-size: 2.5rem;
+            color: #b91c1c;
+        }
+
+        /* error box – flat, no rounded */
+        .error-box {
+            background: #fee9e7;
+            border: 1px solid #b91c1c;
+            color: #991b1b;
+            padding: 0.7rem 1rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+
+        .error-box i {
+            margin-top: 0.15rem;
+            font-size: 1.1rem;
+        }
+
+        .error-box strong {
+            color: #991b1b;
+        }
+
+        /* info box */
+        .info-box {
+            border: 1px solid #d0d7de;
+            background: #f8fafc;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1.25rem;
+            text-align: left;
+        }
+
+        .info-box p {
+            margin: 0.25rem 0;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+
+        .info-box strong {
+            color: #0f172a;
+        }
+
+        /* button – flat, sharp, no gradient */
+        .btn-expired {
+            background: #1e293b;
+            border: 1px solid #0f172a;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.7rem 1.5rem;
+            cursor: pointer;
+            transition: background 0.15s;
+            letter-spacing: 0.3px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-width: 180px;
+            text-decoration: none;
+        }
+
+        .btn-expired:hover {
+            background: #0f172a;
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-expired:active {
+            background: #0b111e;
+        }
+
+        .btn-expired-secondary {
+            background: #64748b;
+            border-color: #475569;
+        }
+
+        .btn-expired-secondary:hover {
+            background: #475569;
+        }
+
+        .btn-expired-light {
+            background: transparent;
+            border-color: #d0d7de;
+            color: #1e293b;
+        }
+
+        .btn-expired-light:hover {
+            background: #f1f4f9;
+            color: #0f172a;
+        }
+
+        /* footer – plain */
+        .footer-divider {
+            border-top: 1px solid #d0d7de;
+            margin: 1.8rem 0 1rem;
+        }
+
+        .footer-link {
+            font-weight: 600;
+            color: #1e293b;
+            border-bottom: 1px solid transparent;
+        }
+
+        .footer-link:hover {
+            border-bottom-color: #1e293b;
+        }
+
+        .text-muted {
+            color: #475569;
+        }
+
+        .text-xs {
+            font-size: 0.7rem;
+        }
+
+        .text-sm {
+            font-size: 0.85rem;
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+
+        .gap-3 {
+            gap: 0.75rem;
+        }
+
+        .mt-1 {
+            margin-top: 0.25rem;
+        }
+
+        .mt-2 {
+            margin-top: 0.5rem;
+        }
+
+        .mt-3 {
+            margin-top: 0.75rem;
+        }
+
+        .mt-4 {
+            margin-top: 1rem;
+        }
+
+        .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .mb-3 {
+            margin-bottom: 0.75rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+
+        .gap-3 {
+            gap: 0.75rem;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .border-t {
+            border-top: 1px solid #d0d7de;
+        }
+
+        .pt-3 {
+            padding-top: 0.75rem;
+        }
+
+        @media (max-width: 480px) {
+            .form-body {
+                padding: 1.5rem 1rem;
+            }
+
+            .btn-expired {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .brand-icon span {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="expired-card">
+
+        <!-- brand – flat, no rounded, solid dark -->
+        <div class="brand-block">
+            <div class="brand-icon">
+                <i class="fas fa-pills"></i>
+                <span>PharmaPro</span>
+            </div>
+            <div class="brand-sub">
+                <i class="fas fa-notes-medical mr-1"></i> subscription expired
+            </div>
+        </div>
+
+        <!-- form body -->
+        <div class="form-body">
+
+            <!-- Icon -->
+            <div class="icon-circle">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+
+            <div class="form-title">Subscription Expired</div>
+            <div class="form-sub">Your access to PharmaPro has been restricted</div>
+
+            <!-- Message -->
+            <div class="error-box">
+                <i class="fas fa-times-circle"></i>
+                <div>
+                    <p class="mb-1"><strong>Your organization's subscription has expired.</strong></p>
+                    <p class="mb-0">Please renew immediately to regain access to all features.</p>
+                    {% if tenant.subscription_end_date %}
+                    <p class="mt-1 text-xs" style="color: #991b1b;">
+                        Expired on: <strong>{{ tenant.subscription_end_date|date:"Y-m-d" }}</strong>
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Subscription Details -->
+            <div class="info-box">
+                <p><strong>Organization:</strong> {{ tenant.company_name|default:"N/A" }}</p>
+                <p><strong>Plan:</strong> {{ tenant.get_plan_display|default:"N/A" }}</p>
+                {% if tenant.subscription_end_date %}
+                <p><strong>Expired On:</strong> {{ tenant.subscription_end_date|date:"Y-m-d" }}</p>
+                {% endif %}
+                <p><strong>Status:</strong> <span style="color: #b91c1c; font-weight: 600;">EXPIRED</span></p>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex flex-col items-center gap-2 mb-4">
+                <a href="{% url 'tenants:subscription' %}" class="btn-expired">
+                    <i class="fas fa-credit-card"></i> Renew Now
+                </a>
+                <a href="{% url 'accounts:logout' %}" class="btn-expired btn-expired-light">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+
+            <!-- Support -->
+            <div class="border-t pt-3 mt-2">
+                <p class="text-xs text-muted mb-0">
+                    <i class="fas fa-headset me-1"></i>
+                    Need help? Contact us at <a href="mailto:support@pharmapro.com" style="color: #1e293b; font-weight: 600; text-decoration: none; border-bottom: 1px solid transparent;">support@pharmapro.com</a>
+                </p>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer-divider"></div>
+            <div class="text-center text-xs text-muted">
+                <p class="mb-0">&copy; {% now "Y" %} PharmaPro. All rights reserved.</p>
+            </div>
+
+        </div> <!-- end form-body -->
+    </div> <!-- end expired-card -->
+
+    <script>
+        // If no tenant data is available, redirect to login
+        document.addEventListener('DOMContentLoaded', function() {
+            {% if not tenant %}
+            window.location.href = "{% url 'accounts:login' %}";
+            {% endif %}
+        });
+    </script>
+
+</body>
+</html>

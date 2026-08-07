@@ -1,0 +1,714 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Inventory Alerts - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== MOBILE RESPONSIVE STYLES ===== */
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+        }
+        
+        .row.g-3 {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row.g-3 > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .page-header {
+            padding: 0 0.875rem !important;
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+            align-items: stretch !important;
+        }
+        
+        .page-header h1 {
+            font-size: 1.1rem !important;
+        }
+        
+        .page-header .badge {
+            font-size: 0.7rem !important;
+        }
+        
+        .page-header .btn {
+            width: 100% !important;
+            font-size: 0.75rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .page-header .d-flex.justify-content-between {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .page-header .d-flex.justify-content-between > div {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }
+        
+        .col-md-3 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+            width: 100% !important;
+        }
+        
+        /* Alert list items */
+        .list-group-item {
+            padding: 0.6rem 0.75rem !important;
+        }
+        
+        .list-group-item .d-flex.justify-content-between {
+            flex-direction: column !important;
+            gap: 0.75rem !important;
+        }
+        
+        .list-group-item .d-flex.align-items-center {
+            flex-wrap: wrap !important;
+            gap: 0.25rem !important;
+        }
+        
+        .list-group-item .badge {
+            font-size: 0.55rem !important;
+            padding: 0.2rem 0.4rem !important;
+        }
+        
+        .list-group-item .fw-semibold {
+            font-size: 0.8rem !important;
+        }
+        
+        .list-group-item .text-muted.small {
+            font-size: 0.65rem !important;
+        }
+        
+        .list-group-item .d-flex.flex-column.align-items-end {
+            flex-direction: row !important;
+            flex-wrap: wrap !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+        
+        .list-group-item .btn-sm {
+            font-size: 0.65rem !important;
+            padding: 0.2rem 0.4rem !important;
+            width: auto !important;
+        }
+        
+        .flex-grow-1 {
+            width: 100% !important;
+        }
+        
+        .flex-grow-1.me-3 {
+            margin-right: 0 !important;
+        }
+        
+        /* Pagination */
+        .d-flex.justify-content-between.align-items-center.mt-4 {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+            padding: 0 0.875rem !important;
+        }
+        
+        .pagination {
+            flex-wrap: wrap !important;
+        }
+        
+        .pagination .page-link {
+            padding: 0.25rem 0.5rem !important;
+            font-size: 0.7rem !important;
+        }
+        
+        .text-muted.small {
+            font-size: 0.7rem !important;
+        }
+        
+        /* Empty state */
+        .list-group-item.text-center.py-5 {
+            padding: 2rem 0.875rem !important;
+        }
+        
+        .list-group-item.text-center.py-5 .fa-3x {
+            font-size: 2.5rem !important;
+        }
+        
+        .list-group-item.text-center.py-5 h5 {
+            font-size: 0.95rem !important;
+        }
+        
+        .list-group-item.text-center.py-5 p {
+            font-size: 0.8rem !important;
+        }
+    }
+    
+    /* ===== VERY SMALL PHONES ===== */
+    @media (max-width: 380px) {
+        .list-group-item .badge {
+            font-size: 0.45rem !important;
+            padding: 0.15rem 0.3rem !important;
+        }
+        
+        .list-group-item .fw-semibold {
+            font-size: 0.7rem !important;
+        }
+        
+        .list-group-item .btn-sm {
+            font-size: 0.55rem !important;
+            padding: 0.15rem 0.3rem !important;
+        }
+    }
+    
+    /* ===== TABLET STYLES ===== */
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .row.g-3 {
+            --bs-gutter-x: 0.5rem !important;
+        }
+        
+        .row.g-3 > [class*="col-"] {
+            padding-right: 0.25rem !important;
+            padding-left: 0.25rem !important;
+        }
+    }
+    
+    /* ===== DESKTOP STYLES ===== */
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 10px !important;
+        }
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1) !important;
+    }
+    
+    /* ===== TOAST NOTIFICATION STYLES ===== */
+    #toastContainer {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 400px;
+        width: 100%;
+    }
+    
+    .toast-notification {
+        animation: slideInRight 0.5s ease-out;
+        transition: transform 0.3s ease;
+    }
+    
+    .toast-notification .toast-content {
+        background: white;
+        border-radius: 12px;
+        padding: 16px 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+    }
+    
+    .toast-notification .toast-icon {
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+    
+    .toast-notification .toast-message {
+        flex: 1;
+        font-size: 14px;
+        color: #1f2937;
+        font-weight: 500;
+        line-height: 1.4;
+    }
+    
+    .toast-notification .toast-close {
+        background: none;
+        border: none;
+        color: #9ca3af;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 4px;
+        transition: color 0.2s;
+    }
+    
+    .toast-notification .toast-close:hover {
+        color: #4b5563;
+    }
+    
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        #toastContainer {
+            top: 10px;
+            right: 10px;
+            left: 10px;
+            max-width: none;
+            width: auto;
+        }
+        
+        .toast-notification .toast-content {
+            padding: 12px 16px;
+        }
+        
+        .toast-notification .toast-message {
+            font-size: 13px;
+        }
+    }
+    
+    /* ===== MODAL STYLES ===== */
+    .modal-content {
+        border-radius: 12px !important;
+        border: none !important;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.2) !important;
+    }
+    
+    .modal-header {
+        border-bottom: 1px solid #f0f0f0 !important;
+        padding: 1rem 1.5rem !important;
+    }
+    
+    .modal-footer {
+        border-top: 1px solid #f0f0f0 !important;
+        padding: 1rem 1.5rem !important;
+    }
+    
+    .modal-body {
+        padding: 1.5rem !important;
+    }
+    
+    /* ===== LIST GROUP ITEM HOVER ===== */
+    .list-group-item {
+        transition: background-color 0.2s ease;
+    }
+    
+    .list-group-item:hover {
+        background-color: #f8f9fa !important;
+    }
+    
+    .list-group-item.bg-light:hover {
+        background-color: #e9ecef !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 page-header">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">Inventory Alerts</h1>
+            <p class="text-muted small d-none d-sm-block">Monitor inventory notifications</p>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="badge bg-danger me-2">{{ unread_count }} Unread</span>
+            {% if unread_count > 0 %}
+            <button class="btn btn-primary" id="markAllReadBtn">
+                <i class="fas fa-check-double me-1"></i> <span class="d-none d-sm-inline">Mark All Read</span>
+                <span class="d-inline d-sm-none">All Read</span>
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" id="filterForm" class="row g-3">
+                {% csrf_token %}
+                <div class="col-md-3">
+                    <select class="form-select" name="read" onchange="this.form.submit()">
+                        <option value="">All Status</option>
+                        <option value="unread" {% if read_filter == 'unread' %}selected{% endif %}>Unread</option>
+                        <option value="read" {% if read_filter == 'read' %}selected{% endif %}>Read</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="type" onchange="this.form.submit()">
+                        <option value="">All Types</option>
+                        <option value="low_stock" {% if type_filter == 'low_stock' %}selected{% endif %}>Low Stock</option>
+                        <option value="out_of_stock" {% if type_filter == 'out_of_stock' %}selected{% endif %}>Out of Stock</option>
+                        <option value="expiry" {% if type_filter == 'expiry' %}selected{% endif %}>Expiry</option>
+                        <option value="overstock" {% if type_filter == 'overstock' %}selected{% endif %}>Overstock</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="severity" onchange="this.form.submit()">
+                        <option value="">All Severity</option>
+                        <option value="critical" {% if severity_filter == 'critical' %}selected{% endif %}>Critical</option>
+                        <option value="warning" {% if severity_filter == 'warning' %}selected{% endif %}>Warning</option>
+                        <option value="info" {% if severity_filter == 'info' %}selected{% endif %}>Info</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter me-1"></i> Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Alerts List -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="list-group list-group-flush">
+                {% for alert in alerts %}
+                <div class="list-group-item {% if not alert.is_read %}bg-light{% endif %}">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1 me-3">
+                            <div class="d-flex align-items-center mb-1 flex-wrap">
+                                {% if not alert.is_read %}
+                                <span class="badge bg-danger me-2">New</span>
+                                {% endif %}
+                                <span class="badge bg-{% if alert.severity == 'critical' %}danger{% elif alert.severity == 'warning' %}warning{% else %}info{% endif %} me-2">
+                                    {{ alert.get_severity_display|default:alert.get_alert_type_display }}
+                                </span>
+                                <span class="badge bg-secondary me-2">
+                                    {{ alert.get_alert_type_display }}
+                                </span>
+                                {% if alert.is_resolved %}
+                                <span class="badge bg-success">Resolved</span>
+                                {% endif %}
+                            </div>
+                            <div class="fw-semibold">
+                                <a href="{% url 'inventory:product_detail' alert.product.id %}" class="text-decoration-none">
+                                    {{ alert.product.name }}
+                                </a>
+                            </div>
+                            <div class="text-muted small">{{ alert.message }}</div>
+                            <div class="mt-1">
+                                <small class="text-muted">
+                                    <i class="far fa-clock me-1"></i>
+                                    {{ alert.created_at|timesince }} ago
+                                </small>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column align-items-end gap-2">
+                            {% if not alert.is_read %}
+                            <button class="btn btn-sm btn-outline-primary mark-read-btn" data-alert-id="{{ alert.id }}">
+                                <i class="fas fa-check me-1"></i> <span class="d-none d-sm-inline">Mark Read</span>
+                                <span class="d-inline d-sm-none">Read</span>
+                            </button>
+                            {% endif %}
+                            {% if not alert.is_resolved %}
+                            <button class="btn btn-sm btn-outline-success mark-resolved-btn" data-alert-id="{{ alert.id }}">
+                                <i class="fas fa-check-circle me-1"></i> <span class="d-none d-sm-inline">Resolve</span>
+                                <span class="d-inline d-sm-none">✓</span>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="list-group-item text-center py-5">
+                    <i class="fas fa-check-circle fa-3x text-success mb-3 d-block"></i>
+                    <h5 class="mb-0">No Alerts</h5>
+                    <p class="text-muted small">All inventory items are in good standing.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if alerts.has_other_pages %}
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <div class="text-muted small">
+            Showing {{ alerts.start_index }} to {{ alerts.end_index }} of {{ alerts.paginator.count }} alerts
+        </div>
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm mb-0">
+                {% if alerts.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ alerts.previous_page_number }}{% if read_filter %}&read={{ read_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if severity_filter %}&severity={{ severity_filter }}{% endif %}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+                </li>
+                {% endif %}
+
+                {% for i in alerts.paginator.page_range %}
+                    {% if alerts.number == i %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ i }}</span>
+                    </li>
+                    {% elif i > alerts.number|add:'-3' and i < alerts.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ i }}{% if read_filter %}&read={{ read_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if severity_filter %}&severity={{ severity_filter }}{% endif %}">
+                            {{ i }}
+                        </a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if alerts.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ alerts.next_page_number }}{% if read_filter %}&read={{ read_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if severity_filter %}&severity={{ severity_filter }}{% endif %}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer"></div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">
+                    <i class="fas fa-question-circle text-warning me-2"></i>Confirm Action
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">Are you sure you want to perform this action?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-primary" id="confirmBtn">
+                    <i class="fas fa-check me-1"></i> Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Get CSRF token from cookie
+    function getCsrfToken() {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('csrftoken='))
+            ?.split('=')[1];
+        return cookieValue || document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+    }
+
+    // Show toast notification
+    function showToast(message, type = 'success') {
+        const colors = {
+            success: '#10b981',
+            error: '#ef4444',
+            warning: '#f59e0b',
+            info: '#3b82f6'
+        };
+        
+        const icons = {
+            success: 'fa-check-circle',
+            error: 'fa-exclamation-circle',
+            warning: 'fa-exclamation-triangle',
+            info: 'fa-info-circle'
+        };
+        
+        const container = document.getElementById('toastContainer');
+        const toastId = 'toast-' + Date.now();
+        
+        const toast = document.createElement('div');
+        toast.id = toastId;
+        toast.className = 'toast-notification';
+        toast.innerHTML = `
+            <div class="toast-content" style="border-left: 4px solid ${colors[type]};">
+                <div class="toast-icon" style="color: ${colors[type]};">
+                    <i class="fas ${icons[type]}"></i>
+                </div>
+                <div class="toast-message">${message}</div>
+                <button class="toast-close" onclick="this.parentElement.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+        
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            const element = document.getElementById(toastId);
+            if (element) {
+                element.style.transform = 'translateX(100%)';
+                setTimeout(() => element.remove(), 300);
+            }
+        }, 5000);
+    }
+
+    // Mark alert as read
+    document.querySelectorAll('.mark-read-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const alertId = this.dataset.alertId;
+            const originalHtml = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Loading...';
+            this.disabled = true;
+            
+            fetch(`/inventory/alerts/${alertId}/mark-read/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCsrfToken(),
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('✅ ' + data.message, 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showToast('❌ ' + (data.error || 'Failed to mark alert as read'), 'error');
+                    this.innerHTML = originalHtml;
+                    this.disabled = false;
+                }
+            })
+            .catch(error => {
+                showToast('❌ An error occurred. Please try again.', 'error');
+                this.innerHTML = originalHtml;
+                this.disabled = false;
+            });
+        });
+    });
+
+    // Mark alert as resolved
+    document.querySelectorAll('.mark-resolved-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const alertId = this.dataset.alertId;
+            const originalHtml = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Loading...';
+            this.disabled = true;
+            
+            fetch(`/inventory/alerts/${alertId}/resolve/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCsrfToken(),
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('✅ ' + data.message, 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showToast('❌ ' + (data.error || 'Failed to mark alert as resolved'), 'error');
+                    this.innerHTML = originalHtml;
+                    this.disabled = false;
+                }
+            })
+            .catch(error => {
+                showToast('❌ An error occurred. Please try again.', 'error');
+                this.innerHTML = originalHtml;
+                this.disabled = false;
+            });
+        });
+    });
+
+    // Mark all alerts as read with custom modal
+    document.getElementById('markAllReadBtn')?.addEventListener('click', function() {
+        const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        document.getElementById('confirmMessage').textContent = 'Are you sure you want to mark all alerts as read?';
+        document.getElementById('confirmBtn').onclick = function() {
+            modal.hide();
+            const btn = document.getElementById('markAllReadBtn');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Loading...';
+            btn.disabled = true;
+            
+            fetch('/inventory/alerts/mark-all-read/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCsrfToken(),
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(`✅ ${data.count || 'All'} alerts marked as read`, 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showToast('❌ ' + (data.error || 'Failed to mark all alerts as read'), 'error');
+                    btn.innerHTML = originalHtml;
+                    btn.disabled = false;
+                }
+            })
+            .catch(error => {
+                showToast('❌ An error occurred. Please try again.', 'error');
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            });
+        };
+        modal.show();
+    });
+
+    // Auto-submit filter on change
+    document.querySelectorAll('select[name="read"], select[name="type"], select[name="severity"]').forEach(el => {
+        el.addEventListener('change', function() {
+            this.closest('form').submit();
+        });
+    });
+</script>
+{% endblock %}

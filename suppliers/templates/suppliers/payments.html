@@ -1,0 +1,572 @@
+<!-- apps/suppliers/templates/suppliers/payments.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Payments - {{ supplier.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== MOBILE RESPONSIVE STYLES ===== */
+    @media (max-width: 768px) {
+        .container-fluid.py-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+        }
+        
+        .row.mb-4 {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row.mb-4 > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0.875rem !important;
+        }
+        
+        .row.mb-4 .col {
+            padding-right: 0.875rem !important;
+            padding-left: 0.875rem !important;
+        }
+        
+        .row.mb-4 .col-auto {
+            padding-right: 0.875rem !important;
+            padding-left: 0.875rem !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }
+        
+        .card-header h5 {
+            font-size: 0.85rem !important;
+        }
+        
+        .card-header .btn {
+            font-size: 0.7rem !important;
+            padding: 0.2rem 0.5rem !important;
+            width: auto !important;
+        }
+        
+        .page-header h1 {
+            font-size: 1.1rem !important;
+        }
+        
+        .page-header .btn {
+            font-size: 0.75rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .col-md-3 {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+            padding: 0.125rem !important;
+        }
+        
+        .col-md-3 .card .card-body {
+            padding: 0.5rem !important;
+        }
+        
+        .col-md-3 .card .card-body h6 {
+            font-size: 0.6rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+        
+        .col-md-3 .card .card-body h3 {
+            font-size: 0.85rem !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .table-responsive {
+            font-size: 0.65rem !important;
+        }
+        
+        .table-responsive .table td,
+        .table-responsive .table th {
+            padding: 0.3rem 0.3rem !important;
+            white-space: nowrap !important;
+        }
+        
+        .table-responsive .badge {
+            font-size: 0.5rem !important;
+            padding: 0.15rem 0.3rem !important;
+        }
+        
+        .table-responsive .fw-bold {
+            font-size: 0.7rem !important;
+        }
+        
+        .modal-dialog {
+            margin: 0.5rem !important;
+        }
+        
+        .modal-content {
+            border-radius: 12px !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .form-label {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+        
+        .form-text {
+            font-size: 0.6rem !important;
+        }
+        
+        .input-group-text {
+            font-size: 0.75rem !important;
+            padding: 0.25rem 0.4rem !important;
+        }
+        
+        .modal-footer .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+            width: 100% !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .modal-footer {
+            flex-direction: column !important;
+            gap: 0.25rem !important;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .col-md-3 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.py-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1) !important;
+    }
+    
+    .card-header {
+        background: transparent !important;
+        border-bottom: 2px solid #f0f0f0 !important;
+    }
+    
+    .table td, .table th {
+        vertical-align: middle;
+    }
+    
+    .modal-content {
+        border-radius: 12px !important;
+        border: none !important;
+    }
+    
+    .modal-header {
+        border-bottom: 1px solid #f0f0f0 !important;
+    }
+    
+    .modal-footer {
+        border-top: 1px solid #f0f0f0 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h2 mb-0 page-header">
+                <i class="fas fa-money-bill-wave text-success me-2"></i>Payments - {{ supplier.name }}
+            </h1>
+            <p class="text-muted d-none d-sm-block">Payment history for this supplier</p>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'suppliers:supplier_detail' supplier.id %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> <span class="d-none d-sm-inline">Back to Supplier</span>
+                <span class="d-inline d-sm-none">Back</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-6">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Total Paid</h6>
+                    <h3 class="text-success">Ugx {{ supplier.total_paid|floatformat:0 }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Balance Due</h6>
+                    <h3 class="{% if supplier.balance_due > 0 %}text-danger{% else %}text-success{% endif %}">
+                        Ugx {{ supplier.balance_due|floatformat:0 }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Total Purchases</h6>
+                    <h3>Ugx {{ supplier.total_purchases|floatformat:0 }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted"># of Payments</h6>
+                    <h3>{{ payments|length }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payments Table -->
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h5 class="mb-0"><i class="fas fa-history me-2"></i>Payment History</h5>
+            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addPaymentModal">
+                <i class="fas fa-plus me-1"></i> <span class="d-none d-sm-inline">Record Payment</span>
+                <span class="d-inline d-sm-none">Payment</span>
+            </button>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Payment #</th>
+                            <th class="d-none d-sm-table-cell">Date</th>
+                            <th>Amount</th>
+                            <th class="d-none d-md-table-cell">Method</th>
+                            <th class="d-none d-lg-table-cell">Reference</th>
+                            <th class="d-none d-xl-table-cell">PO</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in payments %}
+                            <tr>
+                                <td><strong>{{ payment.payment_number }}</strong></td>
+                                <td class="d-none d-sm-table-cell">{{ payment.payment_date|date:"Y-m-d" }}</td>
+                                <td><span class="fw-bold text-success">Ugx {{ payment.amount|floatformat:0 }}</span></td>
+                                <td class="d-none d-md-table-cell">{{ payment.get_payment_method_display|slice:":10" }}</td>
+                                <td class="d-none d-lg-table-cell">{{ payment.reference_number|default:"-" }}</td>
+                                <td class="d-none d-xl-table-cell">{% if payment.purchase_order %}{{ payment.purchase_order.po_number }}{% else %}-{% endif %}</td>
+                                <td>{{ payment.notes|default:"-"|truncatechars:20 }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <i class="fas fa-money-bill-wave fa-2x mb-2 d-block"></i>
+                                        <p>No payments recorded for this supplier.</p>
+                                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addPaymentModal">
+                                            <i class="fas fa-plus me-1"></i> Record First Payment
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="bg-light">
+                        <tr>
+                            <th colspan="2" class="text-end d-none d-sm-table-cell">Total:</th>
+                            <th colspan="1" class="text-end d-sm-none">Total:</th>
+                            <th class="text-success">Ugx {{ supplier.total_paid|floatformat:0 }}</th>
+                            <th colspan="4"></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Payment Modal - Self-contained -->
+<div class="modal fade" id="addPaymentModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-money-bill-wave text-success me-2"></i>Record Payment - {{ supplier.name }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addPaymentForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="payment_amount" class="form-label fw-bold">Amount <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">Ugx</span>
+                            <input type="number" class="form-control" id="payment_amount" name="amount" step="0.01" min="0.01" required>
+                        </div>
+                        <div class="form-text">Enter the amount you are paying to this supplier.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="payment_date" class="form-label fw-bold">Payment Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="payment_date" name="payment_date" value="{% now 'Y-m-d' %}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="payment_method" class="form-label fw-bold">Payment Method <span class="text-danger">*</span></label>
+                        <select class="form-select" id="payment_method" name="payment_method" required>
+                            <option value="">Select Payment Method</option>
+                            <option value="cash">Cash</option>
+                            <option value="bank_transfer">Bank Transfer</option>
+                            <option value="cheque">Cheque</option>
+                            <option value="mobile_money">Mobile Money</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reference_number" class="form-label fw-bold">Reference Number</label>
+                        <input type="text" class="form-control" id="reference_number" name="reference_number" placeholder="Cheque number, transaction ID, etc.">
+                        <div class="form-text">Optional reference number for tracking.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="po_select" class="form-label fw-bold">Purchase Order (Optional)</label>
+                        <select class="form-select" id="po_select" name="purchase_order">
+                            <option value="">Select Purchase Order</option>
+                            {% if purchase_orders %}
+                                {% for po in purchase_orders %}
+                                    <option value="{{ po.id }}">{{ po.po_number }} - Ugx {{ po.total_amount|floatformat:0 }}</option>
+                                {% endfor %}
+                            {% else %}
+                                <option value="">No purchase orders available</option>
+                            {% endif %}
+                        </select>
+                        <div class="form-text">Optionally link this payment to a specific purchase order.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="payment_notes" class="form-label fw-bold">Notes</label>
+                        <textarea class="form-control" id="payment_notes" name="notes" rows="2" placeholder="Any additional notes about this payment"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="savePaymentBtn">
+                    <i class="fas fa-save me-1"></i> Record Payment
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Get CSRF token from cookie
+    function getCsrfToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+               document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1] || '';
+    }
+
+    // Show toast function if not already defined
+    function showToast(message, type = 'success') {
+        const colors = {
+            success: '#10b981',
+            error: '#ef4444',
+            warning: '#f59e0b',
+            info: '#3b82f6'
+        };
+        
+        const icons = {
+            success: 'fa-check-circle',
+            error: 'fa-exclamation-circle',
+            warning: 'fa-exclamation-triangle',
+            info: 'fa-info-circle'
+        };
+        
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            background: white;
+            border-left: 4px solid ${colors[type]};
+            border-radius: 8px;
+            padding: 16px 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 400px;
+            animation: slideInRight 0.5s ease-out;
+        `;
+        toast.innerHTML = `
+            <div style="color: ${colors[type]}; font-size: 20px;">
+                <i class="fas ${icons[type]}"></i>
+            </div>
+            <div style="flex: 1; font-size: 14px; color: #1f2937; font-weight: 500;">
+                ${message}
+            </div>
+            <button onclick="this.parentElement.remove()" style="background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 16px;">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.transform = 'translateX(100%)';
+            setTimeout(() => toast.remove(), 300);
+        }, 5000);
+    }
+
+    // Record payment function
+    function recordPayment() {
+        const btn = document.getElementById('savePaymentBtn');
+        const form = document.getElementById('addPaymentForm');
+        const formData = new FormData(form);
+        
+        const amount = document.getElementById('payment_amount').value;
+        const paymentDate = document.getElementById('payment_date').value;
+        const method = document.getElementById('payment_method').value;
+        
+        if (!amount || parseFloat(amount) <= 0) {
+            showToast('Please enter a valid amount greater than zero.', 'warning');
+            document.getElementById('payment_amount').focus();
+            return;
+        }
+        if (!paymentDate) {
+            showToast('Please select a payment date.', 'warning');
+            document.getElementById('payment_date').focus();
+            return;
+        }
+        if (!method) {
+            showToast('Please select a payment method.', 'warning');
+            document.getElementById('payment_method').focus();
+            return;
+        }
+        
+        // Confirm before saving
+        if (!confirm(`Are you sure you want to record a payment of Ugx ${parseFloat(amount).toLocaleString()} for {{ supplier.name }}?`)) {
+            return;
+        }
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Recording...';
+        
+        // Get the supplier ID from the URL
+        var supplierId = '{{ supplier.id }}';
+        var url = "{% url 'suppliers:supplier_payment_create' supplier.id %}";
+        
+        console.log('Payment URL:', url);
+        console.log('Supplier ID:', supplierId);
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast(data.message, 'success');
+                // Close modal
+                var modal = bootstrap.Modal.getInstance(document.getElementById('addPaymentModal'));
+                if (modal) {
+                    modal.hide();
+                }
+                setTimeout(function() {
+                    location.reload();
+                }, 1500);
+            } else {
+                showToast('Error: ' + (data.error || 'Failed to record payment'), 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save me-1"></i> Record Payment';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Error recording payment. Please try again.', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save me-1"></i> Record Payment';
+        });
+    }
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add event listener to the save button
+        const saveBtn = document.getElementById('savePaymentBtn');
+        if (saveBtn) {
+            // Remove any existing event listeners by cloning
+            const newBtn = saveBtn.cloneNode(true);
+            saveBtn.parentNode.replaceChild(newBtn, saveBtn);
+            
+            // Add the event listener
+            newBtn.addEventListener('click', recordPayment);
+        }
+        
+        // Reset modal on close
+        const modal = document.getElementById('addPaymentModal');
+        if (modal) {
+            modal.addEventListener('hidden.bs.modal', function() {
+                document.getElementById('addPaymentForm').reset();
+                document.getElementById('payment_date').value = '{% now "Y-m-d" %}';
+                const btn = document.getElementById('savePaymentBtn');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-save me-1"></i> Record Payment';
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

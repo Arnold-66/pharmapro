@@ -1,0 +1,566 @@
+<!-- suppliers/templates/suppliers/purchase_orders/detail.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}{{ po.po_number }} - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== MOBILE RESPONSIVE STYLES ===== */
+    @media (max-width: 768px) {
+        .container-fluid.py-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }
+        
+        .card-header h6 {
+            font-size: 0.85rem !important;
+        }
+        
+        .breadcrumb {
+            font-size: 0.75rem !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
+        .breadcrumb-item {
+            padding: 0 !important;
+        }
+        
+        .btn-group .btn {
+            font-size: 0.7rem !important;
+            padding: 0.2rem 0.5rem !important;
+        }
+        
+        .table {
+            font-size: 0.75rem !important;
+        }
+        
+        .table th, .table td {
+            padding: 0.3rem 0.2rem !important;
+        }
+        
+        .col-md-8, .col-md-4 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+        
+        .badge {
+            font-size: 0.65rem !important;
+        }
+        
+        .d-grid.gap-2 .btn {
+            font-size: 0.8rem !important;
+            padding: 0.4rem 0.6rem !important;
+        }
+        
+        .text-md-end {
+            text-align: left !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.py-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1) !important;
+    }
+    
+    .card-header {
+        background: transparent !important;
+        border-bottom: 2px solid #f0f0f0 !important;
+    }
+    
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+    }
+    
+    .btn-group .btn {
+        border-radius: 6px !important;
+        margin: 0 2px !important;
+    }
+    
+    .table thead {
+        background-color: #f8f9fa;
+    }
+    
+    /* Toast Custom Styles */
+    .toast-custom {
+        border-radius: 12px !important;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15) !important;
+        min-width: 300px !important;
+        max-width: 400px !important;
+        border: none !important;
+    }
+    
+    .toast-custom .toast-body {
+        padding: 1rem 1.2rem !important;
+        font-weight: 500 !important;
+    }
+    
+    .toast-custom .btn-close {
+        filter: brightness(0) invert(1);
+        opacity: 0.8;
+    }
+    
+    .modal-content {
+        border-radius: 16px !important;
+        border: none !important;
+    }
+    
+    .modal-header {
+        padding: 1.2rem 1.5rem !important;
+    }
+    
+    .modal-body {
+        padding: 1.5rem !important;
+    }
+    
+    .modal-footer {
+        padding: 1rem 1.5rem !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'suppliers:purchase_order_list' %}">Purchase Orders</a></li>
+                    <li class="breadcrumb-item active">{{ po.po_number }}</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-auto">
+            <div class="btn-group" role="group">
+                {% if po.status == 'draft' or po.status == 'pending' %}
+                    <a href="{% url 'suppliers:purchase_order_edit' po.id %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-edit me-1"></i> Edit
+                    </a>
+                {% endif %}
+                <a href="{% url 'suppliers:purchase_order_list' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-arrow-left me-1"></i> Back
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <!-- PO Header -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>{{ po.po_number }}</h4>
+                            <p class="text-muted">Created: {{ po.created_at|date:"Y-m-d H:i" }}</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <span class="badge 
+                                {% if po.status == 'received' %}bg-success
+                                {% elif po.status == 'approved' %}bg-info
+                                {% elif po.status == 'ordered' %}bg-primary
+                                {% elif po.status == 'pending' %}bg-warning
+                                {% elif po.status == 'cancelled' %}bg-danger
+                                {% else %}bg-secondary{% endif %} p-2">
+                                {{ po.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Supplier</h6>
+                            <p>
+                                <strong>{{ po.supplier.name }}</strong><br>
+                                {{ po.supplier.contact_person }}<br>
+                                {{ po.supplier.phone }}<br>
+                                {{ po.supplier.email }}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Delivery</h6>
+                            <p>
+                                Expected: <strong>{{ po.expected_delivery_date|date:"Y-m-d" }}</strong><br>
+                                {% if po.actual_delivery_date %}
+                                    Actual: <strong>{{ po.actual_delivery_date|date:"Y-m-d" }}</strong>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Items -->
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h6 class="mb-0">Items</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-center">Quantity</th>
+                                    <th class="text-end">Unit Price</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                    <tr>
+                                        <td>{{ item.product.name }}</td>
+                                        <td class="text-center">{{ item.quantity }}</td>
+                                        <td class="text-end">Ugx {{ item.unit_price|floatformat:2 }}</td>
+                                        <td class="text-end">Ugx {{ item.total_price|floatformat:2 }}</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center py-3">No items</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="bg-light">
+                                <tr>
+                                    <th colspan="3" class="text-end">Subtotal:</th>
+                                    <th class="text-end">Ugx {{ po.subtotal|floatformat:2 }}</th>
+                                </tr>
+                                <tr>
+                                    <th colspan="3" class="text-end">Tax:</th>
+                                    <th class="text-end">Ugx {{ po.tax_amount|floatformat:2 }}</th>
+                                </tr>
+                                <tr>
+                                    <th colspan="3" class="text-end">Shipping:</th>
+                                    <th class="text-end">Ugx {{ po.shipping_cost|floatformat:2 }}</th>
+                                </tr>
+                                <tr>
+                                    <th colspan="3" class="text-end">Total:</th>
+                                    <th class="text-end fw-bold">Ugx {{ po.total_amount|floatformat:2 }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if po.status == 'draft' %}
+                            <button class="btn btn-warning" onclick="showConfirmModal('submit', '{{ po.id }}', '{{ po.po_number }}')">
+                                <i class="fas fa-paper-plane me-1"></i> Submit for Approval
+                            </button>
+                        {% endif %}
+                        {% if po.status == 'pending' %}
+                            <button class="btn btn-success" onclick="showConfirmModal('approve', '{{ po.id }}', '{{ po.po_number }}')">
+                                <i class="fas fa-check me-1"></i> Approve
+                            </button>
+                        {% endif %}
+                        {% if po.status == 'approved' %}
+                            <button class="btn btn-primary" onclick="showConfirmModal('order', '{{ po.id }}', '{{ po.po_number }}')">
+                                <i class="fas fa-truck me-1"></i> Mark as Ordered
+                            </button>
+                        {% endif %}
+                        {% if po.status == 'ordered' %}
+                            <button class="btn btn-info" onclick="showConfirmModal('receive', '{{ po.id }}', '{{ po.po_number }}')">
+                                <i class="fas fa-boxes me-1"></i> Mark as Received
+                            </button>
+                        {% endif %}
+                        {% if po.status == 'draft' or po.status == 'pending' %}
+                            <button class="btn btn-danger" onclick="showConfirmModal('delete', '{{ po.id }}', '{{ po.po_number }}')">
+                                <i class="fas fa-trash me-1"></i> Delete
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h6 class="mb-0">Notes</h6>
+                </div>
+                <div class="card-body">
+                    <p>{{ po.notes|default:"No notes" }}</p>
+                    <hr>
+                    <small class="text-muted">
+                        Created by: {{ po.created_by.get_full_name|default:po.created_by.username }}<br>
+                        {% if po.approved_by %}
+                            Approved by: {{ po.approved_by.get_full_name|default:po.approved_by.username }} at {{ po.approved_at|date:"Y-m-d H:i" }}
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="confirmModalTitle">
+                    <i class="fas fa-question-circle me-2"></i>Confirm Action
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center" 
+                         style="width: 80px; height: 80px; background: rgba(255, 193, 7, 0.1);">
+                        <i class="fas fa-exclamation-triangle text-warning fa-3x"></i>
+                    </div>
+                </div>
+                <h5 id="confirmModalMessage">Are you sure you want to proceed?</h5>
+                <p class="text-muted" id="confirmModalSubMessage">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-primary px-4" id="confirmModalBtn">
+                    <i class="fas fa-check me-2"></i>Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+<script>
+// ===== TOAST NOTIFICATION FUNCTION =====
+function showToast(message, type = 'success') {
+    const container = document.querySelector('div[style*="position: fixed; top: 20px; right: 20px; z-index: 9999;"]');
+    
+    const toastHTML = `
+        <div class="toast toast-custom align-items-center border-0 mb-3 bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : type === 'warning' ? 'warning' : 'info'} text-white" role="alert" aria-live="assertive" aria-atomic="true" style="display:block;">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'} me-2"></i>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    
+    container.insertAdjacentHTML('beforeend', toastHTML);
+    const toastElement = container.lastElementChild;
+    const toast = new bootstrap.Toast(toastElement, {
+        autohide: true,
+        delay: 5000
+    });
+    toast.show();
+    
+    toastElement.addEventListener('hidden.bs.toast', function() {
+        toastElement.remove();
+    });
+}
+
+// Show confirmation modal
+function showConfirmModal(action, poId, poNumber) {
+    const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+    const modalTitle = document.getElementById('confirmModalTitle');
+    const modalMessage = document.getElementById('confirmModalMessage');
+    const modalSubMessage = document.getElementById('confirmModalSubMessage');
+    const confirmBtn = document.getElementById('confirmModalBtn');
+    
+    const actionConfigs = {
+        'approve': {
+            title: '<i class="fas fa-check-circle text-success me-2"></i>Approve Purchase Order',
+            message: `Are you sure you want to approve PO <strong>${poNumber}</strong>?`,
+            subMessage: 'This will mark the purchase order as approved and update financials.',
+            btnClass: 'btn-success',
+            btnIcon: 'fa-check',
+            btnText: 'Approve',
+            successMessage: '✅ PO approved successfully!',
+            status: 'approved'
+        },
+        'submit': {
+            title: '<i class="fas fa-paper-plane text-warning me-2"></i>Submit for Approval',
+            message: `Are you sure you want to submit PO <strong>${poNumber}</strong> for approval?`,
+            subMessage: 'This will send the purchase order to the approver for review.',
+            btnClass: 'btn-warning',
+            btnIcon: 'fa-paper-plane',
+            btnText: 'Submit',
+            successMessage: '📤 PO submitted for approval successfully!',
+            status: 'pending'
+        },
+        'order': {
+            title: '<i class="fas fa-truck text-primary me-2"></i>Mark as Ordered',
+            message: `Are you sure you want to mark PO <strong>${poNumber}</strong> as ordered?`,
+            subMessage: 'This will confirm that the order has been placed with the supplier.',
+            btnClass: 'btn-primary',
+            btnIcon: 'fa-truck',
+            btnText: 'Mark Ordered',
+            successMessage: '🚛 PO marked as ordered successfully!',
+            status: 'ordered'
+        },
+        'receive': {
+            title: '<i class="fas fa-boxes text-success me-2"></i>Mark as Received',
+            message: `Are you sure you want to mark PO <strong>${poNumber}</strong> as received?`,
+            subMessage: 'This will confirm that all items have been received from the supplier.',
+            btnClass: 'btn-success',
+            btnIcon: 'fa-boxes',
+            btnText: 'Mark Received',
+            successMessage: '📦 PO marked as received successfully!',
+            status: 'received'
+        },
+        'delete': {
+            title: '<i class="fas fa-trash text-danger me-2"></i>Delete Purchase Order',
+            message: `Are you sure you want to delete PO <strong>${poNumber}</strong>?`,
+            subMessage: 'This action cannot be undone. All data associated with this PO will be permanently removed.',
+            btnClass: 'btn-danger',
+            btnIcon: 'fa-trash',
+            btnText: 'Delete',
+            successMessage: '🗑️ PO deleted successfully!',
+            status: 'delete'
+        }
+    };
+    
+    const config = actionConfigs[action];
+    if (!config) return;
+    
+    modalTitle.innerHTML = config.title;
+    modalMessage.innerHTML = config.message;
+    modalSubMessage.textContent = config.subMessage;
+    
+    confirmBtn.className = `btn ${config.btnClass} px-4`;
+    confirmBtn.innerHTML = `<i class="fas ${config.btnIcon} me-2"></i>${config.btnText}`;
+    
+    // Remove old event listeners
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+    
+    // Add new event listener
+    newConfirmBtn.addEventListener('click', function() {
+        modal.hide();
+        if (config.status === 'delete') {
+            deletePO(poId, poNumber, config.successMessage);
+        } else {
+            updatePOStatus(poId, config.status, config.successMessage);
+        }
+    });
+    
+    modal.show();
+}
+
+// Update PO status
+function updatePOStatus(poId, status, successMessage) {
+    $.ajax({
+        url: "{% url 'suppliers:purchase_order_update_status' po.id %}",
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        data: { status: status },
+        success: function(response) {
+            if (response.success) {
+                showToast(successMessage || response.message, 'success');
+                setTimeout(function() {
+                    location.reload();
+                }, 1500);
+            } else {
+                showToast('Error: ' + response.error, 'error');
+            }
+        },
+        error: function(xhr) {
+            let errorMsg = 'Error updating status';
+            if (xhr.responseJSON && xhr.responseJSON.error) {
+                errorMsg = xhr.responseJSON.error;
+            }
+            showToast('Error: ' + errorMsg, 'error');
+        }
+    });
+}
+
+// Delete PO
+function deletePO(poId, poNumber, successMessage) {
+    $.ajax({
+        url: "{% url 'suppliers:purchase_order_delete' po.id %}",
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+            if (response.success) {
+                showToast(successMessage || response.message, 'success');
+                setTimeout(function() {
+                    window.location.href = response.redirect_url;
+                }, 1500);
+            } else {
+                showToast('Error: ' + response.error, 'error');
+            }
+        },
+        error: function(xhr) {
+            let errorMsg = 'Error deleting PO';
+            if (xhr.responseJSON && xhr.responseJSON.error) {
+                errorMsg = xhr.responseJSON.error;
+            }
+            showToast('Error: ' + errorMsg, 'error');
+        }
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,941 @@
+<!-- apps/sales/templates/sales/create.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Create Sale - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Reset all padding/margins on mobile for true edge-to-edge */
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+        }
+        
+        .row.g-3 {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row.g-3 > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+        }
+        
+        .card-header h5 {
+            font-size: 0.85rem !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .form-label {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+        
+        .form-text {
+            font-size: 0.6rem !important;
+        }
+        
+        .product-item .col-md-3,
+        .product-item .col-md-2,
+        .product-item .col-md-1 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        .product-item .row.g-3 {
+            --bs-gutter-x: 0 !important;
+        }
+        
+        .product-item {
+            background: #f8f9fa;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 0.75rem !important;
+        }
+        
+        .col-md-8.mx-auto {
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+        
+        .bg-light.p-3.rounded {
+            border-radius: 8px !important;
+            padding: 0.75rem !important;
+        }
+        
+        .col-6 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+        
+        .col-6.border-start {
+            border-left: none !important;
+            border-top: 1px solid #dee2e6 !important;
+            padding-top: 0.75rem !important;
+            margin-top: 0.75rem !important;
+        }
+        
+        .display-6 {
+            font-size: 1.25rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .btn-lg {
+            font-size: 0.9rem !important;
+            padding: 0.4rem 0.8rem !important;
+            width: 100% !important;
+        }
+        
+        .d-flex.gap-2.justify-content-end {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .d-flex.gap-2.justify-content-end .btn {
+            width: 100% !important;
+        }
+        
+        .product-search-results {
+            max-height: 150px !important;
+            font-size: 0.8rem !important;
+        }
+        
+        .product-search-result-item {
+            padding: 6px 10px !important;
+        }
+        
+        .product-search-result-item .product-name {
+            font-size: 0.85rem !important;
+        }
+        
+        .product-search-result-item .product-details {
+            font-size: 0.7rem !important;
+        }
+        
+        .input-group-text {
+            font-size: 0.75rem !important;
+            padding: 0.25rem 0.4rem !important;
+        }
+        
+        .remove-item {
+            width: 100% !important;
+            padding: 0.3rem !important;
+        }
+        
+        #editTaxBtn {
+            padding: 0.15rem 0.3rem !important;
+            font-size: 0.7rem !important;
+        }
+        
+        .modal-dialog.modal-sm {
+            margin: 1rem !important;
+            max-width: 100% !important;
+        }
+        
+        #amount_received {
+            font-size: 1rem !important;
+            padding: 0.4rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .row.g-3 {
+            --bs-gutter-x: 0.5rem !important;
+        }
+        
+        .row.g-3 > [class*="col-"] {
+            padding-right: 0.25rem !important;
+            padding-left: 0.25rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 10px !important;
+        }
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+    
+    .product-search-wrapper {
+        position: relative;
+    }
+    
+    .product-search-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        max-height: 200px;
+        overflow-y: auto;
+        display: none;
+        z-index: 1000;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .product-search-results.show {
+        display: block;
+    }
+    
+    .product-search-result-item {
+        padding: 8px 12px;
+        cursor: pointer;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .product-search-result-item:hover {
+        background-color: #f0f8ff;
+    }
+    
+    .product-search-result-item .product-name {
+        font-weight: 500;
+    }
+    
+    .product-search-result-item .product-details {
+        font-size: 0.85rem;
+        color: #666;
+    }
+    
+    .product-search-result-item .product-stock {
+        font-size: 0.85rem;
+        color: #28a745;
+    }
+    
+    .stock-info {
+        font-weight: 500;
+    }
+    
+    .stock-info.text-danger {
+        color: #dc3545 !important;
+    }
+    
+    .stock-info.text-success {
+        color: #28a745 !important;
+    }
+    
+    /* Tax edit restricted badge */
+    .tax-restricted-badge {
+        font-size: 0.65rem;
+        padding: 0.15rem 0.4rem;
+        border-radius: 4px;
+        background: #ffc107;
+        color: #212529;
+        margin-left: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h5 class="mb-0">
+                        <i class="fas fa-plus-circle text-primary me-2"></i>Create New Sale
+                    </h5>
+                    <a href="{% url 'sales:sale_list' %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> <span class="d-none d-sm-inline">Back to Sales</span>
+                        <span class="d-inline d-sm-none">Back</span>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="saleForm">
+                        {% csrf_token %}
+
+                        <!-- Customer Information -->
+                        <h6 class="text-muted fw-bold mb-3">
+                            <i class="fas fa-user me-2"></i>Customer Information
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="customer_name" class="form-label">Customer Name</label>
+                                <input type="text" class="form-control" id="customer_name" name="customer_name" 
+                                       placeholder="Enter customer name (optional)">
+                                <div class="form-text">Leave blank for walk-in customers.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="customer_phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="customer_phone" name="customer_phone" 
+                                       placeholder="Enter phone number">
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Products -->
+                        <h6 class="text-muted fw-bold mb-3">
+                            <i class="fas fa-boxes me-2"></i>Products
+                        </h6>
+
+                        <div id="productItems">
+                            <!-- Initial product row -->
+                            <div class="product-item row g-3 mb-3">
+                                <div class="col-md-3">
+                                    <div class="product-search-wrapper">
+                                        <input type="text" class="form-control product-search" 
+                                               placeholder="Search product..." autocomplete="off">
+                                        <input type="hidden" class="product-id" name="product_ids[]" value="">
+                                        <div class="product-search-results"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select unit-select" name="unit_names[]" required>
+                                        <option value="">Select Unit</option>
+                                    </select>
+                                    <div class="form-text small">Base unit: <span class="unit-base-info">-</span></div>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" class="form-control quantity" name="quantities[]" 
+                                           placeholder="Qty" min="0.01" step="0.01" required>
+                                    <div class="form-text small">Available: <span class="stock-info">-</span></div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="input-group">
+                                        <span class="input-group-text">Ugx</span>
+                                        <input type="number" class="form-control unit-price" name="unit_prices[]" 
+                                               placeholder="Price" step="0.01" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <input type="number" class="form-control discount" name="discounts[]" 
+                                           placeholder="Disc" step="0.01" value="0">
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-danger remove-item">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn btn-outline-primary" id="addItemBtn">
+                            <i class="fas fa-plus me-1"></i> Add Product
+                        </button>
+
+                        <hr>
+
+                        <!-- Summary with Tax Edit -->
+                        <div class="row mt-3">
+                            <div class="col-md-8 mx-auto">
+                                <div class="bg-light p-3 rounded">
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Subtotal:</span>
+                                                <span id="subtotal">Ugx 0.00</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Total Discount:</span>
+                                                <span id="totalDiscount">Ugx 0.00</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between mb-2 align-items-center">
+    <span>Tax Rate:</span>
+    <span id="taxRateDisplay">{{ default_tax_rate|default:18 }}%</span>
+</div>
+                                            <div class="d-flex justify-content-between mb-2 align-items-center">
+                                                <span>Tax:</span>
+                                                <span id="taxDisplay">Ugx 0.00</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between fw-bold fs-5 border-top pt-2">
+                                                <span>Total:</span>
+                                                <span id="total">Ugx 0.00</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- POS Payment Section -->
+                                        <div class="col-6 border-start">
+                                            <div class="ps-3">
+                                                <h6 class="fw-bold mb-3 text-primary">
+                                                    <i class="fas fa-cash-register me-2"></i>Payment
+                                                </h6>
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Total Due</label>
+                                                    <div class="display-6 text-success" id="payment_total_display">Ugx 0.00</div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="amount_received" class="form-label fw-bold">Amount Received</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">Ugx</span>
+                                                        <input type="number" class="form-control form-control-lg" 
+                                                               id="amount_received" name="amount_received" 
+                                                               placeholder="0.00" step="0.01" min="0"
+                                                               oninput="calculatePaymentChange()">
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Change</label>
+                                                    <div class="display-6" id="payment_change_display">Ugx 0.00</div>
+                                                    <div id="change_status" class="small"></div>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <label for="payment_method" class="form-label fw-bold">Payment Method</label>
+                                                    <select class="form-select" id="payment_method" name="payment_method">
+                                                        <option value="cash">Cash</option>
+                                                        <option value="mobile_money">Mobile Money</option>
+                                                        <option value="bank_transfer">Bank Transfer</option>
+                                                        <option value="credit_card">Credit Card</option>
+                                                        <option value="debit_card">Debit Card</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tax Edit Modal - Only visible to admins/managers -->
+                        {% if user.role in 'admin,manager' or user.is_superuser %}
+                        <div class="modal fade" id="taxModal" tabindex="-1">
+                            <div class="modal-dialog modal-sm">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Edit Tax Rate</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label for="taxRateInput" class="form-label">Tax Rate (%)</label>
+                                            <input type="number" class="form-control" id="taxRateInput" 
+                                                   value="{{ default_tax_rate|default:18 }}" min="0" max="100" step="0.5">
+                                            <div class="form-text">Current tax: <span id="modalTaxAmount">Ugx 0.00</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" class="btn btn-primary" id="applyTaxBtn">Apply</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Notes -->
+                        <div class="mb-3 mt-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="2" 
+                                      placeholder="Additional notes about this sale"></textarea>
+                        </div>
+
+                        <!-- Hidden fields -->
+                        <input type="hidden" name="tax_rate" id="taxRateHidden" value="{{ default_tax_rate|default:18 }}">
+
+                        <hr>
+                        <div class="d-flex gap-2 justify-content-end flex-wrap">
+                            <a href="{% url 'sales:sale_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                <i class="fas fa-save me-1"></i> Complete Sale
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let productUnitsCache = {};
+    let productStockCache = {};
+    // Load tax rate from server (passed from view) - NO EDITING
+    let currentTaxRate = {{ default_tax_rate|default:18 }};
+    if (currentTaxRate === 0 || currentTaxRate === null || isNaN(currentTaxRate)) {
+        currentTaxRate = 18;
+    }
+    console.log("Tax rate loaded from settings:", currentTaxRate);
+
+
+    console.log("Tax rate loaded from settings:", currentTaxRate);
+    let currentTaxAmount = 0;
+    let searchTimeout = null;
+    let isCalculating = false
+    
+    // Check if user can edit tax (admin/manager/superuser)
+    const canEditTax = {% if user.role in 'admin,manager' or user.is_superuser %}true{% else %}false{% endif %};
+    
+    // Function to create a new product row
+    function createProductRow() {
+        const template = document.querySelector('.product-item');
+        const clone = template.cloneNode(true);
+        
+        clone.querySelectorAll('input, select').forEach(el => {
+            if (el.tagName === 'SELECT') {
+                const firstOption = el.querySelector('option:first-child');
+                el.innerHTML = '';
+                if (firstOption) {
+                    el.appendChild(firstOption.cloneNode(true));
+                } else {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = 'Select Unit';
+                    el.appendChild(option);
+                }
+                el.selectedIndex = 0;
+            } else if (el.type === 'hidden') {
+                el.value = '';
+            } else if (el.classList.contains('discount')) {
+                el.value = '0';
+            } else {
+                el.value = '';
+            }
+        });
+        
+        const results = clone.querySelector('.product-search-results');
+        if (results) {
+            results.innerHTML = '';
+            results.classList.remove('show');
+        }
+        
+        const baseInfo = clone.querySelector('.unit-base-info');
+        if (baseInfo) baseInfo.textContent = '-';
+        
+        const stockInfo = clone.querySelector('.stock-info');
+        if (stockInfo) stockInfo.textContent = '-';
+        
+        return clone;
+    }
+    
+    // Function to attach events to a row
+    function attachRowEvents(row) {
+        const removeBtn = row.querySelector('.remove-item');
+        removeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const items = document.querySelectorAll('.product-item');
+            if (items.length > 1) {
+                this.closest('.product-item').remove();
+                calculateTotals();
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Cannot Remove',
+                    text: 'You need at least one product item.',
+                    timer: 2000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            }
+        });
+        
+        const searchInput = row.querySelector('.product-search');
+        const resultsDiv = row.querySelector('.product-search-results');
+        const productIdInput = row.querySelector('.product-id');
+        const unitSelect = row.querySelector('.unit-select');
+        const stockInfo = row.querySelector('.stock-info');
+        const baseInfo = row.querySelector('.unit-base-info');
+        
+        searchInput.addEventListener('input', function() {
+            const query = this.value.trim();
+            
+            if (query.length < 2) {
+                resultsDiv.innerHTML = '';
+                resultsDiv.classList.remove('show');
+                return;
+            }
+            
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+            }
+            
+            resultsDiv.innerHTML = '<div class="product-search-result-item text-muted">Searching...</div>';
+            resultsDiv.classList.add('show');
+            
+            searchTimeout = setTimeout(() => {
+                fetch(`/sales/products/search/?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        resultsDiv.innerHTML = '';
+                        
+                        if (data.products && data.products.length > 0) {
+                            data.products.forEach(product => {
+                                const item = document.createElement('div');
+                                item.className = 'product-search-result-item';
+                                item.innerHTML = `
+                                    <div class="product-name">${product.name}</div>
+                                    <div class="product-details">
+                                        Stock: ${product.stock} ${product.unit} | 
+                                        ${product.barcode ? 'Barcode: ' + product.barcode : ''}
+                                    </div>
+                                `;
+                                item.addEventListener('click', function() {
+                                    selectProduct(row, product);
+                                });
+                                resultsDiv.appendChild(item);
+                            });
+                        } else {
+                            resultsDiv.innerHTML = '<div class="product-search-result-item text-muted">No products found</div>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Search error:', error);
+                        resultsDiv.innerHTML = '<div class="product-search-result-item text-danger">Error searching</div>';
+                    });
+            }, 300);
+        });
+        
+        searchInput.addEventListener('blur', function() {
+            setTimeout(() => {
+                resultsDiv.classList.remove('show');
+            }, 200);
+        });
+        
+        searchInput.addEventListener('focus', function() {
+            if (resultsDiv.children.length > 0) {
+                resultsDiv.classList.add('show');
+            }
+        });
+        
+        unitSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const priceInput = this.closest('.product-item').querySelector('.unit-price');
+            if (selectedOption && selectedOption.dataset.price) {
+                priceInput.value = selectedOption.dataset.price;
+                
+                const productId = productIdInput.value;
+                if (productId && productStockCache[productId]) {
+                    const stock = productStockCache[productId];
+                    const qtyPerUnit = parseFloat(selectedOption.dataset.quantity) || 1;
+                    const availableUnits = Math.floor(stock / qtyPerUnit);
+                    const baseUnit = selectedOption.dataset.baseunit || 'units';
+                    stockInfo.textContent = `${availableUnits} ${selectedOption.value}s (${stock} ${baseUnit} base units)`;
+                }
+                
+                calculateTotals();
+            }
+        });
+        
+        const quantityInput = row.querySelector('.quantity');
+        quantityInput.addEventListener('input', function() {
+            calculateTotals();
+            const productId = productIdInput.value;
+            const unitName = unitSelect.value;
+            const quantity = parseFloat(this.value) || 0;
+            
+            if (productId && unitName && productStockCache[productId]) {
+                const stock = productStockCache[productId];
+                const selectedOption = unitSelect.options[unitSelect.selectedIndex];
+                const qtyPerUnit = parseFloat(selectedOption?.dataset?.quantity) || 1;
+                const needed = quantity * qtyPerUnit;
+                
+                if (needed > stock) {
+                    this.classList.add('is-invalid');
+                    stockInfo.textContent = `❌ Insufficient! Need ${needed}, have ${stock}`;
+                    stockInfo.style.color = 'red';
+                } else {
+                    this.classList.remove('is-invalid');
+                    stockInfo.textContent = `✅ ${stock - needed} remaining`;
+                    stockInfo.style.color = 'green';
+                }
+            }
+        });
+        
+        const priceInput = row.querySelector('.unit-price');
+        priceInput.addEventListener('input', calculateTotals);
+        
+        const discountInput = row.querySelector('.discount');
+        discountInput.addEventListener('input', calculateTotals);
+    }
+    
+    function selectProduct(row, product) {
+        const searchInput = row.querySelector('.product-search');
+        const resultsDiv = row.querySelector('.product-search-results');
+        const productIdInput = row.querySelector('.product-id');
+        
+        searchInput.value = product.name;
+        productIdInput.value = product.id;
+        resultsDiv.classList.remove('show');
+        
+        productStockCache[product.id] = product.stock;
+        
+        loadSaleUnits(row, product.id);
+    }
+    
+    function loadSaleUnits(row, productId) {
+        const unitSelect = row.querySelector('.unit-select');
+        const baseInfo = row.querySelector('.unit-base-info');
+        const stockInfo = row.querySelector('.stock-info');
+        
+        unitSelect.innerHTML = '<option value="">Select Unit</option>';
+        
+        if (!productId) return;
+        
+        if (productUnitsCache[productId]) {
+            const units = productUnitsCache[productId];
+            const stock = productStockCache[productId] || 0;
+            
+            units.forEach(unit => {
+                const option = document.createElement('option');
+                option.value = unit.name;
+                option.textContent = `${unit.name} (${unit.quantity_per_unit} base units) - Ugx ${unit.selling_price}`;
+                option.dataset.price = unit.selling_price;
+                option.dataset.quantity = unit.quantity_per_unit;
+                option.dataset.unit_id = unit.id;
+                option.dataset.baseunit = unit.abbreviation || 'units';
+                if (unit.is_default) option.selected = true;
+                unitSelect.appendChild(option);
+            });
+            
+            const defaultUnit = units.find(u => u.is_default);
+            if (defaultUnit) {
+                baseInfo.textContent = defaultUnit.abbreviation || 'units';
+                const qtyPerUnit = parseFloat(defaultUnit.quantity_per_unit) || 1;
+                const availableUnits = Math.floor(stock / qtyPerUnit);
+                stockInfo.textContent = `${availableUnits} ${defaultUnit.name}s (${stock} base units)`;
+            }
+            
+            unitSelect.dispatchEvent(new Event('change'));
+            calculateTotals();
+            return;
+        }
+        
+        fetch(`/inventory/products/${productId}/sale-units/`)
+            .then(response => {
+                if (!response.ok) throw new Error('Network error');
+                return response.json();
+            })
+            .then(data => {
+                if (data.units && data.units.length > 0) {
+                    productUnitsCache[productId] = data.units;
+                    const stock = productStockCache[productId] || 0;
+                    
+                    data.units.forEach(unit => {
+                        const option = document.createElement('option');
+                        option.value = unit.name;
+                        option.textContent = `${unit.name} (${unit.quantity_per_unit} base units) - Ugx ${unit.selling_price}`;
+                        option.dataset.price = unit.selling_price;
+                        option.dataset.quantity = unit.quantity_per_unit;
+                        option.dataset.unit_id = unit.id;
+                        option.dataset.baseunit = unit.abbreviation || 'units';
+                        if (unit.is_default) option.selected = true;
+                        unitSelect.appendChild(option);
+                    });
+                    
+                    const defaultUnit = data.units.find(u => u.is_default);
+                    if (defaultUnit) {
+                        baseInfo.textContent = defaultUnit.abbreviation || 'units';
+                        const qtyPerUnit = parseFloat(defaultUnit.quantity_per_unit) || 1;
+                        const availableUnits = Math.floor(stock / qtyPerUnit);
+                        stockInfo.textContent = `${availableUnits} ${defaultUnit.name}s (${stock} base units)`;
+                    }
+                    
+                    unitSelect.dispatchEvent(new Event('change'));
+                    calculateTotals();
+                }
+            })
+            .catch(error => {
+                console.error('Error loading units:', error);
+            });
+    }
+    
+    // Calculate totals and update payment section - NO FLICKERING
+    function calculateTotals() {
+        if (isCalculating) return;
+        isCalculating = true;
+        
+        try {
+            let subtotal = 0;
+            let totalDiscount = 0;
+            const items = document.querySelectorAll('.product-item');
+            
+            items.forEach(item => {
+                const quantity = parseFloat(item.querySelector('.quantity').value) || 0;
+                const unitPrice = parseFloat(item.querySelector('.unit-price').value) || 0;
+                const discount = parseFloat(item.querySelector('.discount').value) || 0;
+                
+                const lineTotal = quantity * unitPrice;
+                subtotal += lineTotal;
+                totalDiscount += discount;
+            });
+            
+            const taxableAmount = subtotal - totalDiscount;
+            currentTaxAmount = taxableAmount * (currentTaxRate / 100);
+            const total = taxableAmount + currentTaxAmount;
+            
+            // Batch all DOM updates together to prevent flickering
+            const subtotalEl = document.getElementById('subtotal');
+            const totalDiscountEl = document.getElementById('totalDiscount');
+            const taxRateDisplayEl = document.getElementById('taxRateDisplay');
+            const taxDisplayEl = document.getElementById('taxDisplay');
+            const totalEl = document.getElementById('total');
+            const modalTaxAmountEl = document.getElementById('modalTaxAmount');
+            const paymentTotalDisplayEl = document.getElementById('payment_total_display');
+            const taxRateHiddenEl = document.getElementById('taxRateHidden');
+            
+            if (subtotalEl) subtotalEl.textContent = 'Ugx ' + subtotal.toFixed(2);
+            if (totalDiscountEl) totalDiscountEl.textContent = 'Ugx ' + totalDiscount.toFixed(2);
+            if (taxRateDisplayEl) taxRateDisplayEl.textContent = currentTaxRate + '%';
+            if (taxDisplayEl) taxDisplayEl.textContent = 'Ugx ' + currentTaxAmount.toFixed(2);
+            if (totalEl) totalEl.textContent = 'Ugx ' + total.toFixed(2);
+            if (modalTaxAmountEl) modalTaxAmountEl.textContent = 'Ugx ' + currentTaxAmount.toFixed(2);
+            if (paymentTotalDisplayEl) paymentTotalDisplayEl.textContent = 'Ugx ' + total.toFixed(2);
+            if (taxRateHiddenEl) taxRateHiddenEl.value = currentTaxRate;
+            
+            calculatePaymentChange();
+        } finally {
+            isCalculating = false;
+        }
+    }
+    
+    // Calculate change for POS
+    window.calculatePaymentChange = function() {
+        const totalText = document.getElementById('total').textContent;
+        const total = parseFloat(totalText.replace('Ugx ', '').replace(/,/g, '')) || 0;
+        const received = parseFloat(document.getElementById('amount_received').value) || 0;
+        const change = received - total;
+        
+        const changeDisplay = document.getElementById('payment_change_display');
+        const changeStatus = document.getElementById('change_status');
+        
+        if (change >= 0) {
+            changeDisplay.textContent = 'Ugx ' + change.toFixed(2);
+            changeDisplay.style.color = '#28a745';
+            if (change === 0) {
+                changeStatus.textContent = '✅ Exact payment';
+                changeStatus.className = 'text-muted';
+            } else {
+                changeStatus.textContent = '💰 Change to return: Ugx ' + change.toFixed(2);
+                changeStatus.className = 'text-success fw-bold';
+            }
+        } else {
+            changeDisplay.textContent = 'Ugx ' + Math.abs(change).toFixed(2);
+            changeDisplay.style.color = '#dc3545';
+            changeStatus.textContent = '⚠️ Short: Need Ugx ' + Math.abs(change).toFixed(2) + ' more';
+            changeStatus.className = 'text-danger fw-bold';
+        }
+    };
+    
+    // Add product row
+    document.getElementById('addItemBtn').addEventListener('click', function() {
+        const newRow = createProductRow();
+        document.getElementById('productItems').appendChild(newRow);
+        attachRowEvents(newRow);
+        setTimeout(calculateTotals, 100);
+    });
+    
+    // Attach events to existing rows
+    document.querySelectorAll('.product-item').forEach(row => {
+        attachRowEvents(row);
+    });
+    
+    // Tax Modal Handling - NO FLICKERING (only if user can edit tax)
+    {% if user.role in 'admin,manager' or user.is_superuser %}
+    const taxModal = new bootstrap.Modal(document.getElementById('taxModal'));
+    
+    document.getElementById('editTaxBtn').addEventListener('click', function() {
+        document.getElementById('taxRateInput').value = currentTaxRate;
+        document.getElementById('modalTaxAmount').textContent = 'Ugx ' + currentTaxAmount.toFixed(2);
+        taxModal.show();
+    });
+    
+    document.getElementById('applyTaxBtn').addEventListener('click', function() {
+        const newRate = parseFloat(document.getElementById('taxRateInput').value);
+        if (!isNaN(newRate) && newRate >= 0 && newRate <= 100) {
+            currentTaxRate = newRate;
+            calculateTotals();
+            taxModal.hide();
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Tax Updated',
+                text: `Tax rate set to ${currentTaxRate}%`,
+                timer: 1500,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Tax Rate',
+                text: 'Please enter a valid tax rate between 0 and 100.',
+                timer: 2000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        }
+    });
+    {% endif %}
+    
+    // Initial calculation
+    setTimeout(calculateTotals, 300);
+    
+    // Form validation
+    document.getElementById('saleForm').addEventListener('submit', function(e) {
+        const btn = document.getElementById('submitBtn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Processing...';
+        btn.disabled = true;
+        
+        const taxInput = document.getElementById('taxRateHidden');
+        if (taxInput) {
+            taxInput.value = currentTaxRate;
+        }
+        
+        const amountReceived = document.getElementById('amount_received').value || '0';
+        const paymentMethod = document.getElementById('payment_method').value || 'cash';
+        
+        const receivedInput = document.createElement('input');
+        receivedInput.type = 'hidden';
+        receivedInput.name = 'amount_received';
+        receivedInput.value = amountReceived;
+        this.appendChild(receivedInput);
+        
+        const methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = 'payment_method';
+        methodInput.value = paymentMethod;
+        this.appendChild(methodInput);
+    });
+});
+</script>
+{% endblock %}

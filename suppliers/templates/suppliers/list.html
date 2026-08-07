@@ -1,0 +1,643 @@
+<!-- apps/suppliers/templates/suppliers/list.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Suppliers - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== MOBILE RESPONSIVE STYLES ===== */
+    @media (max-width: 768px) {
+        .container-fluid.py-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+        }
+        
+        /* Fix for stat cards - 2x2 grid */
+        .row.mb-4 {
+            --bs-gutter-x: 0.25rem !important;
+            --bs-gutter-y: 0.25rem !important;
+            margin-right: -0.125rem !important;
+            margin-left: -0.125rem !important;
+        }
+        
+        .row.mb-4 > [class*="col-"] {
+            padding-right: 0.125rem !important;
+            padding-left: 0.125rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .row.mb-4 .col-md-3.col-sm-6 {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+        }
+        
+        .row.mb-4 .col-md-3.col-sm-6 .stat-card .card-body {
+            padding: 0.5rem !important;
+        }
+        
+        .row.mb-4 .col-md-3.col-sm-6 .stat-card h6 {
+            font-size: 0.55rem !important;
+            margin-bottom: 0.1rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.3px !important;
+        }
+        
+        .row.mb-4 .col-md-3.col-sm-6 .stat-card h2 {
+            font-size: 1rem !important;
+            margin-bottom: 0 !important;
+        }
+        
+        .row.mb-4 .col-md-3.col-sm-6 .stat-card .rounded-circle.p-3 {
+            padding: 0.3rem !important;
+            width: 36px !important;
+            height: 36px !important;
+        }
+        
+        .row.mb-4 .col-md-3.col-sm-6 .stat-card .rounded-circle.p-3 i {
+            font-size: 1rem !important;
+        }
+        
+        /* Cards edge-to-edge */
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+        }
+        
+        .card-footer {
+            padding: 0.6rem 0.875rem !important;
+        }
+        
+        .page-header h1 {
+            font-size: 1.1rem !important;
+        }
+        
+        .page-header .btn {
+            font-size: 0.75rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .page-header .d-flex {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+            align-items: stretch !important;
+        }
+        
+        .page-header .col-auto {
+            width: 100% !important;
+        }
+        
+        .col-md-3, .col-md-2 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .d-flex.gap-2 {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .d-flex.gap-2 .btn {
+            width: 100% !important;
+        }
+        
+        .table-responsive {
+            font-size: 0.6rem !important;
+        }
+        
+        .table-responsive .table td,
+        .table-responsive .table th {
+            padding: 0.3rem 0.25rem !important;
+            white-space: nowrap !important;
+        }
+        
+        .table-responsive .badge {
+            font-size: 0.45rem !important;
+            padding: 0.15rem 0.25rem !important;
+        }
+        
+        .table-responsive .btn-group .btn {
+            padding: 0.1rem 0.2rem !important;
+            font-size: 0.45rem !important;
+            width: auto !important;
+        }
+        
+        .table-responsive .rounded-circle {
+            width: 24px !important;
+            height: 24px !important;
+            font-size: 0.6rem !important;
+        }
+        
+        .table-responsive .fw-semibold {
+            font-size: 0.6rem !important;
+        }
+        
+        .table-responsive .small.text-muted {
+            font-size: 0.5rem !important;
+        }
+        
+        .pagination .page-link {
+            padding: 0.2rem 0.4rem !important;
+            font-size: 0.65rem !important;
+        }
+        
+        .card-footer .pagination {
+            justify-content: center !important;
+        }
+        
+        .modal-dialog {
+            margin: 0.5rem !important;
+        }
+        
+        .modal-content {
+            border-radius: 12px !important;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .row.mb-4 .col-md-3.col-sm-6 .stat-card .card-body {
+            padding: 0.35rem !important;
+        }
+        
+        .row.mb-4 .col-md-3.col-sm-6 .stat-card h6 {
+            font-size: 0.4rem !important;
+        }
+        
+        .row.mb-4 .col-md-3.col-sm-6 .stat-card h2 {
+            font-size: 0.75rem !important;
+        }
+        
+        .row.mb-4 .col-md-3.col-sm-6 .stat-card .rounded-circle.p-3 {
+            padding: 0.2rem !important;
+            width: 28px !important;
+            height: 28px !important;
+        }
+        
+        .row.mb-4 .col-md-3.col-sm-6 .stat-card .rounded-circle.p-3 i {
+            font-size: 0.7rem !important;
+        }
+        
+        .table-responsive {
+            font-size: 0.5rem !important;
+        }
+        
+        .table-responsive .table td,
+        .table-responsive .table th {
+            padding: 0.15rem 0.1rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.py-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .row.mb-4 {
+            --bs-gutter-x: 0.5rem !important;
+        }
+        
+        .row.mb-4 > [class*="col-"] {
+            padding-right: 0.25rem !important;
+            padding-left: 0.25rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1) !important;
+    }
+    
+    .stat-card {
+        transition: transform 0.2s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-3px);
+    }
+    
+    .stat-card .card-body {
+        padding: 1rem 1.25rem !important;
+    }
+    
+    .stat-card .rounded-circle {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .table td, .table th {
+        vertical-align: middle;
+    }
+    
+    .btn-group .btn {
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .modal-content {
+        border-radius: 12px !important;
+        border: none !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h2 mb-0 page-header">
+                <i class="fas fa-truck text-primary me-2"></i>Suppliers
+            </h1>
+            <p class="text-muted d-none d-sm-block">Manage your organization's suppliers</p>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'suppliers:supplier_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> <span class="d-none d-sm-inline">Add Supplier</span>
+                <span class="d-inline d-sm-none">Add</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Cards - 2x2 grid on mobile -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Total</h6>
+                            <h2 class="mb-0">{{ total_suppliers }}</h2>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-truck text-primary fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Active</h6>
+                            <h2 class="mb-0 text-success">{{ active_suppliers }}</h2>
+                        </div>
+                        <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-check-circle text-success fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Approved</h6>
+                            <h2 class="mb-0 text-info">{{ approved_suppliers }}</h2>
+                        </div>
+                        <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-user-check text-info fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card stat-card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Pending</h6>
+                            <h2 class="mb-0 text-warning">{{ pending_suppliers }}</h2>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-clock text-warning fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control" placeholder="Search suppliers..." value="{{ search_query }}">
+                        <button class="btn btn-outline-secondary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <select name="status" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                        <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+                        <option value="suspended" {% if status_filter == 'suspended' %}selected{% endif %}>Suspended</option>
+                        <option value="blacklisted" {% if status_filter == 'blacklisted' %}selected{% endif %}>Blacklisted</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="type" class="form-select">
+                        <option value="">All Types</option>
+                        <option value="manufacturer" {% if type_filter == 'manufacturer' %}selected{% endif %}>Manufacturer</option>
+                        <option value="distributor" {% if type_filter == 'distributor' %}selected{% endif %}>Distributor</option>
+                        <option value="wholesaler" {% if type_filter == 'wholesaler' %}selected{% endif %}>Wholesaler</option>
+                        <option value="importer" {% if type_filter == 'importer' %}selected{% endif %}>Importer</option>
+                        <option value="retailer" {% if type_filter == 'retailer' %}selected{% endif %}>Retailer</option>
+                        <option value="exporter" {% if type_filter == 'exporter' %}selected{% endif %}>Exporter</option>
+                        <option value="other" {% if type_filter == 'other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="approved" class="form-select">
+                        <option value="">All Approval</option>
+                        <option value="approved" {% if approved_filter == 'approved' %}selected{% endif %}>Approved</option>
+                        <option value="pending" {% if approved_filter == 'pending' %}selected{% endif %}>Pending</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-grow-1">Apply Filters</button>
+                        <a href="{% url 'suppliers:supplier_list' %}" class="btn btn-outline-secondary">Clear</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Suppliers Table -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Supplier</th>
+                            <th class="d-none d-sm-table-cell">Contact</th>
+                            <th class="d-none d-md-table-cell">Type</th>
+                            <th>Status</th>
+                            <th class="d-none d-sm-table-cell">Approval</th>
+                            <th class="d-none d-lg-table-cell">Balance</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for supplier in suppliers %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar avatar-sm me-2">
+                                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; flex-shrink: 0;">
+                                                <span class="fw-bold">{{ supplier.name|first|upper }}</span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold">{{ supplier.name|truncatechars:15 }}</div>
+                                            <div class="small text-muted d-none d-sm-block">Code: {{ supplier.code }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="d-none d-sm-table-cell">
+                                    <div>
+                                        <div>{{ supplier.contact_person|truncatechars:12 }}</div>
+                                        <div class="small text-muted">
+                                            <i class="fas fa-phone me-1"></i>{{ supplier.phone }}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="d-none d-md-table-cell">
+                                    <span class="badge bg-info">
+                                        {{ supplier.get_supplier_type_display|slice:":8" }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if supplier.status == 'active' %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% elif supplier.status == 'inactive' %}
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    {% elif supplier.status == 'suspended' %}
+                                        <span class="badge bg-warning">Suspended</span>
+                                    {% elif supplier.status == 'blacklisted' %}
+                                        <span class="badge bg-danger">Blacklisted</span>
+                                    {% endif %}
+                                </td>
+                                <td class="d-none d-sm-table-cell">
+                                    {% if supplier.is_approved %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td class="d-none d-lg-table-cell">
+                                    <span class="fw-bold">Ugx {{ supplier.balance_due|floatformat:0 }}</span>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'suppliers:supplier_detail' supplier.id %}" class="btn btn-sm btn-outline-info" title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'suppliers:supplier_payments' supplier.id %}" class="btn btn-sm btn-outline-success" title="View Payments">
+                                            <i class="fas fa-money-bill-wave"></i>
+                                        </a>
+                                        <a href="{% url 'suppliers:supplier_edit' supplier.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-{% if supplier.status == 'active' %}warning{% else %}success{% endif %} toggle-supplier-btn" 
+                                                data-supplier-id="{{ supplier.id }}" 
+                                                data-status="{{ supplier.status }}"
+                                                title="{% if supplier.status == 'active' %}Deactivate{% else %}Activate{% endif %}">
+                                            <i class="fas fa-{% if supplier.status == 'active' %}ban{% else %}check{% endif %}"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger delete-supplier-btn" 
+                                                data-supplier-id="{{ supplier.id }}" 
+                                                data-supplier-name="{{ supplier.name }}"
+                                                title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="fas fa-truck fa-4x mb-3 d-block"></i>
+                                        <h5>No suppliers found</h5>
+                                        <p>Start by adding your first supplier.</p>
+                                        <a href="{% url 'suppliers:supplier_create' %}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-plus me-1"></i> Add Supplier
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% if suppliers.has_other_pages %}
+            <div class="card-footer">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-end mb-0">
+                        {% if suppliers.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ suppliers.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if approved_filter %}&approved={{ approved_filter }}{% endif %}">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+                            </li>
+                        {% endif %}
+                        {% for num in suppliers.paginator.page_range %}
+                            {% if suppliers.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > suppliers.number|add:'-3' and num < suppliers.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if approved_filter %}&approved={{ approved_filter }}{% endif %}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if suppliers.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ suppliers.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if approved_filter %}&approved={{ approved_filter }}{% endif %}">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Delete Supplier Modal -->
+<div class="modal fade" id="deleteSupplierModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle text-danger me-2"></i>Delete Supplier
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="deleteSupplierName"></strong>?</p>
+                <p class="text-muted small">
+                    <i class="fas fa-info-circle me-1"></i>
+                    This action cannot be undone. All data associated with this supplier will be permanently removed.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteSupplierForm" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i> Delete Supplier
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Toggle supplier status
+        $('.toggle-supplier-btn').click(function() {
+            const btn = $(this);
+            const supplierId = btn.data('supplier-id');
+            const currentStatus = btn.data('status');
+            
+            const action = currentStatus === 'active' ? 'deactivate' : 'activate';
+            if (confirm(`Are you sure you want to ${action} this supplier?`)) {
+                $.ajax({
+                    url: `/suppliers/${supplierId}/toggle-status/`,
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            alert(response.error || 'Error toggling supplier status');
+                        }
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 403) {
+                            alert('You do not have permission to perform this action.');
+                        } else {
+                            alert('Error toggling supplier status');
+                        }
+                    }
+                });
+            }
+        });
+        
+        // Delete supplier
+        $('.delete-supplier-btn').click(function() {
+            const supplierId = $(this).data('supplier-id');
+            const supplierName = $(this).data('supplier-name');
+            $('#deleteSupplierName').text(supplierName);
+            $('#deleteSupplierForm').attr('action', `/suppliers/${supplierId}/delete/`);
+            $('#deleteSupplierModal').modal('show');
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

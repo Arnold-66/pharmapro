@@ -1,0 +1,71 @@
+<!-- inventory/templates/inventory/email/expiry_alert.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Product Expiry Alert</title>
+    <style>
+        body { font-family: 'Inter', Arial, sans-serif; line-height: 1.6; color: #0f172a; margin: 0; padding: 0; background: #eef1f5; }
+        .container { max-width: 600px; margin: 20px auto; padding: 0; background: #ffffff; border: 1px solid #d0d7de; }
+        .header { background: #1e293b; padding: 30px 20px; text-align: center; border-bottom: 2px solid #b0b8c4; }
+        .header h1 { margin: 0; font-size: 24px; color: #f1f5f9; }
+        .content { padding: 30px; }
+        .alert-box { background: #fefce8; border-left: 4px solid #f59e0b; padding: 15px 20px; margin: 20px 0; }
+        .alert-box strong { color: #92400e; }
+        .details-box { background: #f8fafc; border: 1px solid #d0d7de; padding: 20px; margin: 20px 0; }
+        .details-box p { margin: 8px 0; }
+        .button { display: inline-block; padding: 12px 30px; background: #1e293b; color: white; text-decoration: none; font-weight: 600; border: 1px solid #0f172a; }
+        .button:hover { background: #0f172a; }
+        .footer { text-align: center; padding: 20px; background: #f8fafc; border-top: 1px solid #d0d7de; color: #94a3b8; font-size: 12px; }
+        .text-center { text-align: center; margin: 20px 0; }
+        .mt-20 { margin-top: 20px; }
+        .mb-20 { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚠️ Product Expiry Alert</h1>
+        </div>
+        <div class="content">
+            <h2>Hello {% if recipient %}{{ recipient.get_full_name }}{% else %}Pharmacy Team{% endif %},</h2>
+            <p>A product in your inventory is approaching its expiry date.</p>
+            
+            <div class="alert-box">
+                <strong>⚠️ Action Required:</strong> Please review this product and take appropriate action.
+            </div>
+            
+            <div class="details-box">
+                <p><strong>Product:</strong> {{ product.name }}</p>
+                <p><strong>SKU:</strong> {{ product.sku }}</p>
+                <p><strong>Current Stock:</strong> {{ product.quantity }} units</p>
+                <p><strong>Expiry Date:</strong> {{ product.expiry_date }}</p>
+                <p><strong>Days Until Expiry:</strong> {{ days_until_expiry }} days</p>
+                <p><strong>Location:</strong> {{ product.location|default:"Not specified" }}</p>
+            </div>
+            
+            <div class="text-center mt-20 mb-20">
+                <a href="{{ protocol }}://{{ domain }}{{ product_link }}" class="button">
+                    View Product Details
+                </a>
+            </div>
+            
+            <p><strong>Suggested Actions:</strong></p>
+            <ul>
+                <li>Check the product for quality</li>
+                <li>Consider marking it for sale or moving it to the front</li>
+                <li>Remove from inventory if expired</li>
+                <li>Update the expiry status in the system</li>
+            </ul>
+            
+            <p>If you have any questions, please contact your system administrator.</p>
+            
+            <p><strong>The PharmaPro Team</strong></p>
+        </div>
+        <div class="footer">
+            <p>&copy; {% now "Y" %} PharmaPro. All rights reserved.</p>
+            <p>This is an automated alert from your inventory management system.</p>
+        </div>
+    </div>
+</body>
+</html>

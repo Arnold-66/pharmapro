@@ -1,0 +1,767 @@
+<!-- accounts/templates/accounts/user_create.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Create User - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== RESET ALL PADDING/MARGINS ON MOBILE ===== */
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0 !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0.25rem !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0.125rem !important;
+            padding-left: 0.125rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .card {
+            border-radius: 4px !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.5rem 0.5rem !important;
+        }
+        
+        .card-header {
+            padding: 0.5rem 0.5rem !important;
+        }
+        
+        .card-header h4, .card-header h6 {
+            font-size: 0.7rem !important;
+        }
+        
+        .page-header {
+            padding: 0 0.5rem !important;
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+            align-items: stretch !important;
+        }
+        
+        .page-header h1 {
+            font-size: 1rem !important;
+        }
+        
+        .page-header .btn {
+            width: 100% !important;
+            font-size: 0.75rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        /* ===== STATS CARDS - 2 PER ROW WITH VISIBLE TEXT ===== */
+        .row.g-3.mb-4 {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0.25rem !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row.g-3.mb-4 > .col-6 {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+            padding-right: 0.125rem !important;
+            padding-left: 0.125rem !important;
+        }
+        
+        .stat-card {
+            border-radius: 4px !important;
+            margin-bottom: 0 !important;
+            height: 100% !important;
+        }
+        
+        .stat-card .card-body {
+            padding: 0.5rem 0.5rem !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+        
+        .stat-card .stat-icon {
+            width: 32px !important;
+            height: 32px !important;
+            min-width: 32px !important;
+            min-height: 32px !important;
+            padding: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 50% !important;
+            flex-shrink: 0 !important;
+        }
+        
+        .stat-card .stat-icon i {
+            font-size: 0.9rem !important;
+        }
+        
+        .stat-card .stat-content {
+            flex: 1 !important;
+            min-width: 0 !important;
+            overflow: visible !important;
+        }
+        
+        .stat-card .stat-content h6 {
+            font-size: 0.55rem !important;
+            margin-bottom: 0.05rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.3px !important;
+            color: #6c757d !important;
+            font-weight: 600 !important;
+            white-space: normal !important;
+            word-wrap: break-word !important;
+            line-height: 1.2 !important;
+        }
+        
+        .stat-card .stat-content h2 {
+            font-size: 0.85rem !important;
+            margin-bottom: 0 !important;
+            font-weight: 700 !important;
+            line-height: 1.2 !important;
+            word-wrap: break-word !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .form-label {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+        
+        .form-text {
+            font-size: 0.6rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .btn-lg {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.8rem !important;
+        }
+        
+        .badge {
+            font-size: 0.6rem !important;
+            padding: 0.2rem 0.35rem !important;
+        }
+        
+        .alert {
+            padding: 0.75rem !important;
+            border-radius: 4px !important;
+        }
+        
+        .alert .d-flex {
+            flex-direction: column !important;
+            text-align: center !important;
+        }
+        
+        .alert .fa-2x {
+            font-size: 1.5rem !important;
+            margin: 0 0 0.5rem 0 !important;
+        }
+        
+        .d-flex.gap-2 {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .d-flex.gap-2 .btn {
+            width: 100% !important;
+        }
+        
+        .input-group .btn {
+            padding: 0.3rem 0.4rem !important;
+        }
+        
+        .progress {
+            height: 6px !important;
+        }
+        
+        .card-header.d-flex {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .card-header.d-flex .btn {
+            width: 100% !important;
+        }
+        
+        .col-md-4 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .stat-card .card-body {
+            padding: 0.35rem 0.35rem !important;
+            gap: 0.3rem !important;
+        }
+        
+        .stat-card .stat-icon {
+            width: 26px !important;
+            height: 26px !important;
+            min-width: 26px !important;
+            min-height: 26px !important;
+        }
+        
+        .stat-card .stat-icon i {
+            font-size: 0.7rem !important;
+        }
+        
+        .stat-card .stat-content h6 {
+            font-size: 0.45rem !important;
+        }
+        
+        .stat-card .stat-content h2 {
+            font-size: 0.75rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0.5rem !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0.25rem !important;
+            padding-left: 0.25rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+    
+    /* ===== COMMON STYLES ===== */
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+    
+    .card-header {
+        background: transparent !important;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    /* ===== STAT CARD STYLES ===== */
+    .stat-card {
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        transition: transform 0.2s;
+        overflow: hidden;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .stat-card .card-body {
+        display: flex !important;
+        align-items: center !important;
+        gap: 1rem !important;
+        padding: 0.5rem !important;
+    }
+    
+    .stat-card .stat-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+    
+    .stat-card .stat-icon i {
+        font-size: 1.5rem;
+    }
+    
+    .stat-card .stat-content {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .stat-card .stat-content h6 {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #6c757d;
+        margin-bottom: 0.15rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .stat-card .stat-content h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0;
+        line-height: 1.2;
+    }
+    
+    /* ===== COLOR VARIATIONS ===== */
+    .bg-primary-soft {
+        background-color: rgba(52, 152, 219, 0.12);
+        color: #3498db;
+    }
+    
+    .bg-success-soft {
+        background-color: rgba(46, 204, 113, 0.12);
+        color: #28a745;
+    }
+    
+    .bg-warning-soft {
+        background-color: rgba(255, 193, 7, 0.12);
+        color: #ffc107;
+    }
+    
+    .text-primary-dark {
+        color: #2c3e50;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+    
+    .btn-primary {
+        background: #2c3e50;
+        border-color: #2c3e50;
+    }
+    
+    .btn-primary:hover {
+        background: #1a2a3a;
+        border-color: #1a2a3a;
+    }
+    
+    .alert {
+        border-radius: 10px;
+        border: none;
+    }
+    
+    .badge {
+        font-weight: 500;
+        padding: 0.35rem 0.75rem;
+    }
+    
+    .progress {
+        border-radius: 10px;
+        background-color: #f0f0f0;
+        overflow: hidden;
+    }
+    
+    .progress-bar {
+        border-radius: 10px;
+        transition: width 0.6s ease;
+    }
+    
+    #passwordStrength {
+        font-size: 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4" style="padding: 0 0.5rem;">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800 fw-bold">
+                <i class="fas fa-user-plus text-primary me-2"></i>Create New User
+            </h1>
+            <p class="text-muted small mb-0 mt-1">Add a new user to your organization</p>
+        </div>
+        <div class="mt-2 mt-sm-0">
+            <a href="{% url 'accounts:user_list' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left me-1"></i> Back to Users
+            </a>
+        </div>
+    </div>
+
+    <!-- ===== USER LIMIT STATS ===== -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-6 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="stat-icon bg-primary-soft">
+                        <i class="fas fa-users text-primary"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h6>Current Users</h6>
+                        <h2 class="text-primary-dark">{{ current_users }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-6">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="stat-icon {% if max_users == 0 %}bg-success-soft{% else %}bg-warning-soft{% endif %}">
+                        <i class="fas fa-{% if max_users == 0 %}infinity{% else %}chart-line{% endif %} {% if max_users == 0 %}text-success{% else %}text-warning{% endif %}"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h6>Maximum Users</h6>
+                        <h2 class="{% if max_users == 0 %}text-success{% else %}text-warning{% endif %}">
+                            {% if max_users == 0 %}
+                                Unlimited
+                            {% else %}
+                                {{ max_users }}
+                            {% endif %}
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== PLAN LIMIT ALERT ===== -->
+    {% if not can_add_more %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <div class="d-flex">
+                <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                <div>
+                    <h5 class="alert-heading">User Limit Reached!</h5>
+                    <p class="mb-1">
+                        Your current plan (<strong>{{ tenant.get_plan_display }}</strong>) allows a maximum of 
+                        <strong>{% if max_users == 0 %}Unlimited{% else %}{{ max_users }}{% endif %}</strong> users.
+                    </p>
+                    <p class="mb-0">
+                        You currently have <strong>{{ current_users }}</strong> users.
+                        {% if max_users > 0 %}
+                            You need to <a href="{% url 'tenants:subscription' %}" class="alert-link fw-bold">upgrade your plan</a> 
+                            to add more users.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% else %}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <div class="d-flex">
+                <i class="fas fa-info-circle fa-2x me-3"></i>
+                <div>
+                    <h6 class="alert-heading">User Limit Status</h6>
+                    <p class="mb-0">
+                        You are using <strong>{{ current_users }}</strong> out of 
+                        <strong>{% if max_users == 0 %}Unlimited{% else %}{{ max_users }}{% endif %}</strong> 
+                        available users on your <strong>{{ tenant.get_plan_display }}</strong> plan.
+                        {% if max_users > 0 and current_users >= max_users|add:"-2" %}
+                            <span class="badge bg-warning text-dark ms-2">
+                                <i class="fas fa-exclamation-circle me-1"></i> Approaching Limit
+                            </span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Progress Bar -->
+        {% if max_users > 0 %}
+            <div class="mb-4">
+                <div class="d-flex justify-content-between">
+                    <small class="text-muted">User Usage</small>
+                    <small class="text-muted">{{ current_users }} / {{ max_users }}</small>
+                </div>
+                <div class="progress" style="height: 8px;">
+                    <div class="progress-bar {% if current_users >= max_users %}bg-danger{% elif current_users >= max_users|add:"-2" %}bg-warning{% else %}bg-success{% endif %}" 
+                         role="progressbar" 
+                         style="width: {% widthratio current_users max_users 100 %}%;" 
+                         aria-valuenow="{{ current_users }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="{{ max_users }}">
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    <!-- ===== CREATE USER FORM ===== -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+            <h4 class="mb-0">
+                <i class="fas fa-user-plus me-2"></i>User Details
+            </h4>
+        </div>
+        <div class="card-body">
+            {% if can_add_more %}
+                <form method="post" novalidate id="createUserForm">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="first_name" class="form-label fw-bold">First Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="last_name" class="form-label fw-bold">Last Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-8">
+                            <label for="email" class="form-label fw-bold">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                            <div class="form-text">This will be used as the username for login.</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="phone" class="form-label fw-bold">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" name="phone">
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <label for="role" class="form-label fw-bold">Role <span class="text-danger">*</span></label>
+                            <select class="form-select" id="role" name="role" required>
+                                <option value="">Select Role</option>
+                                {% for role_code, role_name in roles %}
+                                    <option value="{{ role_code }}">{{ role_name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text text-muted">
+                                <i class="fas fa-info-circle"></i>
+                                Super Admin role is reserved for system administrators.
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="password" class="form-label fw-bold">Password</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="password" name="password" 
+                                       placeholder="Auto-generated" value="{{ default_password }}">
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword" title="Show/Hide">
+                                    <i class="fas fa-eye" id="passwordIcon"></i>
+                                </button>
+                                <button class="btn btn-outline-secondary" type="button" id="generatePassword" title="Generate New">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle"></i>
+                                Default: <strong>{{ default_password }}</strong>
+                                <span class="badge bg-info ms-1" id="passwordStrength">Auto-generated</span>
+                            </div>
+                            <div class="form-text text-muted">
+                                <i class="fas fa-lightbulb"></i>
+                                Format: <strong>organization@year</strong> (e.g., {{ default_password }})
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Permissions -->
+                    <div class="card mb-3 mt-3">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">
+                                <i class="fas fa-lock me-2"></i>Permissions
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="can_create" name="can_create">
+                                        <label class="form-check-label" for="can_create">
+                                            <i class="fas fa-plus-circle text-success me-1"></i> Create
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="can_edit" name="can_edit">
+                                        <label class="form-check-label" for="can_edit">
+                                            <i class="fas fa-edit text-primary me-1"></i> Edit
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="can_delete" name="can_delete">
+                                        <label class="form-check-label" for="can_delete">
+                                            <i class="fas fa-trash text-danger me-1"></i> Delete
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info d-flex align-items-center">
+                        <i class="fas fa-info-circle fa-2x me-3"></i>
+                        <div>
+                            <strong>Email Notification:</strong>
+                            <p class="mb-0">The user will receive an email with their login credentials.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <i class="fas fa-user-plus me-2"></i> Create User
+                        </button>
+                        <a href="{% url 'accounts:user_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            {% else %}
+                <!-- User Limit Reached -->
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-users-slash fa-5x text-muted"></i>
+                    </div>
+                    <h4 class="mb-3">User Limit Reached</h4>
+                    <p class="text-muted mb-4">
+                        Your organization has reached the maximum number of users allowed on your 
+                        <strong>{{ tenant.get_plan_display }}</strong> plan.
+                    </p>
+                    <div class="alert alert-warning d-inline-block mx-auto text-start">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <div>
+                                <strong>Current Usage:</strong> {{ current_users }} users
+                                <br>
+                                <strong>Plan Limit:</strong> 
+                                {% if max_users == 0 %}Unlimited{% else %}{{ max_users }} users{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex flex-wrap gap-2 justify-content-center">
+                        <a href="{% url 'tenants:subscription' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-arrow-up me-2"></i> Upgrade Plan
+                        </a>
+                        <a href="{% url 'accounts:user_list' %}" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-arrow-left me-2"></i> Back to Users
+                        </a>
+                    </div>
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            Need help? Contact <a href="mailto:support@pharmapro.com">support@pharmapro.com</a>
+                        </small>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle password visibility
+        let isPasswordVisible = false;
+        
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const passwordIcon = document.getElementById('passwordIcon');
+            
+            if (isPasswordVisible) {
+                passwordInput.type = 'password';
+                passwordIcon.className = 'fas fa-eye';
+                isPasswordVisible = false;
+            } else {
+                passwordInput.type = 'text';
+                passwordIcon.className = 'fas fa-eye-slash';
+                isPasswordVisible = true;
+            }
+        });
+        
+        // Generate new password
+        document.getElementById('generatePassword').addEventListener('click', function() {
+            const currentPassword = document.getElementById('password').value;
+            let orgName = currentPassword.split('@')[0] || 'org';
+            
+            if (orgName.length < 3 || orgName === 'org') {
+                const tenantName = '{{ tenant.company_name|default:"org" }}';
+                orgName = tenantName.toLowerCase().replace(/[^a-z0-9]/g, '');
+            }
+            
+            const year = new Date().getFullYear();
+            const randomSuffix = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            const newPassword = `${orgName}${randomSuffix}@${year}`;
+            
+            document.getElementById('password').value = newPassword;
+            updatePasswordStrength(newPassword);
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Password Generated!',
+                text: 'New password has been generated.',
+                timer: 2000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        });
+        
+        // Update password strength
+        function updatePasswordStrength(password) {
+            const strengthBadge = document.getElementById('passwordStrength');
+            let strength = 'Weak';
+            let badgeClass = 'bg-danger';
+            
+            if (password.length >= 8) {
+                strength = 'Good';
+                badgeClass = 'bg-warning text-dark';
+            }
+            if (password.length >= 12 && /[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+                strength = 'Strong';
+                badgeClass = 'bg-success';
+            }
+            if (password.length >= 16 && /[!@#$%^&*(),.?":{}|<>]/.test(password) && /\d/.test(password)) {
+                strength = 'Very Strong';
+                badgeClass = 'bg-primary';
+            }
+            
+            strengthBadge.textContent = strength;
+            strengthBadge.className = `badge ${badgeClass} ms-1`;
+        }
+        
+        document.getElementById('password').addEventListener('input', function() {
+            updatePasswordStrength(this.value);
+        });
+        
+        updatePasswordStrength(document.getElementById('password').value);
+        
+        document.getElementById('createUserForm').addEventListener('submit', function(e) {
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Creating...';
+            btn.disabled = true;
+        });
+    });
+</script>
+{% endblock %}

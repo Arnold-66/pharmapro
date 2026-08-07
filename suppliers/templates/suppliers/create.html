@@ -1,0 +1,377 @@
+<!-- apps/suppliers/templates/suppliers/create.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Create Supplier - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== MOBILE RESPONSIVE STYLES ===== */
+    @media (max-width: 768px) {
+        .container-fluid.py-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }
+        
+        .card-header h4 {
+            font-size: 0.95rem !important;
+        }
+        
+        .card-header .btn {
+            font-size: 0.7rem !important;
+            padding: 0.2rem 0.5rem !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .form-label {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+        
+        .form-text {
+            font-size: 0.6rem !important;
+        }
+        
+        .input-group-text {
+            font-size: 0.75rem !important;
+            padding: 0.25rem 0.4rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+            width: 100% !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .d-flex.gap-2.mt-4 {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .col-md-6, .col-md-4 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+        
+        .card.bg-light {
+            border-radius: 8px !important;
+        }
+        
+        .alert-info {
+            font-size: 0.8rem !important;
+            padding: 0.5rem !important;
+        }
+        
+        .alert-info .fa-2x {
+            font-size: 1.5rem !important;
+        }
+        
+        .form-check {
+            padding: 0.25rem 0 !important;
+        }
+        
+        .form-check-label {
+            font-size: 0.8rem !important;
+        }
+        
+        .col-md-3 {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+        }
+        
+        .card.bg-light .card-body {
+            padding: 0.5rem !important;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .col-md-3 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.py-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1) !important;
+    }
+    
+    .card-header {
+        background: transparent !important;
+        border-bottom: 2px solid #f0f0f0 !important;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--secondary-color, #3498db) !important;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25) !important;
+    }
+    
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+    }
+    
+    .alert {
+        border-radius: 10px;
+        border: none;
+    }
+    
+    .card.bg-light {
+        background-color: #f8f9fa !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h4 class="mb-0">
+                        <i class="fas fa-truck me-2"></i>Create New Supplier
+                    </h4>
+                    <a href="{% url 'suppliers:supplier_list' %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> <span class="d-none d-sm-inline">Back to Suppliers</span>
+                        <span class="d-inline d-sm-none">Back</span>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label fw-bold">Supplier Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="code" class="form-label fw-bold">Supplier Code</label>
+                                <input type="text" class="form-control" id="code" name="code" placeholder="Leave blank to auto-generate">
+                                <div class="form-text">Unique identifier for this supplier.</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="contact_person" class="form-label fw-bold">Contact Person <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="contact_person" name="contact_person" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="supplier_type" class="form-label fw-bold">Supplier Type</label>
+                                <select class="form-select" id="supplier_type" name="supplier_type">
+                                    <option value="other">Other</option>
+                                    <option value="manufacturer">Manufacturer</option>
+                                    <option value="distributor">Distributor</option>
+                                    <option value="wholesaler">Wholesaler</option>
+                                    <option value="importer">Importer</option>
+                                    <option value="exporter">Exporter</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label fw-bold">Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label fw-bold">Phone <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" id="phone" name="phone" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="alternative_phone" class="form-label fw-bold">Alternative Phone</label>
+                                <input type="tel" class="form-control" id="alternative_phone" name="alternative_phone">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="website" class="form-label fw-bold">Website</label>
+                                <input type="url" class="form-control" id="website" name="website" placeholder="https://example.com">
+                            </div>
+                        </div>
+
+                        <div class="card bg-light mb-3">
+                            <div class="card-header bg-transparent">
+                                <h6 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>Address</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="address" class="form-label fw-bold">Address <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="address" name="address" rows="2" required></textarea>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="city" class="form-label fw-bold">City <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="city" name="city" required>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="state" class="form-label fw-bold">State</label>
+                                        <input type="text" class="form-control" id="state" name="state">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="country" class="form-label fw-bold">Country</label>
+                                        <input type="text" class="form-control" id="country" name="country" value="Uganda">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="postal_code" class="form-label fw-bold">Postal Code</label>
+                                    <input type="text" class="form-control" id="postal_code" name="postal_code">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card bg-light mb-3">
+                            <div class="card-header bg-transparent">
+                                <h6 class="mb-0"><i class="fas fa-building me-2"></i>Business Details</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="tax_id" class="form-label fw-bold">Tax ID</label>
+                                        <input type="text" class="form-control" id="tax_id" name="tax_id">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="registration_number" class="form-label fw-bold">Registration Number</label>
+                                        <input type="text" class="form-control" id="registration_number" name="registration_number">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card bg-light mb-3">
+                            <div class="card-header bg-transparent">
+                                <h6 class="mb-0"><i class="fas fa-credit-card me-2"></i>Payment Terms</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="payment_terms" class="form-label fw-bold">Payment Terms</label>
+                                        <input type="text" class="form-control" id="payment_terms" name="payment_terms" value="Net 30">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="credit_limit" class="form-label fw-bold">Credit Limit</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">Ugx</span>
+                                            <input type="number" class="form-control" id="credit_limit" name="credit_limit" step="0.01" value="0">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="lead_time_days" class="form-label fw-bold">Lead Time (Days)</label>
+                                        <input type="number" class="form-control" id="lead_time_days" name="lead_time_days" value="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card bg-light mb-3">
+                            <div class="card-header bg-transparent">
+                                <h6 class="mb-0"><i class="fas fa-tags me-2"></i>Categories Supplied</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    {% for category in categories %}
+                                        <div class="col-md-3 col-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="category_{{ category.id }}" name="categories" value="{{ category.id }}">
+                                                <label class="form-check-label" for="category_{{ category.id }}">
+                                                    {{ category.name }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <div class="col-12">
+                                            <p class="text-muted">No categories available. Please create categories first.</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notes" class="form-label fw-bold">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Additional notes about this supplier"></textarea>
+                        </div>
+
+                        <div class="alert alert-info d-flex align-items-center">
+                            <i class="fas fa-info-circle fa-2x me-3"></i>
+                            <div>
+                                <strong>Note:</strong>
+                                <p class="mb-0">The supplier will be created in a pending state. You can approve them later.</p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4 flex-wrap">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i> Create Supplier
+                            </button>
+                            <a href="{% url 'suppliers:supplier_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

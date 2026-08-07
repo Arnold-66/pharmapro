@@ -1,0 +1,48 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0"><i class="fas fa-pause me-2"></i> Suspend Tenant</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        You are about to suspend <strong>{{ tenant.name }}</strong>.
+                    </div>
+                    
+                    <p>This will:</p>
+                    <ul>
+                        <li>Prevent all users from logging in</li>
+                        <li>Cancel any active subscriptions</li>
+                        <li>Mark the tenant as suspended</li>
+                    </ul>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="reason" class="form-label">Reason for Suspension</label>
+                            <textarea class="form-control" id="reason" name="reason" rows="3" 
+                                      placeholder="Please provide a reason for suspension..."></textarea>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-pause"></i> Suspend Tenant
+                            </button>
+                            <a href="{% url 'tenants:detail' tenant.id %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
