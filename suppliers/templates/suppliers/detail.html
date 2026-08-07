@@ -1,0 +1,931 @@
+<!-- apps/suppliers/templates/suppliers/detail.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}{{ supplier.name }} - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Reset all padding/margins on mobile for true edge-to-edge */
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+        }
+        
+        .row.g-3 {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0 !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row.g-3 > [class*="col-"] {
+            padding-right: 0 !important;
+            padding-left: 0 !important;
+        }
+        
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .card-header {
+            padding: 0.6rem 0.875rem !important;
+        }
+        
+        .card-header h5, .card-header h6 {
+            font-size: 0.85rem !important;
+        }
+        
+        .badge {
+            font-size: 0.65rem !important;
+            padding: 0.25rem 0.4rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .btn-sm {
+            font-size: 0.7rem !important;
+            padding: 0.2rem 0.4rem !important;
+        }
+        
+        .d-flex.gap-2.justify-content-end {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .d-flex.gap-2.justify-content-end .btn {
+            width: 100% !important;
+        }
+        
+        .col-md-4.text-md-end {
+            text-align: left !important;
+            margin-top: 1rem !important;
+        }
+        
+        .rounded-circle {
+            width: 40px !important;
+            height: 40px !important;
+            font-size: 1rem !important;
+        }
+        
+        .table {
+            font-size: 0.75rem !important;
+        }
+        
+        .table td, .table th {
+            padding: 0.4rem 0.3rem !important;
+        }
+        
+        .display-6 {
+            font-size: 1.25rem !important;
+        }
+        
+        .modal-dialog {
+            margin: 0.5rem !important;
+        }
+        
+        .modal-body {
+            padding: 0.75rem !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .form-label {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+        
+        .breadcrumb {
+            font-size: 0.8rem !important;
+            padding: 0.5rem 0 !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .row.g-3 {
+            --bs-gutter-x: 0.5rem !important;
+        }
+        
+        .row.g-3 > [class*="col-"] {
+            padding-right: 0.25rem !important;
+            padding-left: 0.25rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 10px !important;
+        }
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+    
+    .supplier-avatar {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+    
+    @media (max-width: 768px) {
+        .supplier-avatar {
+            width: 40px !important;
+            height: 40px !important;
+            font-size: 1rem !important;
+        }
+    }
+    
+    .stat-value {
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.4rem 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        color: #6c757d;
+        font-size: 0.85rem;
+    }
+    
+    .info-value {
+        font-weight: 500;
+        text-align: right;
+    }
+    
+    .table-action-btn {
+        padding: 0.15rem 0.3rem;
+        font-size: 0.7rem;
+    }
+    
+    .empty-state {
+        padding: 2rem;
+        text-align: center;
+        color: #6c757d;
+    }
+    
+    .empty-state i {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        opacity: 0.3;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- Breadcrumb & Actions -->
+    <div class="row mb-3">
+        <div class="col-12 col-md-7">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'suppliers:supplier_list' %}">Suppliers</a></li>
+                    <li class="breadcrumb-item active">{{ supplier.name }}</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-12 col-md-5">
+            <div class="d-flex gap-2 justify-content-start justify-content-md-end flex-wrap mt-2 mt-md-0">
+                <a href="{% url 'suppliers:supplier_edit' supplier.id %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-edit me-1"></i> <span class="d-none d-sm-inline">Edit</span>
+                </a>
+                <a href="{% url 'suppliers:supplier_list' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-arrow-left me-1"></i> <span class="d-none d-sm-inline">Back</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supplier Header Card -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-7">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center supplier-avatar me-3">
+                            {{ supplier.name|first|upper }}
+                        </div>
+                        <div>
+                            <h4 class="mb-0">{{ supplier.name }}</h4>
+                            <p class="text-muted mb-1">
+                                <i class="fas fa-code me-1"></i> Code: {{ supplier.code }}
+                            </p>
+                            <div class="d-flex flex-wrap gap-1">
+                                <span class="badge bg-{% if supplier.status == 'active' %}success{% elif supplier.status == 'inactive' %}secondary{% elif supplier.status == 'suspended' %}warning{% else %}danger{% endif %}">
+                                    {{ supplier.get_status_display }}
+                                </span>
+                                {% if supplier.is_approved %}
+                                    <span class="badge bg-info">Approved</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Pending Approval</span>
+                                {% endif %}
+                                <span class="badge bg-secondary">{{ supplier.get_supplier_type_display }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5 mt-3 mt-md-0">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div class="bg-light p-2 rounded">
+                                <div class="stat-label">Total Purchases</div>
+                                <div class="stat-value total-purchases">Ugx {{ supplier.total_purchases|floatformat:2 }}</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="bg-light p-2 rounded">
+                                <div class="stat-label">Total Paid</div>
+                                <div class="stat-value text-success total-paid">Ugx {{ supplier.total_paid|floatformat:2 }}</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="bg-light p-2 rounded">
+                                <div class="stat-label">Balance Due</div>
+                                <div class="stat-value balance-due {% if supplier.balance_due > 0 %}text-danger{% else %}text-success{% endif %}">
+                                    Ugx {{ supplier.balance_due|floatformat:2 }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="bg-light p-2 rounded">
+                                <div class="stat-label">Available Credit</div>
+                                <div class="stat-value available-credit {% if supplier.get_available_credit <= 0 %}text-danger{% else %}text-success{% endif %}">
+                                    Ugx {{ supplier.get_available_credit|floatformat:2 }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 mt-1">
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-success btn-sm flex-grow-1" data-bs-toggle="modal" data-bs-target="#addPaymentModal">
+                                    <i class="fas fa-money-bill-wave me-1"></i> Payment
+                                </button>
+                                <button type="button" id="updateFinancialsBtn" class="btn btn-info btn-sm" onclick="updateFinancials()">
+                                    <i class="fas fa-sync me-1"></i> <span class="d-none d-sm-inline">Refresh</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <!-- Left Column -->
+        <div class="col-12 col-md-4">
+            <!-- Contact Information -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h6 class="mb-0"><i class="fas fa-address-card me-2"></i>Contact Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="info-row">
+                        <span class="info-label"><i class="fas fa-user me-1"></i> Contact Person</span>
+                        <span class="info-value">{{ supplier.contact_person }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label"><i class="fas fa-envelope me-1"></i> Email</span>
+                        <span class="info-value"><a href="mailto:{{ supplier.email }}">{{ supplier.email }}</a></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label"><i class="fas fa-phone me-1"></i> Phone</span>
+                        <span class="info-value"><a href="tel:{{ supplier.phone }}">{{ supplier.phone }}</a></span>
+                    </div>
+                    {% if supplier.alternative_phone %}
+                    <div class="info-row">
+                        <span class="info-label"><i class="fas fa-phone-alt me-1"></i> Alternative</span>
+                        <span class="info-value">{{ supplier.alternative_phone }}</span>
+                    </div>
+                    {% endif %}
+                    {% if supplier.website %}
+                    <div class="info-row">
+                        <span class="info-label"><i class="fas fa-globe me-1"></i> Website</span>
+                        <span class="info-value"><a href="{{ supplier.website }}" target="_blank">{{ supplier.website }}</a></span>
+                    </div>
+                    {% endif %}
+                    <div class="info-row">
+                        <span class="info-label"><i class="fas fa-map-marker-alt me-1"></i> Address</span>
+                        <span class="info-value text-end">
+                            {{ supplier.address }}<br>
+                            {{ supplier.city }}{% if supplier.state %}, {{ supplier.state }}{% endif %}<br>
+                            {{ supplier.country }}{% if supplier.postal_code %} - {{ supplier.postal_code }}{% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Business Details -->
+            <div class="card shadow-sm mt-3">
+                <div class="card-header bg-transparent">
+                    <h6 class="mb-0"><i class="fas fa-building me-2"></i>Business Details</h6>
+                </div>
+                <div class="card-body">
+                    <div class="info-row">
+                        <span class="info-label">Tax ID</span>
+                        <span class="info-value">{{ supplier.tax_id|default:"-" }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Registration</span>
+                        <span class="info-value">{{ supplier.registration_number|default:"-" }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Payment Terms</span>
+                        <span class="info-value">{{ supplier.payment_terms }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Lead Time</span>
+                        <span class="info-value">{{ supplier.lead_time_days }} days</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Credit Limit</span>
+                        <span class="info-value">Ugx {{ supplier.credit_limit|floatformat:2 }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Quality Rating</span>
+                        <span class="info-value">
+                            {% for i in "12345"|make_list %}
+                                <i class="fas fa-star {% if forloop.counter <= supplier.quality_rating %}text-warning{% else %}text-muted{% endif %}" style="font-size:0.8rem;"></i>
+                            {% endfor %}
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Reliability Score</span>
+                        <span class="info-value">
+                            {% for i in "12345"|make_list %}
+                                <i class="fas fa-star {% if forloop.counter <= supplier.reliability_score %}text-warning{% else %}text-muted{% endif %}" style="font-size:0.8rem;"></i>
+                            {% endfor %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="card shadow-sm mt-3">
+                <div class="card-header bg-transparent">
+                    <h6 class="mb-0"><i class="fas fa-tags me-2"></i>Categories Supplied</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-1">
+                        {% for category in supplier.categories.all %}
+                            <span class="badge bg-info">{{ category.name }}</span>
+                        {% empty %}
+                            <span class="text-muted">No categories assigned</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-12 col-md-8">
+            <!-- Products Supplied -->
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0"><i class="fas fa-boxes me-2"></i>Products Supplied</h6>
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                        <i class="fas fa-plus me-1"></i> Add Product
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Supplier Code</th>
+                                    <th>Cost Price</th>
+                                    <th>Min Order</th>
+                                    <th>Lead Time</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in products %}
+                                    <tr>
+                                        <td>
+                                            <div class="fw-semibold">{{ item.product.name }}</div>
+                                            <div class="small text-muted">SKU: {{ item.product.sku }}</div>
+                                        </td>
+                                        <td>{{ item.supplier_product_code|default:"-" }}</td>
+                                        <td>Ugx {{ item.cost_price|floatformat:2 }}</td>
+                                        <td>{{ item.min_order_quantity }}</td>
+                                        <td>{{ item.lead_time_days }} days</td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-sm btn-outline-danger remove-product-btn" 
+                                                    data-id="{{ item.id }}" 
+                                                    data-product="{{ item.product.name }}">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                            {% if item.is_preferred %}
+                                                <span class="badge bg-success d-block d-sm-inline mt-1 mt-sm-0">Preferred</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="empty-state">
+                                                <i class="fas fa-box"></i>
+                                                <p class="mb-2">No products assigned to this supplier.</p>
+                                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                                                    <i class="fas fa-plus me-1"></i> Add Product
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Purchase Orders -->
+            <div class="card shadow-sm mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Recent Purchase Orders</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>PO Number</th>
+                                    <th>Date</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for po in purchase_orders %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'suppliers:purchase_order_detail' po.id %}" class="fw-semibold">
+                                                {{ po.po_number }}
+                                            </a>
+                                        </td>
+                                        <td>{{ po.order_date|date:"Y-m-d" }}</td>
+                                        <td>Ugx {{ po.total_amount|floatformat:2 }}</td>
+                                        <td>
+                                            <span class="badge bg-{% if po.status == 'received' %}success{% elif po.status == 'approved' %}info{% elif po.status == 'ordered' %}primary{% elif po.status == 'pending' %}warning{% elif po.status == 'cancelled' %}danger{% else %}secondary{% endif %}">
+                                                {{ po.get_status_display }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="4">
+                                            <div class="empty-state">
+                                                <i class="fas fa-shopping-cart"></i>
+                                                <p class="mb-0">No purchase orders found.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Product Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus me-2"></i>Add Product to Supplier
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addProductForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="product_id" class="form-label fw-bold">Product <span class="text-danger">*</span></label>
+                        <select class="form-select" id="product_id" name="product_id" required>
+                            <option value="">Select Product</option>
+                            {% for product in supplier.tenant.products.all %}
+                                <option value="{{ product.id }}">{{ product.name }} ({{ product.sku }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="supplier_product_code" class="form-label fw-bold">Supplier Product Code</label>
+                        <input type="text" class="form-control" id="supplier_product_code" name="supplier_product_code" placeholder="Supplier's product code">
+                    </div>
+                    <div class="mb-3">
+                        <label for="cost_price" class="form-label fw-bold">Cost Price <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">Ugx</span>
+                            <input type="number" class="form-control" id="cost_price" name="cost_price" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="min_order_quantity" class="form-label fw-bold">Min Order Quantity</label>
+                            <input type="number" class="form-control" id="min_order_quantity" name="min_order_quantity" step="0.01" value="1">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="lead_time_days" class="form-label fw-bold">Lead Time (Days)</label>
+                            <input type="number" class="form-control" id="lead_time_days" name="lead_time_days" value="7">
+                        </div>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="is_preferred" name="is_preferred">
+                        <label class="form-check-label" for="is_preferred">
+                            Preferred Supplier for this product
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveProductBtn">
+                    <i class="fas fa-plus me-1"></i> Add Product
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Payment Modal -->
+<div class="modal fade" id="addPaymentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-money-bill-wave me-2"></i>Record Payment
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addPaymentForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="payment_amount" class="form-label fw-bold">Amount <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">Ugx</span>
+                            <input type="number" class="form-control" id="payment_amount" name="amount" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="payment_date" class="form-label fw-bold">Payment Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="payment_date" name="payment_date" value="{% now 'Y-m-d' %}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="payment_method" class="form-label fw-bold">Payment Method <span class="text-danger">*</span></label>
+                        <select class="form-select" id="payment_method" name="payment_method" required>
+                            <option value="">Select Method</option>
+                            <option value="cash">Cash</option>
+                            <option value="bank_transfer">Bank Transfer</option>
+                            <option value="cheque">Cheque</option>
+                            <option value="mobile_money">Mobile Money</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reference_number" class="form-label fw-bold">Reference Number</label>
+                        <input type="text" class="form-control" id="reference_number" name="reference_number" placeholder="Cheque/Transaction number">
+                    </div>
+                    <div class="mb-3">
+                        <label for="po_select" class="form-label fw-bold">Purchase Order (Optional)</label>
+                        <select class="form-select" id="po_select" name="purchase_order">
+                            <option value="">Select Purchase Order</option>
+                            {% for po in supplier.purchase_orders.all %}
+                                <option value="{{ po.id }}">{{ po.po_number }} - Ugx {{ po.total_amount|floatformat:2 }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="payment_notes" class="form-label fw-bold">Notes</label>
+                        <textarea class="form-control" id="payment_notes" name="notes" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="savePaymentBtn">
+                    <i class="fas fa-save me-1"></i> Record Payment
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+    <div id="toastContainer"></div>
+</div>
+
+<!-- Toast Template -->
+<div id="toastTemplate" style="display:none;">
+    <div class="toast align-items-center border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toastMessage"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // ===== TOAST NOTIFICATION FUNCTION =====
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        const template = document.getElementById('toastTemplate');
+        
+        const toastClone = template.cloneNode(true);
+        toastClone.style.display = 'block';
+        toastClone.id = 'toast-' + Date.now();
+        
+        const messageEl = toastClone.querySelector('#toastMessage');
+        messageEl.textContent = message;
+        
+        const toastEl = toastClone.querySelector('.toast');
+        toastEl.className = 'toast align-items-center border-0 mb-2';
+        if (type === 'success') {
+            toastEl.classList.add('bg-success', 'text-white');
+        } else if (type === 'error') {
+            toastEl.classList.add('bg-danger', 'text-white');
+        } else if (type === 'warning') {
+            toastEl.classList.add('bg-warning', 'text-dark');
+        } else {
+            toastEl.classList.add('bg-info', 'text-white');
+        }
+        
+        container.appendChild(toastClone);
+        
+        const toast = new bootstrap.Toast(toastEl, {
+            autohide: true,
+            delay: 5000
+        });
+        toast.show();
+        
+        toastEl.addEventListener('hidden.bs.toast', function() {
+            toastClone.remove();
+        });
+    }
+
+    // ===== ADD PRODUCT VIA AJAX =====
+    $('#saveProductBtn').click(function() {
+        const btn = $(this);
+        const form = $('#addProductForm');
+        const formData = new FormData(form[0]);
+        
+        // Validate required fields
+        const productId = $('#product_id').val();
+        const costPrice = $('#cost_price').val();
+        
+        if (!productId) {
+            showToast('Please select a product.', 'warning');
+            return;
+        }
+        
+        if (!costPrice || costPrice <= 0) {
+            showToast('Please enter a valid cost price.', 'warning');
+            return;
+        }
+        
+        // Disable button and show loading
+        btn.prop('disabled', true);
+        btn.html('<i class="fas fa-spinner fa-spin me-1"></i> Adding...');
+        
+        $.ajax({
+            url: "{% url 'suppliers:supplier_product_add' supplier.id %}",
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response.success) {
+                    showToast(response.message, 'success');
+                    $('#addProductModal').modal('hide');
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    showToast('Error: ' + response.error, 'error');
+                    btn.prop('disabled', false);
+                    btn.html('<i class="fas fa-plus me-1"></i> Add Product');
+                }
+            },
+            error: function(xhr) {
+                let errorMsg = 'Error adding product';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errorMsg = xhr.responseJSON.error;
+                }
+                showToast('Error: ' + errorMsg, 'error');
+                btn.prop('disabled', false);
+                btn.html('<i class="fas fa-plus me-1"></i> Add Product');
+            }
+        });
+    });
+
+    // ===== REMOVE PRODUCT =====
+    $('.remove-product-btn').click(function() {
+        const btn = $(this);
+        const productId = btn.data('id');
+        const productName = btn.data('product');
+        
+        if (confirm(`Are you sure you want to remove "${productName}" from this supplier?`)) {
+            $.ajax({
+                url: `/suppliers/products/${productId}/remove/`,
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        showToast(response.message, 'success');
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        showToast('Error: ' + response.error, 'error');
+                    }
+                },
+                error: function() {
+                    showToast('Error removing product', 'error');
+                }
+            });
+        }
+    });
+
+    // ===== RESET MODAL ON CLOSE =====
+    $('#addProductModal').on('hidden.bs.modal', function() {
+        $('#addProductForm')[0].reset();
+        $('#saveProductBtn').prop('disabled', false);
+        $('#saveProductBtn').html('<i class="fas fa-plus me-1"></i> Add Product');
+    });
+
+    // ===== RECORD PAYMENT =====
+    $('#savePaymentBtn').click(function() {
+        const btn = $(this);
+        const form = $('#addPaymentForm');
+        const formData = new FormData(form[0]);
+        
+        // Validate
+        const amount = $('#payment_amount').val();
+        const paymentDate = $('#payment_date').val();
+        const method = $('#payment_method').val();
+        
+        if (!amount || amount <= 0) {
+            showToast('Please enter a valid amount.', 'warning');
+            return;
+        }
+        if (!paymentDate) {
+            showToast('Please select a payment date.', 'warning');
+            return;
+        }
+        if (!method) {
+            showToast('Please select a payment method.', 'warning');
+            return;
+        }
+        
+        btn.prop('disabled', true);
+        btn.html('<i class="fas fa-spinner fa-spin me-1"></i> Recording...');
+        
+        $.ajax({
+            url: "{% url 'suppliers:supplier_payment_create' supplier.id %}",
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response.success) {
+                    showToast(response.message, 'success');
+                    $('#addPaymentModal').modal('hide');
+                    
+                    if (response.financials) {
+                        updateFinancialDisplay(response.financials);
+                    }
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    showToast('Error: ' + response.error, 'error');
+                }
+                btn.prop('disabled', false);
+                btn.html('<i class="fas fa-save me-1"></i> Record Payment');
+            },
+            error: function(xhr) {
+                let errorMsg = 'Error recording payment';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errorMsg = xhr.responseJSON.error;
+                }
+                showToast('Error: ' + errorMsg, 'error');
+                btn.prop('disabled', false);
+                btn.html('<i class="fas fa-save me-1"></i> Record Payment');
+            }
+        });
+    });
+    
+    // ===== UPDATE FINANCIALS =====
+    window.updateFinancials = function() {
+        const btn = $('#updateFinancialsBtn');
+        btn.prop('disabled', true);
+        btn.html('<i class="fas fa-spinner fa-spin me-1"></i>');
+        
+        $.ajax({
+            url: "{% url 'suppliers:supplier_update_financials' supplier.id %}",
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    showToast(response.message, 'success');
+                    updateFinancialDisplay(response.financials);
+                } else {
+                    showToast('Error: ' + response.error, 'error');
+                }
+                btn.prop('disabled', false);
+                btn.html('<i class="fas fa-sync me-1"></i> Refresh');
+            },
+            error: function() {
+                showToast('Error updating financials', 'error');
+                btn.prop('disabled', false);
+                btn.html('<i class="fas fa-sync me-1"></i> Refresh');
+            }
+        });
+    };
+    
+    // ===== UPDATE FINANCIAL DISPLAY =====
+    function updateFinancialDisplay(financials) {
+        if (financials) {
+            $('.total-purchases').text('Ugx ' + parseFloat(financials.total_purchases).toFixed(2));
+            $('.total-paid').text('Ugx ' + parseFloat(financials.total_paid).toFixed(2));
+            $('.balance-due').text('Ugx ' + parseFloat(financials.balance_due).toFixed(2));
+            $('.available-credit').text('Ugx ' + parseFloat(financials.available_credit).toFixed(2));
+            
+            const balanceDue = $('.balance-due');
+            if (parseFloat(financials.balance_due) > 0) {
+                balanceDue.removeClass('text-success').addClass('text-danger');
+            } else {
+                balanceDue.removeClass('text-danger').addClass('text-success');
+            }
+            
+            const availCredit = $('.available-credit');
+            if (parseFloat(financials.available_credit) <= 0) {
+                availCredit.removeClass('text-success').addClass('text-danger');
+            } else {
+                availCredit.removeClass('text-danger').addClass('text-success');
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
