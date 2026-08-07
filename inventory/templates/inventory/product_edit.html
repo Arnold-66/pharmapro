@@ -1,0 +1,717 @@
+<!-- inventory/templates/inventory/product_edit.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Edit {{ product.name }} - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== MOBILE RESPONSIVE STYLES ===== */
+    @media (max-width: 768px) {
+        .container-fluid.px-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            max-width: 100% !important;
+            padding-top: 0 !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0 !important;
+            --bs-gutter-y: 0.25rem !important;
+            margin-right: 0 !important;
+            margin-left: 0 !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0.125rem !important;
+            padding-left: 0.125rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .card {
+            border-radius: 4px !important;
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 1px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
+        }
+        
+        .card-body {
+            padding: 0.5rem 0.5rem !important;
+        }
+        
+        .card-header {
+            padding: 0.5rem 0.5rem !important;
+        }
+        
+        .card-header h5 {
+            font-size: 0.9rem !important;
+        }
+        
+        .page-header {
+            padding: 0 0.5rem !important;
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+            align-items: stretch !important;
+        }
+        
+        .page-header h1 {
+            font-size: 1rem !important;
+        }
+        
+        .page-header .btn {
+            width: 100% !important;
+            font-size: 0.75rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.5rem !important;
+        }
+        
+        .form-label {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.2rem !important;
+        }
+        
+        .form-text {
+            font-size: 0.65rem !important;
+        }
+        
+        .btn {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.6rem !important;
+        }
+        
+        .badge {
+            font-size: 0.6rem !important;
+            padding: 0.2rem 0.35rem !important;
+        }
+        
+        .input-group-text {
+            font-size: 0.75rem !important;
+            padding: 0.25rem 0.4rem !important;
+        }
+        
+        /* ===== SALE UNITS ===== */
+        .sale-unit-item {
+            background: #f8f9fa;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 0.75rem !important;
+        }
+        
+        .sale-unit-item .col-md-3,
+        .sale-unit-item .col-md-2,
+        .sale-unit-item .col-md-1 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        .sale-unit-item .d-flex.align-items-center {
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }
+        
+        .sale-unit-item .form-check {
+            margin: 0 !important;
+        }
+        
+        .sale-unit-item .remove-unit {
+            width: 100% !important;
+        }
+        
+        /* ===== IMAGE PREVIEW ===== */
+        .product-image-preview {
+            max-height: 80px !important;
+            max-width: 80px !important;
+        }
+        
+        /* ===== ACTION BUTTONS ===== */
+        .d-flex.gap-2.justify-content-end {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+        
+        .d-flex.gap-2.justify-content-end .btn {
+            width: 100% !important;
+        }
+        
+        /* ===== ALERT ===== */
+        .alert {
+            padding: 0.5rem 0.5rem !important;
+            font-size: 0.75rem !important;
+        }
+        
+        .alert br {
+            display: none !important;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .card-header h5 {
+            font-size: 0.8rem !important;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.75rem !important;
+            padding: 0.3rem 0.4rem !important;
+        }
+        
+        .form-label {
+            font-size: 0.7rem !important;
+        }
+        
+        .input-group-text {
+            font-size: 0.7rem !important;
+            padding: 0.2rem 0.3rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 992px) {
+        .container-fluid.px-4 {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .row {
+            --bs-gutter-x: 0.5rem !important;
+        }
+        
+        .row > [class*="col-"] {
+            padding-right: 0.25rem !important;
+            padding-left: 0.25rem !important;
+        }
+    }
+    
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 12px !important;
+        }
+    }
+    
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+    
+    .card-header {
+        background: transparent !important;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    /* ===== SALE UNITS ===== */
+    .sale-unit-item {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+        transition: all 0.2s ease;
+    }
+    
+    .sale-unit-item:hover {
+        border-color: #dee2e6;
+        background: #f1f3f5;
+    }
+    
+    .sale-unit-item .form-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .sale-unit-item .form-text {
+        font-size: 0.7rem;
+    }
+    
+    .btn-primary {
+        background: #2c3e50;
+        border-color: #2c3e50;
+    }
+    
+    .btn-primary:hover {
+        background: #1a2a3a;
+        border-color: #1a2a3a;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="row">
+        <div class="col-lg-10 col-12 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <h5 class="mb-0">
+                        <i class="fas fa-edit text-primary me-2"></i>Edit Product
+                        <span class="badge bg-secondary ms-2">{{ product.sku }}</span>
+                    </h5>
+                    <a href="{% url 'inventory:product_detail' product.id %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> <span class="d-none d-sm-inline">Back to Product</span>
+                        <span class="d-inline d-sm-none">Back</span>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" id="productForm">
+                        {% csrf_token %}
+
+                        <div class="row g-4">
+                            <!-- Basic Information -->
+                            <div class="col-md-6 col-12">
+                                <h6 class="text-muted text-uppercase small fw-bold mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>Basic Information
+                                </h6>
+                                
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Product Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="name" name="name" 
+                                           value="{{ product.name }}" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="sku" class="form-label">SKU <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="sku" name="sku" 
+                                           value="{{ product.sku }}" required>
+                                    <div class="form-text">Must be unique for your organization.</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="barcode" class="form-label">Barcode</label>
+                                    <input type="text" class="form-control" id="barcode" name="barcode" 
+                                           value="{{ product.barcode|default:'' }}">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description</label>
+                                    <textarea class="form-control" id="description" name="description" rows="3">{{ product.description|default:'' }}</textarea>
+                                </div>
+                            </div>
+
+                            <!-- Category & Unit -->
+                            <div class="col-md-6 col-12">
+                                <h6 class="text-muted text-uppercase small fw-bold mb-3">
+                                    <i class="fas fa-tags me-2"></i>Category & Unit
+                                </h6>
+                                
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">Category</label>
+                                    <select class="form-select" id="category" name="category">
+                                        <option value="">Select Category</option>
+                                        {% for category in categories %}
+                                        <option value="{{ category.id }}" {% if product.category.id == category.id %}selected{% endif %}>
+                                            {{ category.name }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="unit" class="form-label">Base Unit</label>
+                                    <select class="form-select" id="unit" name="unit" disabled>
+                                        <option value="{{ product.unit.id }}">{{ product.unit.name|default:'Not set' }} ({{ product.unit.abbreviation|default:'' }})</option>
+                                    </select>
+                                    <div class="form-text text-info">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Base unit is automatically set to the smallest sale unit.
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="status" class="form-label">Status</label>
+                                    <select class="form-select" id="status" name="status">
+                                        <option value="active" {% if product.status == 'active' %}selected{% endif %}>Active</option>
+                                        <option value="inactive" {% if product.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                                        <option value="out_of_stock" {% if product.status == 'out_of_stock' %}selected{% endif %}>Out of Stock</option>
+                                        <option value="discontinued" {% if product.status == 'discontinued' %}selected{% endif %}>Discontinued</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="image" class="form-label">Product Image</label>
+                                    {% if product.image %}
+                                    <div class="mb-2">
+                                        <img src="{{ product.image.url }}" alt="{{ product.name }}" 
+                                             style="max-height: 100px; max-width: 100px;" class="rounded border">
+                                    </div>
+                                    {% endif %}
+                                    <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                                    <div class="form-text">Upload a new image to replace the current one.</div>
+                                </div>
+                            </div>
+
+                            <!-- Stock Information -->
+                            <div class="col-md-6 col-12">
+                                <h6 class="text-muted text-uppercase small fw-bold mb-3">
+                                    <i class="fas fa-boxes me-2"></i>Stock Information
+                                </h6>
+                                
+                                <div class="mb-3">
+                                    <label for="quantity" class="form-label">Current Stock (Base Units)</label>
+                                    <input type="number" class="form-control" id="quantity" name="quantity" 
+                                           value="{{ product.quantity|floatformat:0 }}" min="0" step="1">
+                                    <div class="form-text text-info">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Stock is tracked in the smallest unit ({{ product.unit.name|default:'units' }}).
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="min_quantity" class="form-label">Minimum Quantity</label>
+                                    <input type="number" class="form-control" id="min_quantity" name="min_quantity" 
+                                           value="{{ product.min_quantity|floatformat:0 }}" min="0" step="1">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="reorder_point" class="form-label">Reorder Point</label>
+                                    <input type="number" class="form-control" id="reorder_point" name="reorder_point" 
+                                           value="{{ product.reorder_point|floatformat:0 }}" min="0" step="1">
+                                    <div class="form-text">When stock reaches this level, a reorder alert will be triggered.</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="reorder_quantity" class="form-label">Reorder Quantity</label>
+                                    <input type="number" class="form-control" id="reorder_quantity" name="reorder_quantity" 
+                                           value="{{ product.reorder_quantity|floatformat:0 }}" min="0" step="1">
+                                </div>
+                            </div>
+
+                            <!-- Pricing -->
+                            <div class="col-md-6 col-12">
+                                <h6 class="text-muted text-uppercase small fw-bold mb-3">
+                                    <i class="fas fa-dollar-sign me-2"></i>Pricing
+                                </h6>
+                                
+                                <div class="mb-3">
+                                    <label for="purchase_price" class="form-label">Purchase Price (per base unit)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">Ugx</span>
+                                        <input type="number" class="form-control" id="purchase_price" name="purchase_price" 
+                                               value="{{ product.purchase_price|floatformat:2 }}" step="0.01" min="0">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="selling_price" class="form-label">Selling Price (per base unit)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">Ugx</span>
+                                        <input type="number" class="form-control" id="selling_price" name="selling_price" 
+                                               value="{{ product.selling_price|floatformat:2 }}" step="0.01" min="0">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="wholesale_price" class="form-label">Wholesale Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">Ugx</span>
+                                        <input type="number" class="form-control" id="wholesale_price" name="wholesale_price" 
+                                               value="{{ product.wholesale_price|floatformat:2 }}" step="0.01" min="0">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sale Units Section -->
+                            <div class="col-12">
+                                <h6 class="text-muted text-uppercase small fw-bold mb-3">
+                                    <i class="fas fa-boxes me-2"></i>Sale Units & Pricing
+                                </h6>
+                                
+                                <div class="alert alert-info d-flex flex-wrap align-items-start">
+                                    <i class="fas fa-info-circle me-2 mt-1"></i>
+                                    <div>
+                                        <strong>Define hierarchical units for this product:</strong><br class="d-none d-sm-inline">
+                                        <span class="small">Example: Tablet (Base) → Strip (10 tablets) → Box (100 tablets)</span>
+                                        <br>
+                                        <span class="small text-muted">Stock is tracked in the smallest unit. When you sell 1 strip, 10 tablets are deducted.</span>
+                                    </div>
+                                </div>
+                                
+                                <div id="saleUnitsContainer">
+                                    {% for sale_unit in product.sale_units.all %}
+                                    <div class="sale-unit-item row g-3 mb-3 align-items-end">
+                                        <div class="col-md-3 col-12">
+                                            <label class="form-label">Unit Name <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="unit_names[]" 
+                                                   value="{{ sale_unit.name }}" required>
+                                        </div>
+                                        <div class="col-md-2 col-6">
+                                            <label class="form-label">Abbreviation <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="unit_abbrs[]" 
+                                                   value="{{ sale_unit.abbreviation }}" required>
+                                        </div>
+                                        <div class="col-md-2 col-6">
+                                            <label class="form-label">Contains (Base Units) <span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control" name="unit_quantities[]" 
+                                                   value="{{ sale_unit.quantity_per_unit|floatformat:0 }}" step="0.01" min="0.01" required>
+                                            <div class="form-text">How many base units in this unit</div>
+                                        </div>
+                                        <div class="col-md-2 col-6">
+                                            <label class="form-label">Selling Price <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">Ugx</span>
+                                                <input type="number" class="form-control" name="unit_prices[]" 
+                                                       value="{{ sale_unit.selling_price|floatformat:2 }}" step="0.01" min="0" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-6">
+                                            <label class="form-label">Purchase Price</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">Ugx</span>
+                                                <input type="number" class="form-control" name="unit_costs[]" 
+                                                       value="{{ sale_unit.purchase_price|floatformat:2 }}" step="0.01" min="0">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1 col-12 d-flex align-items-center gap-2 flex-wrap">
+                                            <div class="form-check">
+                                                <input class="form-check-input default-unit" type="radio" name="default_unit" 
+                                                       value="{{ forloop.counter0 }}" {% if sale_unit.is_default %}checked{% endif %}>
+                                                <label class="form-check-label small">Default</label>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-danger remove-unit">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <div class="sale-unit-item row g-3 mb-3 align-items-end">
+                                        <div class="col-md-3 col-12">
+                                            <label class="form-label">Unit Name <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="unit_names[]" placeholder="e.g., Tablet, Strip, Box" required>
+                                        </div>
+                                        <div class="col-md-2 col-6">
+                                            <label class="form-label">Abbreviation <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="unit_abbrs[]" placeholder="e.g., Tbl, Strip, Box" required>
+                                        </div>
+                                        <div class="col-md-2 col-6">
+                                            <label class="form-label">Contains (Base Units) <span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control" name="unit_quantities[]" placeholder="e.g., 1, 10, 100" step="0.01" min="0.01" required>
+                                            <div class="form-text">How many base units in this unit</div>
+                                        </div>
+                                        <div class="col-md-2 col-6">
+                                            <label class="form-label">Selling Price <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">Ugx</span>
+                                                <input type="number" class="form-control" name="unit_prices[]" placeholder="0.00" step="0.01" min="0" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 col-6">
+                                            <label class="form-label">Purchase Price</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">Ugx</span>
+                                                <input type="number" class="form-control" name="unit_costs[]" placeholder="0.00" step="0.01" min="0" value="0">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1 col-12 d-flex align-items-center gap-2 flex-wrap">
+                                            <div class="form-check">
+                                                <input class="form-check-input default-unit" type="radio" name="default_unit" value="0" checked>
+                                                <label class="form-check-label small">Default</label>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-danger remove-unit">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="addSaleUnitBtn">
+                                    <i class="fas fa-plus me-1"></i> Add Sale Unit
+                                </button>
+                                
+                                <div class="mt-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="allow_fractional" name="allow_fractional" 
+                                               {% if product.allow_fractional %}checked{% endif %}>
+                                        <label class="form-check-label" for="allow_fractional">
+                                            Allow fractional sales (e.g., half strip, 2.5 tablets)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Expiry & Location -->
+                            <div class="col-12">
+                                <h6 class="text-muted text-uppercase small fw-bold mb-3">
+                                    <i class="fas fa-clock me-2"></i>Expiry & Location
+                                </h6>
+                                
+                                <div class="row g-3">
+                                    <div class="col-md-3 col-6">
+                                        <label for="batch_number" class="form-label">Batch Number</label>
+                                        <input type="text" class="form-control" id="batch_number" name="batch_number" 
+                                               value="{{ product.batch_number|default:'' }}">
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <label for="manufacturing_date" class="form-label">Manufacturing Date</label>
+                                        <input type="date" class="form-control" id="manufacturing_date" name="manufacturing_date" 
+                                               value="{{ product.manufacturing_date|date:'Y-m-d'|default:'' }}">
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <label for="expiry_date" class="form-label">Expiry Date</label>
+                                        <input type="date" class="form-control" id="expiry_date" name="expiry_date" 
+                                               value="{{ product.expiry_date|date:'Y-m-d'|default:'' }}">
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <label for="shelf_number" class="form-label">Shelf Number</label>
+                                        <input type="text" class="form-control" id="shelf_number" name="shelf_number" 
+                                               value="{{ product.shelf_number|default:'' }}">
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="location" class="form-label">Location</label>
+                                        <input type="text" class="form-control" id="location" name="location" 
+                                               value="{{ product.location|default:'' }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+                        <div class="d-flex gap-2 justify-content-end flex-wrap">
+                            <a href="{% url 'inventory:product_detail' product.id %}" class="btn btn-secondary flex-grow-1 flex-md-grow-0">
+                                <i class="fas fa-times me-1"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary flex-grow-1 flex-md-grow-0" id="submitBtn">
+                                <i class="fas fa-save me-1"></i> Update Product
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let unitCounter = {{ product.sale_units.count }};
+        
+        // Add sale unit row
+        document.getElementById('addSaleUnitBtn')?.addEventListener('click', function() {
+            const container = document.getElementById('saleUnitsContainer');
+            const template = container.querySelector('.sale-unit-item');
+            const clone = template.cloneNode(true);
+            
+            // Clear all input values
+            clone.querySelectorAll('input').forEach(el => {
+                if (el.type !== 'radio') {
+                    el.value = '';
+                } else {
+                    el.checked = false;
+                    el.value = ++unitCounter;
+                }
+            });
+            
+            // Update remove button
+            clone.querySelector('.remove-unit').addEventListener('click', function() {
+                if (container.querySelectorAll('.sale-unit-item').length > 1) {
+                    this.closest('.sale-unit-item').remove();
+                }
+            });
+            
+            // Update radio button name to group them
+            clone.querySelectorAll('.default-unit').forEach(radio => {
+                radio.name = 'default_unit';
+            });
+            
+            container.appendChild(clone);
+        });
+        
+        // Remove unit button on existing rows
+        document.querySelectorAll('.remove-unit').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const container = document.getElementById('saleUnitsContainer');
+                if (container.querySelectorAll('.sale-unit-item').length > 1) {
+                    this.closest('.sale-unit-item').remove();
+                }
+            });
+        });
+
+        // Form validation
+        document.getElementById('productForm').addEventListener('submit', function(e) {
+            // Check if at least one sale unit is defined
+            const unitItems = document.querySelectorAll('.sale-unit-item');
+            let hasDefault = false;
+            
+            unitItems.forEach(item => {
+                const radio = item.querySelector('.default-unit');
+                if (radio && radio.checked) {
+                    hasDefault = true;
+                }
+            });
+            
+            if (unitItems.length === 0) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please add at least one sale unit.',
+                    confirmButtonColor: '#dc3545'
+                });
+                return false;
+            }
+            
+            if (!hasDefault) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please select a default sale unit.',
+                    confirmButtonColor: '#dc3545'
+                });
+                return false;
+            }
+            
+            // Validate unit names are unique
+            const names = [];
+            unitItems.forEach(item => {
+                const nameInput = item.querySelector('input[name="unit_names[]"]');
+                if (nameInput && nameInput.value) {
+                    names.push(nameInput.value.toLowerCase());
+                }
+            });
+            
+            const uniqueNames = new Set(names);
+            if (names.length !== uniqueNames.size) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Sale unit names must be unique.',
+                    confirmButtonColor: '#dc3545'
+                });
+                return false;
+            }
+            
+            // Validate quantity per unit - must have at least one unit with quantity = 1
+            let hasBaseUnit = false;
+            unitItems.forEach(item => {
+                const qtyInput = item.querySelector('input[name="unit_quantities[]"]');
+                if (qtyInput && parseFloat(qtyInput.value) === 1) {
+                    hasBaseUnit = true;
+                }
+            });
+            
+            if (!hasBaseUnit) {
+                if (!confirm('⚠️ No unit has quantity_per_unit = 1. This means you have no base unit. Continue anyway?')) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+            
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Updating...';
+            btn.disabled = true;
+        });
+    });
+</script>
+{% endblock %}
