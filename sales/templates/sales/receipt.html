@@ -6,133 +6,180 @@
 
 {% block extra_css %}
 <style>
-    /* ===== PRINT RECEIPT STYLES ===== */
+    /* ===== SUPERMARKET STYLE RECEIPT ===== */
+    body {
+        background: #f0f0f0 !important;
+        font-family: 'Courier New', Courier, monospace !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    .container {
+        max-width: 400px !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+    }
+    
     @media print {
         body {
             background: white !important;
-            margin: 0 !important;
             padding: 0 !important;
+            margin: 0 !important;
         }
-        
-        .receipt {
+        .container {
             max-width: 100% !important;
-            padding: 10px !important;
+        }
+        .receipt-wrapper {
             box-shadow: none !important;
+            padding: 10px 15px !important;
             border-radius: 0 !important;
         }
-        
         .receipt-actions,
         .no-print {
             display: none !important;
         }
-        
-        .badge {
-            border: 1px solid #ddd !important;
-        }
-        
-        .receipt-footer {
-            page-break-after: avoid !important;
+        .receipt-footer .no-print {
+            display: none !important;
         }
     }
     
-    /* ===== RECEIPT STYLES ===== */
     .receipt-wrapper {
         max-width: 400px;
-        margin: 0 auto;
-        padding: 20px;
+        margin: 20px auto;
         background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        padding: 15px 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-radius: 4px;
     }
     
     .receipt {
-        background: white;
+        font-family: 'Courier New', Courier, monospace;
+        color: #000;
+        font-size: 12px;
+        line-height: 1.5;
     }
     
+    /* ===== HEADER ===== */
     .receipt-header {
         text-align: center;
-        padding-bottom: 15px;
-        border-bottom: 2px dashed #dee2e6;
+        border-bottom: 1px dashed #999;
+        padding-bottom: 10px;
+        margin-bottom: 8px;
     }
     
     .receipt-logo {
-        max-height: 80px;
-        margin-bottom: 10px;
+        max-height: 60px;
+        margin-bottom: 5px;
         object-fit: contain;
     }
     
     .receipt-logo-placeholder {
-        font-size: 2.5rem;
-        color: #2c3e50;
-        margin-bottom: 10px;
+        font-size: 2rem;
+        color: #333;
+        margin-bottom: 5px;
     }
     
     .company-name {
-        margin: 0;
+        font-size: 16px;
         font-weight: 700;
-        color: #2c3e50;
-        font-size: 1.3rem;
+        margin: 0;
+        letter-spacing: 1px;
+        text-transform: uppercase;
     }
     
-    .company-address,
+    .company-address {
+        font-size: 11px;
+        color: #333;
+        margin: 2px 0;
+    }
+    
     .company-phone,
     .company-email {
-        margin: 2px 0;
-        font-size: 0.8rem;
-        color: #6c757d;
+        font-size: 11px;
+        color: #333;
+        margin: 1px 0;
     }
     
     .receipt-title {
+        font-size: 13px;
         font-weight: 700;
-        margin: 12px 0 8px;
-        color: #2c3e50;
-        font-size: 1.1rem;
-        letter-spacing: 1px;
+        letter-spacing: 2px;
+        margin: 6px 0 4px;
+        text-transform: uppercase;
     }
     
+    /* ===== RECEIPT META ===== */
     .receipt-meta {
-        font-size: 0.8rem;
-        text-align: left;
-        padding: 8px 0;
-        background: #f8f9fa;
-        border-radius: 4px;
-        padding: 8px 12px;
+        font-size: 11px;
+        margin: 6px 0;
+        padding: 4px 0;
+        border-top: 1px dashed #ccc;
+        border-bottom: 1px dashed #ccc;
     }
     
-    .receipt-meta div {
-        padding: 2px 0;
+    .receipt-meta .row {
         display: flex;
         justify-content: space-between;
+        padding: 1px 0;
+    }
+    
+    .receipt-meta .label {
+        font-weight: bold;
+    }
+    
+    .receipt-meta .value {
+        text-align: right;
     }
     
     .receipt-meta .badge {
-        font-size: 0.7rem;
-        padding: 0.2rem 0.5rem;
+        font-size: 9px;
+        padding: 1px 6px;
+        border-radius: 2px;
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: 700;
+    }
+    .badge.bg-success {
+        background-color: #28a745 !important;
+        color: white !important;
+    }
+    .badge.bg-warning {
+        background-color: #ffc107 !important;
+        color: #000 !important;
+    }
+    .badge.bg-danger {
+        background-color: #dc3545 !important;
+        color: white !important;
+    }
+    .badge.bg-secondary {
+        background-color: #6c757d !important;
+        color: white !important;
     }
     
-    /* Items Table */
+    /* ===== ITEMS TABLE ===== */
     .receipt-items {
-        padding: 10px 0;
+        padding: 4px 0;
     }
     
     .receipt-table {
         width: 100%;
-        font-size: 0.82rem;
+        font-size: 11px;
         border-collapse: collapse;
+        font-family: 'Courier New', Courier, monospace;
     }
     
     .receipt-table th {
-        border-bottom: 2px solid #dee2e6;
-        padding: 6px 4px;
-        font-weight: 600;
-        color: #495057;
+        border-bottom: 1px solid #999;
+        padding: 3px 2px;
+        font-weight: 700;
         text-align: left;
+        font-size: 11px;
+        letter-spacing: 0.5px;
     }
     
     .receipt-table td {
-        padding: 5px 4px;
-        border-bottom: 1px solid #f0f0f0;
+        padding: 2px 2px;
         vertical-align: top;
+        font-size: 11px;
     }
     
     .receipt-table .text-center {
@@ -143,117 +190,167 @@
         text-align: right;
     }
     
+    .receipt-table .text-left {
+        text-align: left;
+    }
+    
     .item-name {
-        font-weight: 500;
+        font-weight: 400;
     }
     
     .item-detail {
-        font-size: 0.7rem;
-        color: #6c757d;
-        margin-top: 2px;
+        font-size: 10px;
+        color: #666;
+        margin-top: 1px;
     }
     
-    .total-row td {
-        border-top: 2px solid #2c3e50;
-        font-size: 0.95rem;
-        padding: 8px 4px;
-        font-weight: 600;
+    .item-detail .badge {
+        font-size: 8px;
+        padding: 1px 4px;
     }
     
-    .grand-total {
-        font-size: 1.1rem;
-        color: #2c3e50;
+    .receipt-table tfoot tr td {
+        padding: 2px 2px;
+        border-top: none;
     }
     
-    /* Payments */
+    .receipt-table .total-row td {
+        border-top: 1px solid #999;
+        padding: 4px 2px;
+        font-weight: 700;
+        font-size: 13px;
+    }
+    
+    .receipt-table .grand-total {
+        font-size: 14px;
+        font-weight: 700;
+    }
+    
+    /* ===== PAYMENTS ===== */
     .receipt-payments {
-        margin-top: 10px;
-        padding-top: 10px;
-        border-top: 1px solid #dee2e6;
+        margin-top: 6px;
+        padding-top: 6px;
+        border-top: 1px dashed #ccc;
     }
     
     .receipt-payments h5 {
-        font-size: 0.9rem;
-        font-weight: 600;
-        margin-bottom: 8px;
-        color: #2c3e50;
+        font-size: 11px;
+        font-weight: 700;
+        margin: 0 0 4px 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     
     .payment-table {
-        font-size: 0.78rem;
+        font-size: 10px;
+        width: 100%;
+        border-collapse: collapse;
+        font-family: 'Courier New', Courier, monospace;
     }
     
     .payment-table th {
-        border-bottom: 1px solid #dee2e6;
-        padding: 4px 4px;
+        border-bottom: 1px solid #ccc;
+        padding: 2px 2px;
+        text-align: left;
+        font-weight: 700;
+        font-size: 10px;
     }
     
     .payment-table td {
-        padding: 4px 4px;
-        border-bottom: 1px solid #f0f0f0;
+        padding: 2px 2px;
+        font-size: 10px;
     }
     
-    /* Notes */
+    .payment-table .text-right {
+        text-align: right;
+    }
+    
+    /* ===== NOTES ===== */
     .receipt-notes {
-        font-size: 0.8rem;
-        margin-top: 10px;
-        padding: 8px 12px;
-        background: #f8f9fa;
-        border-radius: 4px;
+        font-size: 10px;
+        margin-top: 6px;
+        padding: 4px 6px;
+        background: #f8f8f8;
+        border-left: 3px solid #ccc;
     }
     
     .receipt-notes p {
         margin: 0;
+        font-style: italic;
     }
     
-    /* Footer */
+    /* ===== DIVIDER ===== */
+    .receipt-divider {
+        border: none;
+        border-top: 1px dashed #999;
+        margin: 6px 0;
+    }
+    
+    .receipt-divider-double {
+        border: none;
+        border-top: 2px solid #333;
+        margin: 6px 0;
+    }
+    
+    /* ===== FOOTER ===== */
     .receipt-footer {
-        margin-top: 15px;
-        padding-top: 15px;
-        border-top: 2px dashed #dee2e6;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px dashed #999;
         text-align: center;
     }
     
     .thank-you {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #2c3e50;
-        margin: 5px 0;
+        font-size: 13px;
+        font-weight: 700;
+        margin: 3px 0;
+        letter-spacing: 1px;
+        text-transform: uppercase;
     }
     
     .footer-text {
-        font-size: 0.75rem;
-        color: #6c757d;
-        margin: 2px 0;
+        font-size: 10px;
+        color: #666;
+        margin: 1px 0;
     }
     
     .footer-brand {
-        color: #3498db;
-        font-weight: 500;
+        color: #333;
+        font-weight: 700;
     }
     
-    /* Actions */
+    .footer-timestamp {
+        font-size: 10px;
+        color: #999;
+        margin-top: 4px;
+        font-style: italic;
+    }
+    
+    /* ===== ACTIONS ===== */
     .receipt-actions {
         display: flex;
+        gap: 8px;
+        margin-top: 12px;
+        padding-top: 10px;
+        border-top: 1px solid #ddd;
         justify-content: center;
-        gap: 10px;
-        margin-top: 15px;
-        padding-top: 15px;
-        border-top: 1px solid #dee2e6;
     }
     
     .btn-print {
         background: #2c3e50;
         color: white;
         border: none;
-        padding: 8px 24px;
-        border-radius: 6px;
+        padding: 8px 20px;
+        border-radius: 3px;
         cursor: pointer;
-        font-size: 0.9rem;
+        font-size: 11px;
+        font-family: 'Courier New', Courier, monospace;
         transition: all 0.2s;
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     
     .btn-print:hover {
@@ -265,15 +362,18 @@
         background: #e9ecef;
         color: #333;
         border: none;
-        padding: 8px 24px;
-        border-radius: 6px;
+        padding: 8px 20px;
+        border-radius: 3px;
         cursor: pointer;
-        font-size: 0.9rem;
+        font-size: 11px;
+        font-family: 'Courier New', Courier, monospace;
         text-decoration: none;
         transition: all 0.2s;
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     
     .btn-back:hover {
@@ -282,47 +382,62 @@
         text-decoration: none;
     }
     
-    .badge.bg-success {
-        background-color: #28a745 !important;
-    }
-    .badge.bg-warning {
-        background-color: #ffc107 !important;
-        color: #212529 !important;
-    }
-    .badge.bg-danger {
-        background-color: #dc3545 !important;
-    }
-    .badge.bg-secondary {
-        background-color: #6c757d !important;
+    .btn-pdf {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 11px;
+        font-family: 'Courier New', Courier, monospace;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-decoration: none;
     }
     
-    /* Mobile Responsive */
+    .btn-pdf:hover {
+        background: #c82333;
+        color: white;
+        text-decoration: none;
+    }
+    
+    /* ===== MOBILE ===== */
     @media (max-width: 480px) {
         .receipt-wrapper {
-            padding: 10px;
+            padding: 10px 12px;
+            margin: 5px auto;
             border-radius: 0;
         }
         
+        .receipt {
+            font-size: 11px;
+        }
+        
         .receipt-table {
-            font-size: 0.7rem;
+            font-size: 10px;
         }
         
         .receipt-table td,
         .receipt-table th {
-            padding: 3px 2px;
+            padding: 2px 1px;
         }
         
         .company-name {
-            font-size: 1.1rem;
+            font-size: 14px;
         }
         
         .receipt-meta {
-            font-size: 0.7rem;
+            font-size: 10px;
         }
         
         .receipt-actions {
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
         
         .receipt-actions .btn {
@@ -331,27 +446,32 @@
         }
         
         .item-detail {
-            font-size: 0.65rem;
+            font-size: 9px;
         }
         
         .total-row td {
-            font-size: 0.85rem;
+            font-size: 12px;
+        }
+        
+        .grand-total {
+            font-size: 13px;
         }
     }
     
-    /* Loading overlay */
+    /* ===== PRINT LOADING ===== */
     .print-loading {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(255,255,255,0.9);
+        background: rgba(255,255,255,0.95);
         display: none;
         justify-content: center;
         align-items: center;
         z-index: 9999;
         flex-direction: column;
+        font-family: 'Courier New', Courier, monospace;
     }
     
     .print-loading.show {
@@ -359,12 +479,12 @@
     }
     
     .print-loading .spinner {
-        width: 50px;
-        height: 50px;
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #3498db;
+        width: 40px;
+        height: 40px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #333;
         border-radius: 50%;
-        animation: spin 1s linear infinite;
+        animation: spin 0.8s linear infinite;
     }
     
     @keyframes spin {
@@ -373,9 +493,11 @@
     }
     
     .print-loading p {
-        margin-top: 15px;
-        color: #2c3e50;
+        margin-top: 12px;
+        color: #333;
+        font-size: 12px;
         font-weight: 500;
+        letter-spacing: 0.5px;
     }
 </style>
 {% endblock %}
@@ -389,7 +511,8 @@
 
 <div class="receipt-wrapper">
     <div class="receipt" id="receipt">
-        <!-- Header -->
+        
+        <!-- ===== HEADER ===== -->
         <div class="receipt-header">
             {% if tenant_logo %}
                 <img src="{{ tenant_logo }}" alt="{{ company_name }}" class="receipt-logo">
@@ -398,48 +521,66 @@
                     <i class="fas fa-capsules"></i>
                 </div>
             {% endif %}
-            <h3 class="company-name">{{ company_name }}</h3>
-            {% if company_address %}<p class="company-address">{{ company_address }}</p>{% endif %}
-            {% if company_phone %}<p class="company-phone">Tel: {{ company_phone }}</p>{% endif %}
-            {% if company_email %}<p class="company-email">{{ company_email }}</p>{% endif %}
+            <div class="company-name">{{ company_name|upper }}</div>
+            {% if company_address %}<div class="company-address">{{ company_address }}</div>{% endif %}
+            {% if company_phone %}<div class="company-phone">Tel: {{ company_phone }}</div>{% endif %}
+            {% if company_email %}<div class="company-email">{{ company_email }}</div>{% endif %}
             <div class="receipt-title">SALES RECEIPT</div>
-            <div class="receipt-meta">
-                <div><span>Invoice:</span> <strong>{{ sale.invoice_number }}</strong></div>
-                <div><span>Date:</span> {{ sale.sale_date|date:"Y-m-d H:i" }}</div>
-                <div><span>Customer:</span> {{ sale.customer_name|default:"Walk-in Customer" }}</div>
-                {% if sale.customer_phone %}
-                    <div><span>Phone:</span> {{ sale.customer_phone }}</div>
-                {% endif %}
-                <div><span>Status:</span> 
+        </div>
+
+        <!-- ===== META INFO ===== -->
+        <div class="receipt-meta">
+            <div class="row">
+                <span class="label">Receipt #:</span>
+                <span class="value">{{ sale.invoice_number }}</span>
+            </div>
+            <div class="row">
+                <span class="label">Date/Time:</span>
+                <span class="value">{{ sale.sale_date|date:"m/d/Y h:i A" }}</span>
+            </div>
+            <div class="row">
+                <span class="label">Customer:</span>
+                <span class="value">{{ sale.customer_name|default:"WALK-IN"|upper }}</span>
+            </div>
+            {% if sale.customer_phone %}
+            <div class="row">
+                <span class="label">Phone:</span>
+                <span class="value">{{ sale.customer_phone }}</span>
+            </div>
+            {% endif %}
+            <div class="row">
+                <span class="label">Status:</span>
+                <span class="value">
                     <span class="badge {% if sale.payment_status == 'paid' %}bg-success{% elif sale.payment_status == 'partial' %}bg-warning{% elif sale.payment_status == 'unpaid' %}bg-danger{% else %}bg-secondary{% endif %}">
-                        {{ sale.get_payment_status_display }}
+                        {{ sale.get_payment_status_display|upper }}
                     </span>
-                </div>
+                </span>
+            </div>
+            <div class="row">
+                <span class="label">Payment:</span>
+                <span class="value">{{ sale.get_payment_method_display|upper|default:"-" }}</span>
             </div>
         </div>
 
-        <!-- Items -->
+        <!-- ===== ITEMS ===== -->
         <div class="receipt-items">
             <table class="receipt-table">
                 <thead>
                     <tr>
-                        <th>Item</th>
-                        <th class="text-center">Qty</th>
-                        <th class="text-right">Price</th>
-                        <th class="text-right">Total</th>
+                        <th style="width:45%;">ITEM</th>
+                        <th style="width:15%;" class="text-center">QTY</th>
+                        <th style="width:20%;" class="text-right">PRICE</th>
+                        <th style="width:20%;" class="text-right">TOTAL</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for item in items %}
                     <tr>
                         <td>
-                            <div class="item-name">{{ item.product.name }}</div>
-                            <div class="item-detail">
-                                {{ item.quantity }} × Ugx {{ item.unit_price|floatformat:0 }}
-                                {% if item.discount > 0 %}
-                                    <span class="badge bg-warning text-dark ms-1">-{{ item.discount|floatformat:0 }}</span>
-                                {% endif %}
-                            </div>
+                            <div class="item-name">{{ item.product.name|upper|truncatechars:25 }}</div>
+                            {% if item.discount > 0 %}
+                                <div class="item-detail">DISCOUNT: -Ugx {{ item.discount|floatformat:0 }}</div>
+                            {% endif %}
                         </td>
                         <td class="text-center">{{ item.quantity|floatformat:0 }}</td>
                         <td class="text-right">Ugx {{ item.unit_price|floatformat:0 }}</td>
@@ -447,92 +588,108 @@
                     </tr>
                     {% endfor %}
                 </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="3" class="text-right"><strong>Subtotal:</strong></td>
-                        <td class="text-right">Ugx {{ sale.subtotal|floatformat:0 }}</td>
-                    </tr>
-                    {% if sale.discount_amount > 0 %}
-                    <tr>
-                        <td colspan="3" class="text-right"><strong>Discount:</strong></td>
-                        <td class="text-right text-danger">-Ugx {{ sale.discount_amount|floatformat:0 }}</td>
-                    </tr>
-                    {% endif %}
-                    <tr>
-                        <td colspan="3" class="text-right"><strong>Tax ({{ sale.tax_rate|floatformat:0 }}%):</strong></td>
-                        <td class="text-right">Ugx {{ sale.tax_amount|floatformat:0 }}</td>
-                    </tr>
-                    <tr class="total-row">
-                        <td colspan="3" class="text-right"><strong>TOTAL:</strong></td>
-                        <td class="text-right grand-total"><strong>Ugx {{ sale.total_amount|floatformat:0 }}</strong></td>
-                    </tr>
-                    {% if sale.paid_amount > 0 %}
-                    <tr>
-                        <td colspan="3" class="text-right"><strong>Amount Paid:</strong></td>
-                        <td class="text-right text-success">Ugx {{ sale.paid_amount|floatformat:0 }}</td>
-                    </tr>
-                    {% endif %}
-                    {% if sale.change_amount > 0 %}
-                    <tr>
-                        <td colspan="3" class="text-right"><strong>Change:</strong></td>
-                        <td class="text-right text-success">Ugx {{ sale.change_amount|floatformat:0 }}</td>
-                    </tr>
-                    {% endif %}
-                    {% if sale.balance_due > 0 %}
-                    <tr>
-                        <td colspan="3" class="text-right"><strong>Balance Due:</strong></td>
-                        <td class="text-right text-danger">Ugx {{ sale.balance_due|floatformat:0 }}</td>
-                    </tr>
-                    {% endif %}
-                </tfoot>
             </table>
         </div>
 
-        <!-- Payments -->
+        <!-- ===== DIVIDER ===== -->
+        <hr class="receipt-divider">
+
+        <!-- ===== TOTALS ===== -->
+        <table class="receipt-table">
+            <tfoot>
+                <tr>
+                    <td colspan="2" class="text-right" style="font-weight:700;">SUBTOTAL</td>
+                    <td class="text-right" style="font-weight:700;">Ugx {{ sale.subtotal|floatformat:0 }}</td>
+                </tr>
+                {% if sale.discount_amount > 0 %}
+                <tr>
+                    <td colspan="2" class="text-right">DISCOUNT</td>
+                    <td class="text-right text-danger">-Ugx {{ sale.discount_amount|floatformat:0 }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td colspan="2" class="text-right">TAX ({{ sale.tax_rate|floatformat:0 }}%)</td>
+                    <td class="text-right">Ugx {{ sale.tax_amount|floatformat:0 }}</td>
+                </tr>
+                <tr class="total-row">
+                    <td colspan="2" class="text-right" style="font-size:14px;">TOTAL</td>
+                    <td class="text-right grand-total">Ugx {{ sale.total_amount|floatformat:0 }}</td>
+                </tr>
+                {% if sale.paid_amount > 0 %}
+                <tr>
+                    <td colspan="2" class="text-right">AMOUNT PAID</td>
+                    <td class="text-right text-success">Ugx {{ sale.paid_amount|floatformat:0 }}</td>
+                </tr>
+                {% endif %}
+                {% if sale.change_amount > 0 %}
+                <tr>
+                    <td colspan="2" class="text-right">CHANGE</td>
+                    <td class="text-right text-success">Ugx {{ sale.change_amount|floatformat:0 }}</td>
+                </tr>
+                {% endif %}
+                {% if sale.balance_due > 0 %}
+                <tr>
+                    <td colspan="2" class="text-right" style="font-weight:700;color:#dc3545;">BALANCE DUE</td>
+                    <td class="text-right" style="font-weight:700;color:#dc3545;">Ugx {{ sale.balance_due|floatformat:0 }}</td>
+                </tr>
+                {% endif %}
+            </tfoot>
+        </table>
+
+        <!-- ===== DIVIDER ===== -->
+        <hr class="receipt-divider">
+
+        <!-- ===== PAYMENTS ===== -->
         {% if payments %}
         <div class="receipt-payments">
-            <h5>Payment Details</h5>
-            <table class="receipt-table payment-table">
+            <h5>PAYMENT DETAILS</h5>
+            <table class="payment-table">
                 <thead>
                     <tr>
-                        <th>Method</th>
-                        <th class="text-right">Amount</th>
-                        <th>Date</th>
+                        <th>METHOD</th>
+                        <th class="text-right">AMOUNT</th>
+                        <th style="text-align:right;">DATE</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for payment in payments %}
                     <tr>
-                        <td>{{ payment.get_method_display }}</td>
+                        <td>{{ payment.get_method_display|upper }}</td>
                         <td class="text-right">Ugx {{ payment.amount|floatformat:0 }}</td>
-                        <td>{{ payment.created_at|date:"Y-m-d H:i" }}</td>
+                        <td style="text-align:right;font-size:9px;">{{ payment.created_at|date:"m/d/y H:i" }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+        <hr class="receipt-divider">
         {% endif %}
 
-        <!-- Notes -->
+        <!-- ===== NOTES ===== -->
         {% if sale.notes %}
         <div class="receipt-notes">
             <p><strong>Notes:</strong> {{ sale.notes }}</p>
         </div>
         {% endif %}
 
-        <!-- Footer -->
+        <!-- ===== FOOTER ===== -->
         <div class="receipt-footer">
-            <p class="thank-you">Thank you for your business!</p>
-            <p class="footer-text">{{ company_name }}</p>
-            <p class="footer-text">Powered by <span class="footer-brand">PharmaPro</span></p>
+            <div class="thank-you">THANK YOU FOR YOUR BUSINESS!</div>
+            <div class="footer-text">{{ company_name|upper }}</div>
+            <div class="footer-text">Returns accepted within 14 days with valid receipt</div>
+            <div class="footer-text">Powered by <span class="footer-brand">PharmaPro</span></div>
+            <div class="footer-timestamp">Generated: {% now "m/d/Y h:i:s A" %}</div>
             
-            <!-- Actions -->
+            <!-- ===== ACTIONS ===== -->
             <div class="receipt-actions no-print">
                 <button class="btn-print" onclick="printReceipt()">
-                    <i class="fas fa-print"></i> Print Receipt
+                    <i class="fas fa-print"></i> PRINT
                 </button>
+                <a href="{% url 'sales:sale_receipt_pdf' sale.id %}" class="btn-pdf" target="_blank">
+                    <i class="fas fa-file-pdf"></i> PDF
+                </a>
                 <a href="{% url 'sales:sale_detail' sale.id %}" class="btn-back">
-                    <i class="fas fa-arrow-left"></i> Back
+                    <i class="fas fa-arrow-left"></i> BACK
                 </a>
             </div>
         </div>
@@ -550,12 +707,9 @@
         const loading = document.getElementById('printLoading');
         loading.classList.add('show');
         
-        // Small delay to ensure everything is rendered
         setTimeout(function() {
             loading.classList.remove('show');
             window.print();
-            
-            // Reset print attempted after print dialog closes
             setTimeout(function() {
                 printAttempted = false;
             }, 1000);
@@ -564,12 +718,10 @@
     
     // ===== AUTO-PRINT ON PAGE LOAD =====
     document.addEventListener('DOMContentLoaded', function() {
-        // Check if we should auto-print (from URL parameter)
         const urlParams = new URLSearchParams(window.location.search);
         const autoPrint = urlParams.get('auto_print');
         
         if (autoPrint !== 'false') {
-            // Auto-print after 1 second
             setTimeout(function() {
                 printReceipt();
             }, 1000);

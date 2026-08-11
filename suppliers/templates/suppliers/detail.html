@@ -13,19 +13,19 @@
             padding-right: 0 !important;
             max-width: 100% !important;
         }
-        
+
         .row.g-3 {
             --bs-gutter-x: 0 !important;
             --bs-gutter-y: 0 !important;
             margin-right: 0 !important;
             margin-left: 0 !important;
         }
-        
+
         .row.g-3 > [class*="col-"] {
             padding-right: 0 !important;
             padding-left: 0 !important;
         }
-        
+
         .card {
             border-radius: 0 !important;
             border-left: none !important;
@@ -33,128 +33,128 @@
             margin-bottom: 1px !important;
             box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
         }
-        
+
         .card-body {
             padding: 0.75rem 0.875rem !important;
         }
-        
+
         .card-header {
             padding: 0.6rem 0.875rem !important;
         }
-        
+
         .card-header h5, .card-header h6 {
             font-size: 0.85rem !important;
         }
-        
+
         .badge {
             font-size: 0.65rem !important;
             padding: 0.25rem 0.4rem !important;
         }
-        
+
         .btn {
             font-size: 0.8rem !important;
             padding: 0.3rem 0.6rem !important;
         }
-        
+
         .btn-sm {
             font-size: 0.7rem !important;
             padding: 0.2rem 0.4rem !important;
         }
-        
+
         .d-flex.gap-2.justify-content-end {
             flex-direction: column !important;
             gap: 0.5rem !important;
         }
-        
+
         .d-flex.gap-2.justify-content-end .btn {
             width: 100% !important;
         }
-        
+
         .col-md-4.text-md-end {
             text-align: left !important;
             margin-top: 1rem !important;
         }
-        
+
         .rounded-circle {
             width: 40px !important;
             height: 40px !important;
             font-size: 1rem !important;
         }
-        
+
         .table {
             font-size: 0.75rem !important;
         }
-        
+
         .table td, .table th {
             padding: 0.4rem 0.3rem !important;
         }
-        
+
         .display-6 {
             font-size: 1.25rem !important;
         }
-        
+
         .modal-dialog {
             margin: 0.5rem !important;
         }
-        
+
         .modal-body {
             padding: 0.75rem !important;
         }
-        
+
         .form-control, .form-select {
             font-size: 0.85rem !important;
             padding: 0.4rem 0.5rem !important;
         }
-        
+
         .form-label {
             font-size: 0.75rem !important;
             margin-bottom: 0.2rem !important;
         }
-        
+
         .breadcrumb {
             font-size: 0.8rem !important;
             padding: 0.5rem 0 !important;
         }
     }
-    
+
     @media (min-width: 769px) and (max-width: 992px) {
         .container-fluid.px-4 {
             padding-left: 0.5rem !important;
             padding-right: 0.5rem !important;
         }
-        
+
         .row.g-3 {
             --bs-gutter-x: 0.5rem !important;
         }
-        
+
         .row.g-3 > [class*="col-"] {
             padding-right: 0.25rem !important;
             padding-left: 0.25rem !important;
         }
     }
-    
+
     @media (min-width: 993px) {
         .card {
             border-radius: 10px !important;
         }
     }
-    
+
     .card {
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    
+
     .card:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
     }
-    
+
     .supplier-avatar {
         width: 60px;
         height: 60px;
         font-size: 1.5rem;
         flex-shrink: 0;
     }
-    
+
     @media (max-width: 768px) {
         .supplier-avatar {
             width: 40px !important;
@@ -162,49 +162,49 @@
             font-size: 1rem !important;
         }
     }
-    
+
     .stat-value {
         font-weight: 600;
         font-size: 1.1rem;
     }
-    
+
     .stat-label {
         font-size: 0.8rem;
         color: #6c757d;
     }
-    
+
     .info-row {
         display: flex;
         justify-content: space-between;
         padding: 0.4rem 0;
         border-bottom: 1px solid #f0f0f0;
     }
-    
+
     .info-row:last-child {
         border-bottom: none;
     }
-    
+
     .info-label {
         color: #6c757d;
         font-size: 0.85rem;
     }
-    
+
     .info-value {
         font-weight: 500;
         text-align: right;
     }
-    
+
     .table-action-btn {
         padding: 0.15rem 0.3rem;
         font-size: 0.7rem;
     }
-    
+
     .empty-state {
         padding: 2rem;
         text-align: center;
         color: #6c757d;
     }
-    
+
     .empty-state i {
         font-size: 2.5rem;
         margin-bottom: 0.5rem;
@@ -226,6 +226,8 @@
             </nav>
         </div>
         <div class="col-12 col-md-5">
+            <!-- Add this in the actions section -->
+
             <div class="d-flex gap-2 justify-content-start justify-content-md-end flex-wrap mt-2 mt-md-0">
                 <a href="{% url 'suppliers:supplier_edit' supplier.id %}" class="btn btn-primary btn-sm">
                     <i class="fas fa-edit me-1"></i> <span class="d-none d-sm-inline">Edit</span>
@@ -233,6 +235,11 @@
                 <a href="{% url 'suppliers:supplier_list' %}" class="btn btn-outline-secondary btn-sm">
                     <i class="fas fa-arrow-left me-1"></i> <span class="d-none d-sm-inline">Back</span>
                 </a>
+                {% if not supplier.is_approved %}
+                <button type="button" class="btn btn-danger btn-sm" onclick="rejectSupplier('{{ supplier.id }}', '{{ supplier.name }}')">
+                            <i class="fas fa-times me-1"></i> Reject
+                        </button>
+            {% endif %}
             </div>
         </div>
     </div>
@@ -452,8 +459,8 @@
                                         <td>{{ item.min_order_quantity }}</td>
                                         <td>{{ item.lead_time_days }} days</td>
                                         <td class="text-center">
-                                            <button type="button" class="btn btn-sm btn-outline-danger remove-product-btn" 
-                                                    data-id="{{ item.id }}" 
+                                            <button type="button" class="btn btn-sm btn-outline-danger remove-product-btn"
+                                                    data-id="{{ item.id }}"
                                                     data-product="{{ item.product.name }}">
                                                 <i class="fas fa-times"></i>
                                             </button>
@@ -680,14 +687,14 @@ $(document).ready(function() {
     function showToast(message, type = 'success') {
         const container = document.getElementById('toastContainer');
         const template = document.getElementById('toastTemplate');
-        
+
         const toastClone = template.cloneNode(true);
         toastClone.style.display = 'block';
         toastClone.id = 'toast-' + Date.now();
-        
+
         const messageEl = toastClone.querySelector('#toastMessage');
         messageEl.textContent = message;
-        
+
         const toastEl = toastClone.querySelector('.toast');
         toastEl.className = 'toast align-items-center border-0 mb-2';
         if (type === 'success') {
@@ -699,15 +706,15 @@ $(document).ready(function() {
         } else {
             toastEl.classList.add('bg-info', 'text-white');
         }
-        
+
         container.appendChild(toastClone);
-        
+
         const toast = new bootstrap.Toast(toastEl, {
             autohide: true,
             delay: 5000
         });
         toast.show();
-        
+
         toastEl.addEventListener('hidden.bs.toast', function() {
             toastClone.remove();
         });
@@ -718,25 +725,25 @@ $(document).ready(function() {
         const btn = $(this);
         const form = $('#addProductForm');
         const formData = new FormData(form[0]);
-        
+
         // Validate required fields
         const productId = $('#product_id').val();
         const costPrice = $('#cost_price').val();
-        
+
         if (!productId) {
             showToast('Please select a product.', 'warning');
             return;
         }
-        
+
         if (!costPrice || costPrice <= 0) {
             showToast('Please enter a valid cost price.', 'warning');
             return;
         }
-        
+
         // Disable button and show loading
         btn.prop('disabled', true);
         btn.html('<i class="fas fa-spinner fa-spin me-1"></i> Adding...');
-        
+
         $.ajax({
             url: "{% url 'suppliers:supplier_product_add' supplier.id %}",
             method: 'POST',
@@ -776,7 +783,7 @@ $(document).ready(function() {
         const btn = $(this);
         const productId = btn.data('id');
         const productName = btn.data('product');
-        
+
         if (confirm(`Are you sure you want to remove "${productName}" from this supplier?`)) {
             $.ajax({
                 url: `/suppliers/products/${productId}/remove/`,
@@ -813,12 +820,12 @@ $(document).ready(function() {
         const btn = $(this);
         const form = $('#addPaymentForm');
         const formData = new FormData(form[0]);
-        
+
         // Validate
         const amount = $('#payment_amount').val();
         const paymentDate = $('#payment_date').val();
         const method = $('#payment_method').val();
-        
+
         if (!amount || amount <= 0) {
             showToast('Please enter a valid amount.', 'warning');
             return;
@@ -831,10 +838,10 @@ $(document).ready(function() {
             showToast('Please select a payment method.', 'warning');
             return;
         }
-        
+
         btn.prop('disabled', true);
         btn.html('<i class="fas fa-spinner fa-spin me-1"></i> Recording...');
-        
+
         $.ajax({
             url: "{% url 'suppliers:supplier_payment_create' supplier.id %}",
             method: 'POST',
@@ -848,7 +855,7 @@ $(document).ready(function() {
                 if (response.success) {
                     showToast(response.message, 'success');
                     $('#addPaymentModal').modal('hide');
-                    
+
                     if (response.financials) {
                         updateFinancialDisplay(response.financials);
                     }
@@ -872,13 +879,13 @@ $(document).ready(function() {
             }
         });
     });
-    
+
     // ===== UPDATE FINANCIALS =====
     window.updateFinancials = function() {
         const btn = $('#updateFinancialsBtn');
         btn.prop('disabled', true);
         btn.html('<i class="fas fa-spinner fa-spin me-1"></i>');
-        
+
         $.ajax({
             url: "{% url 'suppliers:supplier_update_financials' supplier.id %}",
             method: 'POST',
@@ -902,7 +909,7 @@ $(document).ready(function() {
             }
         });
     };
-    
+
     // ===== UPDATE FINANCIAL DISPLAY =====
     function updateFinancialDisplay(financials) {
         if (financials) {
@@ -910,14 +917,14 @@ $(document).ready(function() {
             $('.total-paid').text('Ugx ' + parseFloat(financials.total_paid).toFixed(2));
             $('.balance-due').text('Ugx ' + parseFloat(financials.balance_due).toFixed(2));
             $('.available-credit').text('Ugx ' + parseFloat(financials.available_credit).toFixed(2));
-            
+
             const balanceDue = $('.balance-due');
             if (parseFloat(financials.balance_due) > 0) {
                 balanceDue.removeClass('text-success').addClass('text-danger');
             } else {
                 balanceDue.removeClass('text-danger').addClass('text-success');
             }
-            
+
             const availCredit = $('.available-credit');
             if (parseFloat(financials.available_credit) <= 0) {
                 availCredit.removeClass('text-success').addClass('text-danger');
@@ -926,6 +933,77 @@ $(document).ready(function() {
             }
         }
     }
+    // ===== REJECT SUPPLIER FROM DETAIL PAGE =====
+function rejectSupplier(supplierId, supplierName) {
+    Swal.fire({
+        title: 'Reject Supplier',
+        html: `
+            <div class="text-start">
+                <p>Are you sure you want to <strong class="text-danger">reject</strong> <strong>"${supplierName}"</strong>?</p>
+                <div class="mt-3 p-3 bg-light rounded">
+                    <p class="mb-1"><i class="fas fa-times-circle text-danger me-2"></i> This supplier will be:</p>
+                    <ul class="mb-0">
+                        <li>❌ Marked as <strong class="text-danger">Rejected</strong></li>
+                        <li>❌ Not eligible for purchase orders</li>
+                        <li>❌ Hidden from supplier lists</li>
+                    </ul>
+                </div>
+                <div class="mt-3">
+                    <label for="rejectReasonDetail" class="form-label fw-bold">Reason for Rejection (Optional)</label>
+                    <textarea id="rejectReasonDetail" class="form-control" rows="2" placeholder="Enter reason for rejection..."></textarea>
+                </div>
+                <p class="text-muted small mt-2"><i class="fas fa-info-circle me-1"></i> This action cannot be undone.</p>
+            </div>
+        `,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: '<i class="fas fa-times me-2"></i> Yes, Reject Supplier',
+        cancelButtonText: '<i class="fas fa-times me-2"></i> Cancel',
+        reverseButtons: true,
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const reason = document.getElementById('rejectReasonDetail')?.value || '';
+
+            fetch(`/suppliers/${supplierId}/reject/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCsrfToken(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ reason: reason }),
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Rejected!',
+                        text: `${supplierName} has been rejected successfully.`,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: data.error || 'Failed to reject supplier'
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: error.message || 'An unexpected error occurred'
+                });
+            });
+        }
+    });
+}
 });
 </script>
 {% endblock %}

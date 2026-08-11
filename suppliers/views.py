@@ -1621,3 +1621,94 @@ def purchase_order_print_view(request, po_id):
         'now': timezone.now()
     }
     return render(request, 'suppliers/purchase_orders/print.html', context)
+
+
+@login_required
+def supplier_reject_view(request, supplier_id):
+    """Reject a supplier - Manager, Admin, Superuser only"""
+    if not user_can_approve_purchase_orders(request.user):
+        return JsonResponse({'success': False, 'error': 'Permission denied'}, status=403)
+
+    tenant = request.user.tenant
+    supplier = get_object_or_404(Supplier, id=supplier_id, tenant=tenant)
+
+    if request.method == 'POST':
+        try:
+            # Parse JSON body if present
+            import json
+            try:
+                data = json.loads(request.body)
+                reason = data.get('reason', '')
+            except:
+                reason = request.POST.get('reason', '')
+
+            # Mark supplier as rejected (set is_approved=False and status to 'inactive')
+            supplier.is_approved = False
+            supplier.is_verified = False
+            supplier.status = 'inactive'
+            supplier.rejected_at = timezone.now()
+            supplier.rejected_by = request.user
+            supplier.rejection_reason = reason
+            supplier.save()
+
+            # ===== SEND REJECTION NOTIFICATION =====
+            from accounts.utils import create_supplier_approval_notification
+            create_supplier_approval_notification(supplier, 'rejected', request.user)
+
+            return JsonResponse({
+                'success': True,
+                'message': f'Supplier "{supplier.name}" rejected successfully'
+            })
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
+
+
+@login_required
+def supplier_bulk_reject_view(request):
+    """Bulk reject suppliers - Only for managers and admins"""
+    if not user_can_approve_purchase_orders(request.user):
+        return JsonResponse({
+            'success': False,
+            'error': 'You do not have permission to reject suppliers.'
+        }, status=403)
+
+    tenant = request.user.tenant
+
+    if request.method == 'POST':
+        try:
+            supplier_ids = request.POST.getlist('supplier_ids[]')
+            if not supplier_ids:
+                return JsonResponse({'success': False, 'error': 'No suppliers selected'}, status=400)
+
+            reason = request.POST.get('reason', '')
+            rejected_count = 0
+
+            for supplier_id in supplier_ids:
+                try:
+                    supplier = Supplier.objects.get(id=supplier_id, tenant=tenant, is_approved=False)
+                    supplier.is_approved = False
+                    supplier.is_verified = False
+                    supplier.status = 'inactive'
+                    supplier.rejected_at = timezone.now()
+                    supplier.rejected_by = request.user
+                    supplier.rejection_reason = reason
+                    supplier.save()
+                    rejected_count += 1
+
+                    # Send notification for each rejected supplier
+                    from accounts.utils import create_supplier_approval_notification
+                    create_supplier_approval_notification(supplier, 'rejected', request.user)
+
+                except Supplier.DoesNotExist:
+                    continue
+
+            return JsonResponse({
+                'success': True,
+                'message': f'{rejected_count} supplier(s) rejected successfully'
+            })
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)

@@ -39,6 +39,8 @@ urlpatterns = [
     path('purchase-orders/approvals/', views.purchase_order_approval_view, name='purchase_order_approvals'),
     path('purchase-orders/bulk-approve/', views.purchase_order_bulk_approve_view, name='purchase_order_bulk_approve'),
 
+    path('<uuid:supplier_id>/reject/', views.supplier_reject_view, name='supplier_reject'),
+    path('bulk-reject/', views.supplier_bulk_reject_view, name='supplier_bulk_reject'),
     # API
     path('api/search-products/', views.search_products_for_supplier_api, name='search_products_api'),
     path('api/search-suppliers/', views.search_suppliers_api, name='search_suppliers_api'),

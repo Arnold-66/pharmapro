@@ -570,6 +570,12 @@
                                                     title="Approve">
                                                 <i class="fas fa-check"></i>
                                             </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger reject-single-btn" 
+                                                    data-supplier-id="{{ supplier.id }}" 
+                                                    data-supplier-name="{{ supplier.name }}"
+                                                    title="Reject">
+                                                <i class="fas fa-times"></i>
+                                            </button>
                                         {% else %}
                                             <button type="button" class="btn btn-sm btn-outline-secondary" disabled title="Already Approved">
                                                 <i class="fas fa-check-circle text-success"></i>
@@ -662,6 +668,9 @@
                 <span class="fw-bold text-muted">Bulk Actions:</span>
                 <button type="button" class="btn btn-success" id="bulkApproveBtn">
                     <i class="fas fa-check-double me-1"></i> Approve Selected
+                </button>
+                <button type="button" class="btn btn-danger" id="bulkRejectBtn">
+                    <i class="fas fa-times-double me-1"></i> Reject Selected
                 </button>
                 <span class="text-muted small" id="selectedCount">0 selected</span>
             </div>
@@ -795,7 +804,131 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Approve single supplier with SweetAlert2
+    // ===== REJECT SINGLE SUPPLIER =====
+    document.querySelectorAll('.reject-single-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const supplierId = this.dataset.supplierId;
+            const supplierName = this.dataset.supplierName;
+            
+            Swal.fire({
+                title: 'Reject Supplier',
+                html: `
+                    <div class="text-start">
+                        <p>Are you sure you want to <strong class="text-danger">reject</strong> <strong>"${supplierName}"</strong>?</p>
+                        <div class="mt-3 p-3 bg-light rounded">
+                            <p class="mb-1"><i class="fas fa-times-circle text-danger me-2"></i> This supplier will be:</p>
+                            <ul class="mb-0">
+                                <li>❌ Marked as <strong class="text-danger">Rejected</strong></li>
+                                <li>❌ Not eligible for purchase orders</li>
+                                <li>❌ Hidden from supplier lists</li>
+                            </ul>
+                        </div>
+                        <div class="mt-3">
+                            <label for="rejectReason_${supplierId}" class="form-label fw-bold">Reason for Rejection (Optional)</label>
+                            <textarea id="rejectReason_${supplierId}" class="form-control" rows="2" placeholder="Enter reason for rejection..."></textarea>
+                        </div>
+                        <p class="text-muted small mt-2"><i class="fas fa-info-circle me-1"></i> This action cannot be undone.</p>
+                    </div>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-times me-2"></i> Yes, Reject Supplier',
+                cancelButtonText: '<i class="fas fa-times me-2"></i> Cancel',
+                reverseButtons: true,
+                background: '#ffffff',
+                backdrop: 'rgba(0,0,0,0.4)',
+                customClass: {
+                    popup: 'rounded-4 shadow-lg',
+                    confirmButton: 'btn btn-danger px-4 py-2',
+                    cancelButton: 'btn btn-secondary px-4 py-2',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const originalHtml = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    this.disabled = true;
+                    
+                    const reason = document.getElementById(`rejectReason_${supplierId}`)?.value || '';
+                    
+                    const csrfToken = getCsrfToken();
+                    
+                    fetch(`/suppliers/${supplierId}/reject/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ reason: reason }),
+                        credentials: 'same-origin'
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(data => {
+                                throw new Error(data.error || 'Failed to reject supplier');
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Rejected!',
+                                text: `${supplierName} has been rejected successfully.`,
+                                timer: 2000,
+                                showConfirmButton: false,
+                                customClass: {
+                                    popup: 'rounded-4'
+                                }
+                            });
+                            
+                            // Remove the row from the table
+                            const row = this.closest('tr');
+                            row.style.transition = 'all 0.3s ease';
+                            row.style.opacity = '0';
+                            setTimeout(() => {
+                                row.remove();
+                                updateStats();
+                            }, 300);
+                            
+                            this.innerHTML = originalHtml;
+                            this.disabled = false;
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: data.error || 'Failed to reject supplier',
+                                confirmButtonColor: '#dc3545',
+                                customClass: {
+                                    popup: 'rounded-4'
+                                }
+                            });
+                            this.innerHTML = originalHtml;
+                            this.disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: error.message || 'An unexpected error occurred',
+                            confirmButtonColor: '#dc3545',
+                            customClass: {
+                                popup: 'rounded-4'
+                            }
+                        });
+                        this.innerHTML = originalHtml;
+                        this.disabled = false;
+                    });
+                }
+            });
+        });
+    });
+    
+    // ===== APPROVE SINGLE SUPPLIER =====
     document.querySelectorAll('.approve-single-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const supplierId = this.dataset.supplierId;
@@ -857,7 +990,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     })
                     .then(data => {
                         if (data.success) {
-                            // Success toast
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Approved!',
@@ -900,29 +1032,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 checkbox.disabled = true;
                             }
                             
-                            // Update stats
-                            const pendingBadge = document.querySelector('.stat-card .text-warning');
-                            const approvedBadge = document.querySelector('.stat-card .text-success');
-                            if (pendingBadge) {
-                                const pendingCount = parseInt(pendingBadge.textContent) - 1;
-                                pendingBadge.textContent = pendingCount;
-                            }
-                            if (approvedBadge) {
-                                const approvedCount = parseInt(approvedBadge.textContent) + 1;
-                                approvedBadge.textContent = approvedCount;
-                            }
-                            
-                            // Update view toggle badges
-                            const pendingToggle = document.querySelector('a[href*="show_approved=false"]');
-                            const approvedToggle = document.querySelector('a[href*="show_approved=true"]');
-                            if (pendingToggle) {
-                                const badge = pendingToggle.querySelector('.badge');
-                                if (badge) badge.textContent = pendingBadge ? pendingBadge.textContent : '0';
-                            }
-                            if (approvedToggle) {
-                                const badge = approvedToggle.querySelector('.badge');
-                                if (badge) badge.textContent = approvedBadge ? approvedBadge.textContent : '0';
-                            }
+                            updateStats();
                             
                             this.innerHTML = originalHtml;
                             this.disabled = false;
@@ -959,7 +1069,169 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Bulk approve with SweetAlert2
+    // ===== UPDATE STATS =====
+    function updateStats() {
+        const rows = document.querySelectorAll('tbody tr:not([style*="opacity: 0"])');
+        const pendingRows = document.querySelectorAll('tbody tr td:nth-child(6) .badge.bg-warning');
+        const approvedRows = document.querySelectorAll('tbody tr td:nth-child(6) .badge.bg-success');
+        
+        const pendingCount = pendingRows.length;
+        const approvedCount = approvedRows.length;
+        const totalCount = rows.length;
+        
+        const pendingBadge = document.querySelector('.stat-card .text-warning');
+        const approvedBadge = document.querySelector('.stat-card .text-success');
+        const totalBadge = document.querySelector('.stat-card .text-primary');
+        
+        if (pendingBadge) pendingBadge.textContent = pendingCount;
+        if (approvedBadge) approvedBadge.textContent = approvedCount;
+        if (totalBadge) totalBadge.textContent = totalCount;
+        
+        // Update view toggle badges
+        const pendingToggle = document.querySelector('a[href*="show_approved=false"]');
+        const approvedToggle = document.querySelector('a[href*="show_approved=true"]');
+        if (pendingToggle) {
+            const badge = pendingToggle.querySelector('.badge');
+            if (badge) badge.textContent = pendingCount;
+        }
+        if (approvedToggle) {
+            const badge = approvedToggle.querySelector('.badge');
+            if (badge) badge.textContent = approvedCount;
+        }
+    }
+    
+    // ===== BULK REJECT =====
+    const bulkRejectBtn = document.getElementById('bulkRejectBtn');
+    if (bulkRejectBtn) {
+        bulkRejectBtn.addEventListener('click', function() {
+            const selected = document.querySelectorAll('.supplier-checkbox:checked:not([disabled])');
+            if (selected.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No Selection',
+                    text: 'Please select at least one supplier to reject.',
+                    confirmButtonColor: '#f59e0b',
+                    customClass: {
+                        popup: 'rounded-4'
+                    }
+                });
+                return;
+            }
+            
+            const supplierNames = Array.from(selected).map(cb => {
+                const row = cb.closest('tr');
+                const nameCell = row.querySelector('.fw-semibold');
+                return nameCell ? nameCell.textContent : 'Unknown';
+            });
+            
+            Swal.fire({
+                title: `Reject ${selected.length} Supplier${selected.length > 1 ? 's' : ''}?`,
+                html: `
+                    <div class="text-start">
+                        <p>Are you sure you want to <strong class="text-danger">reject</strong> <strong>${selected.length}</strong> supplier${selected.length > 1 ? 's' : ''}?</p>
+                        <div class="mt-3 p-3 bg-light rounded">
+                            <p class="mb-2"><i class="fas fa-list me-2"></i> Selected suppliers:</p>
+                            <ul class="mb-0">
+                                ${supplierNames.map(name => `<li>❌ ${name}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="mt-3">
+                            <label for="bulkRejectReason" class="form-label fw-bold">Reason for Rejection (Optional)</label>
+                            <textarea id="bulkRejectReason" class="form-control" rows="2" placeholder="Enter reason for rejection..."></textarea>
+                        </div>
+                        <p class="text-muted small mt-2"><i class="fas fa-info-circle me-1"></i> This action cannot be undone.</p>
+                    </div>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: `<i class="fas fa-times me-2"></i> Reject ${selected.length} Supplier${selected.length > 1 ? 's' : ''}`,
+                cancelButtonText: '<i class="fas fa-times me-2"></i> Cancel',
+                reverseButtons: true,
+                background: '#ffffff',
+                backdrop: 'rgba(0,0,0,0.4)',
+                customClass: {
+                    popup: 'rounded-4 shadow-lg',
+                    confirmButton: 'btn btn-danger px-4 py-2',
+                    cancelButton: 'btn btn-secondary px-4 py-2',
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const supplierIds = Array.from(selected).map(cb => cb.value);
+                    const reason = document.getElementById('bulkRejectReason')?.value || '';
+                    
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Rejecting...';
+                    this.disabled = true;
+                    
+                    const csrfToken = getCsrfToken();
+                    const formData = new FormData();
+                    supplierIds.forEach(id => formData.append('supplier_ids[]', id));
+                    formData.append('reason', reason);
+                    
+                    fetch('/suppliers/bulk-reject/', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken
+                        },
+                        body: formData,
+                        credentials: 'same-origin'
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(data => {
+                                throw new Error(data.error || 'Failed to reject suppliers');
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: `${data.message || 'Suppliers Rejected!'}`,
+                                text: `${selected.length} supplier${selected.length > 1 ? 's have' : ' has'} been rejected successfully.`,
+                                timer: 2000,
+                                showConfirmButton: false,
+                                customClass: {
+                                    popup: 'rounded-4'
+                                }
+                            });
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: data.error || 'Failed to reject suppliers',
+                                confirmButtonColor: '#dc3545',
+                                customClass: {
+                                    popup: 'rounded-4'
+                                }
+                            });
+                            this.innerHTML = '<i class="fas fa-times-double me-1"></i> Reject Selected';
+                            this.disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: error.message || 'An unexpected error occurred',
+                            confirmButtonColor: '#dc3545',
+                            customClass: {
+                                popup: 'rounded-4'
+                            }
+                        });
+                        this.innerHTML = '<i class="fas fa-times-double me-1"></i> Reject Selected';
+                        this.disabled = false;
+                    });
+                }
+            });
+        });
+    }
+    
+    // ===== BULK APPROVE =====
     const bulkApproveBtn = document.getElementById('bulkApproveBtn');
     if (bulkApproveBtn) {
         bulkApproveBtn.addEventListener('click', function() {
