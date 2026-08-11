@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ po.po_number }} - {{ company_name }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .header img {
+            max-height: 80px;
+            margin-bottom: 10px;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin: 5px 0;
+            color: #2c3e50;
+        }
+        .header p {
+            margin: 3px 0;
+            color: #666;
+        }
+        .title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #2c3e50;
+        }
+        .po-info {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .po-info table {
+            width: 100%;
+        }
+        .po-info td {
+            padding: 5px 10px;
+        }
+        .po-info .label {
+            font-weight: bold;
+            color: #555;
+            width: 150px;
+        }
+        table.items {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table.items th {
+            background: #2c3e50;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+        table.items td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        table.items .text-center {
+            text-align: center;
+        }
+        table.items .text-end {
+            text-align: right;
+        }
+        table.items tfoot td {
+            font-weight: bold;
+            border-top: 2px solid #333;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            font-size: 11px;
+            color: #888;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+        }
+        .status-badge.draft { background: #6c757d; }
+        .status-badge.pending { background: #ffc107; color: #212529; }
+        .status-badge.approved { background: #17a2b8; }
+        .status-badge.ordered { background: #007bff; }
+        .status-badge.received { background: #28a745; }
+        .status-badge.cancelled { background: #dc3545; }
+        
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -10px;
+        }
+        .col-6 {
+            flex: 0 0 50%;
+            max-width: 50%;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+        .mb-3 {
+            margin-bottom: 15px;
+        }
+        .fw-bold {
+            font-weight: bold;
+        }
+        .text-muted {
+            color: #6c757d;
+        }
+        
+        @media print {
+            .no-print { display: none; }
+            body { margin: 0; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with Company Logo -->
+    <div class="header">
+        {% if tenant_logo %}
+            <img src="{{ tenant_logo }}" alt="{{ company_name }}">
+        {% endif %}
+        <h1>{{ company_name }}</h1>
+        <p>{{ company_address }}</p>
+        <p>Tel: {{ company_phone }} | Email: {{ company_email }}</p>
+    </div>
+
+    <!-- Title -->
+    <div class="title">PURCHASE ORDER</div>
+
+    <!-- PO Information -->
+    <div class="po-info">
+        <table>
+            <tr>
+                <td class="label">PO Number:</td>
+                <td><strong>{{ po.po_number }}</strong></td>
+                <td class="label">Status:</td>
+                <td>
+                    <span class="status-badge {{ po.status }}">
+                        {{ po.get_status_display }}
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="label">Date Created:</td>
+                <td>{{ po.created_at|date:"Y-m-d H:i" }}</td>
+                <td class="label">Expected Delivery:</td>
+                <td>{{ po.expected_delivery_date|date:"Y-m-d" }}</td>
+            </tr>
+            <tr>
+                <td class="label">Supplier:</td>
+                <td colspan="3">
+                    <strong>{{ po.supplier.name }}</strong><br>
+                    {{ po.supplier.contact_person }}<br>
+                    {{ po.supplier.phone }}<br>
+                    {{ po.supplier.email }}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Items Table -->
+    <table class="items">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Product</th>
+                <th class="text-center">Quantity</th>
+                <th class="text-end">Unit Price</th>
+                <th class="text-end">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ item.product.name }}</td>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td class="text-end">Ugx {{ item.unit_price|floatformat:2 }}</td>
+                <td class="text-end">Ugx {{ item.total_price|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">No items</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4" class="text-end">Subtotal:</td>
+                <td class="text-end">Ugx {{ po.subtotal|floatformat:2 }}</td>
+            </tr>
+            <tr>
+                <td colspan="4" class="text-end">Tax:</td>
+                <td class="text-end">Ugx {{ po.tax_amount|floatformat:2 }}</td>
+            </tr>
+            <tr>
+                <td colspan="4" class="text-end">Shipping:</td>
+                <td class="text-end">Ugx {{ po.shipping_cost|floatformat:2 }}</td>
+            </tr>
+            <tr>
+                <td colspan="4" class="text-end fw-bold">TOTAL:</td>
+                <td class="text-end fw-bold">Ugx {{ po.total_amount|floatformat:2 }}</td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <!-- Notes -->
+    {% if po.notes %}
+    <div class="mb-3">
+        <strong>Notes:</strong>
+        <p>{{ po.notes }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>Generated on: {% now "Y-m-d H:i:s" %}</p>
+        <p>This is a system-generated document. For inquiries, please contact the procurement department.</p>
+        <p>&copy; {% now "Y" %} {{ company_name }}. All rights reserved.</p>
+    </div>
+
+    <!-- Print Button -->
+    <div style="text-align: center; margin-top: 20px;" class="no-print">
+        <button onclick="window.print()" class="btn btn-primary">
+            <i class="fas fa-print"></i> Print
+        </button>
+        <button onclick="window.close()" class="btn btn-secondary">
+            <i class="fas fa-times"></i> Close
+        </button>
+    </div>
+
+    <script>
+        // Auto-print when page loads
+        window.onload = function() {
+            // Uncomment below to auto-print
+            // window.print();
+        };
+    </script>
+</body>
+</html>

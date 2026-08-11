@@ -15,19 +15,19 @@
             padding-top: 0.5rem !important;
             padding-bottom: 0.5rem !important;
         }
-        
+
         .row {
             --bs-gutter-x: 0 !important;
             --bs-gutter-y: 0 !important;
             margin-right: 0 !important;
             margin-left: 0 !important;
         }
-        
+
         .row > [class*="col-"] {
             padding-right: 0 !important;
             padding-left: 0 !important;
         }
-        
+
         .card {
             border-radius: 0 !important;
             border-left: none !important;
@@ -35,27 +35,27 @@
             margin-bottom: 1px !important;
             box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
         }
-        
+
         .card-body {
             padding: 0.75rem 0.875rem !important;
         }
-        
+
         .card-header {
             padding: 0.6rem 0.875rem !important;
             flex-wrap: wrap !important;
             gap: 0.5rem !important;
         }
-        
+
         .card-header h1, .card-header h2 {
             font-size: 0.95rem !important;
         }
-        
+
         .card-header .btn {
             font-size: 0.7rem !important;
             padding: 0.2rem 0.5rem !important;
             width: auto !important;
         }
-        
+
         /* ===== STATS CARDS GRID - 3 PER ROW ON MOBILE ===== */
         .stats-row {
             display: grid !important;
@@ -63,82 +63,48 @@
             gap: 0.4rem !important;
             padding: 0 0.3rem !important;
         }
-        
+
         .stats-row .col-md-2 {
             flex: 0 0 100% !important;
             max-width: 100% !important;
             padding: 0 !important;
         }
-        
+
         .stats-row .stat-card {
             border-radius: 8px !important;
             margin-bottom: 0 !important;
         }
-        
+
         .stats-row .stat-card .card-body {
             padding: 0.35rem 0.2rem !important;
         }
-        
+
         .stats-row .stat-card h3 {
             font-size: 0.85rem !important;
         }
-        
+
         .stats-row .stat-card h6 {
             font-size: 0.45rem !important;
             margin-bottom: 0.1rem !important;
         }
-        
-        .table {
-            font-size: 0.7rem !important;
+
+        /* ===== QUICK FILTERS ===== */
+        .quick-filters {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 4px !important;
+            justify-content: center !important;
+            padding: 0 0.875rem !important;
         }
-        
-        .table th, .table td {
-            padding: 0.3rem 0.2rem !important;
+
+        .quick-filters .btn {
+            flex: 1 1 auto !important;
+            min-width: 50px !important;
+            max-width: 70px !important;
+            font-size: 0.65rem !important;
+            padding: 0.2rem 0.3rem !important;
         }
-        
-        .form-control, .form-select {
-            font-size: 0.8rem !important;
-            padding: 0.3rem 0.4rem !important;
-        }
-        
-        .btn {
-            font-size: 0.75rem !important;
-            padding: 0.25rem 0.5rem !important;
-        }
-        
-        .btn-group .btn {
-            font-size: 0.6rem !important;
-            padding: 0.15rem 0.3rem !important;
-        }
-        
-        .badge {
-            font-size: 0.55rem !important;
-        }
-        
-        .d-flex.gap-2 .btn {
-            width: auto !important;
-        }
-        
-        .pagination {
-            font-size: 0.7rem !important;
-        }
-        
-        /* ===== HEADER TEXT IMPROVEMENTS ===== */
-        .page-header h1 {
-            font-size: 1.1rem !important;
-            word-break: break-word !important;
-        }
-        
-        .page-header p {
-            font-size: 0.75rem !important;
-            margin-bottom: 0 !important;
-        }
-        
-        .page-header .btn {
-            font-size: 0.7rem !important;
-            padding: 0.25rem 0.6rem !important;
-        }
-        
+
         /* ===== FILTERS ON MOBILE ===== */
         .filters-row .col-md-3,
         .filters-row .col-md-2,
@@ -147,60 +113,154 @@
             max-width: 100% !important;
             padding: 0.2rem 0 !important;
         }
-        
+
         .filters-row .input-group {
             width: 100% !important;
         }
+
+        .filter-section {
+            padding: 0.5rem 0.875rem !important;
+        }
+
+        .filter-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 8px !important;
+        }
+
+        .filter-grid .form-group {
+            margin-bottom: 0 !important;
+        }
+
+        .filter-actions {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 8px !important;
+            padding: 0.875rem !important;
+        }
+
+        /* ===== TABLE ===== */
+        .table {
+            font-size: 0.7rem !important;
+        }
+
+        .table th, .table td {
+            padding: 0.3rem 0.2rem !important;
+        }
+
+        .table-responsive .btn-group .btn {
+            font-size: 0.55rem !important;
+            padding: 0.1rem 0.25rem !important;
+        }
+
+        .form-control, .form-select {
+            font-size: 0.8rem !important;
+            padding: 0.3rem 0.4rem !important;
+        }
+
+        .btn {
+            font-size: 0.75rem !important;
+            padding: 0.25rem 0.5rem !important;
+        }
+
+        .badge {
+            font-size: 0.55rem !important;
+        }
+
+        .d-flex.gap-2 .btn {
+            width: auto !important;
+        }
+
+        .pagination {
+            font-size: 0.7rem !important;
+        }
+
+        /* ===== HEADER TEXT IMPROVEMENTS ===== */
+        .page-header {
+            padding: 0 0.875rem !important;
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+            align-items: stretch !important;
+        }
+
+        .page-header h1 {
+            font-size: 1.1rem !important;
+            word-break: break-word !important;
+        }
+
+        .page-header p {
+            font-size: 0.75rem !important;
+            margin-bottom: 0 !important;
+        }
+
+        .page-header .btn {
+            width: 100% !important;
+            font-size: 0.7rem !important;
+            padding: 0.25rem 0.6rem !important;
+        }
     }
-    
+
     @media (max-width: 400px) {
         .stats-row {
             grid-template-columns: 1fr 1fr 1fr !important;
             gap: 0.3rem !important;
         }
-        
+
         .stats-row .stat-card h3 {
             font-size: 0.75rem !important;
         }
-        
+
         .stats-row .stat-card h6 {
             font-size: 0.4rem !important;
         }
+
+        .quick-filters .btn {
+            min-width: 40px !important;
+            max-width: 60px !important;
+            font-size: 0.55rem !important;
+            padding: 0.15rem 0.2rem !important;
+        }
     }
-    
+
     @media (min-width: 769px) and (max-width: 992px) {
         .container-fluid.py-4 {
             padding-left: 0.5rem !important;
             padding-right: 0.5rem !important;
         }
-        
+
         .col-md-2 {
             flex: 0 0 33.333% !important;
             max-width: 33.333% !important;
         }
+
+        .filter-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr 1fr !important;
+            gap: 10px !important;
+        }
     }
-    
+
     @media (min-width: 993px) {
         .card {
             border-radius: 12px !important;
         }
     }
-    
+
     .card {
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         box-shadow: 0 2px 12px rgba(0,0,0,0.08);
     }
-    
+
     .card:hover {
         transform: translateY(-2px);
         box-shadow: 0 5px 20px rgba(0,0,0,0.1) !important;
     }
-    
+
     .card-header {
         background: transparent !important;
         border-bottom: 2px solid #f0f0f0 !important;
     }
-    
+
     .stat-card {
         transition: all 0.3s ease;
         border-radius: 12px !important;
@@ -212,36 +272,52 @@
     .stat-card .card-body {
         border-radius: 12px !important;
     }
-    
+
     .form-control:focus, .form-select:focus {
         border-color: var(--secondary-color, #3498db) !important;
         box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25) !important;
     }
-    
+
     .btn {
         border-radius: 8px;
         font-weight: 500;
     }
-    
+
     .btn-group .btn {
         border-radius: 6px !important;
         margin: 0 2px !important;
     }
-    
+
     .table thead {
         background-color: #f8f9fa;
     }
-    
+
     .pagination .page-link {
         border-radius: 6px !important;
         margin: 0 2px !important;
         border: none !important;
     }
-    
+
     .pagination .page-item.active .page-link {
         background-color: var(--secondary-color, #3498db) !important;
     }
-    
+
+    /* Quick filter buttons styling */
+    .quick-filters .btn {
+        transition: all 0.2s ease;
+    }
+
+    .quick-filters .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .quick-filters .btn.active-filter {
+        border-color: #0d6efd;
+        background-color: #0d6efd;
+        color: white;
+    }
+
     /* Toast Custom Styles */
     .toast-custom {
         border-radius: 12px !important;
@@ -250,32 +326,55 @@
         max-width: 400px !important;
         border: none !important;
     }
-    
+
     .toast-custom .toast-body {
         padding: 1rem 1.2rem !important;
         font-weight: 500 !important;
     }
-    
+
     .toast-custom .btn-close {
         filter: brightness(0) invert(1);
         opacity: 0.8;
     }
-    
+
     .modal-content {
         border-radius: 16px !important;
         border: none !important;
     }
-    
+
     .modal-header {
         padding: 1.2rem 1.5rem !important;
     }
-    
+
     .modal-body {
         padding: 1.5rem !important;
     }
-    
+
     .modal-footer {
         padding: 1rem 1.5rem !important;
+    }
+
+    /* Print Styles */
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+        .print-only {
+            display: block !important;
+        }
+        .card {
+            box-shadow: none !important;
+            border: 1px solid #ddd !important;
+        }
+        .table {
+            font-size: 10px !important;
+        }
+        .badge {
+            font-size: 8px !important;
+        }
+        .page-header {
+            padding: 0 !important;
+        }
     }
 </style>
 {% endblock %}
@@ -283,17 +382,18 @@
 {% block content %}
 <div class="container-fluid py-4">
     <!-- ===== HEADER WITH IMPROVED TEXT ===== -->
-    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4" style="padding: 0 0.5rem;">
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h2 mb-0 fw-bold">
                 <i class="fas fa-shopping-cart text-primary me-2"></i>Purchase Orders
             </h1>
             <p class="text-muted mb-0 mt-1">Manage your organization's purchase orders</p>
         </div>
-        <div class="mt-2 mt-sm-0 d-flex flex-wrap gap-2">
+        <div class="mt-2 mt-sm-0 d-flex flex-wrap gap-2 no-print">
             <a href="{% url 'suppliers:purchase_order_create' %}" class="btn btn-primary">
                 <i class="fas fa-plus me-1"></i> Create PO
             </a>
+           
             {% if user.is_superuser or user.role == 'admin' or user.role == 'manager' %}
                 <a href="{% url 'suppliers:purchase_order_approvals' %}" class="btn btn-warning">
                     <i class="fas fa-check-double me-1"></i> Approvals
@@ -305,8 +405,30 @@
         </div>
     </div>
 
+    <!-- ===== QUICK FILTER BUTTONS - Day/Month/Year ===== -->
+    <div class="quick-filters mb-3 no-print">
+        <button type="button" class="btn btn-outline-primary btn-sm" data-filter="today">
+            <i class="fas fa-calendar-day"></i> Today
+        </button>
+        <button type="button" class="btn btn-outline-primary btn-sm" data-filter="week">
+            <i class="fas fa-calendar-week"></i> Week
+        </button>
+        <button type="button" class="btn btn-outline-primary btn-sm" data-filter="month">
+            <i class="fas fa-calendar-alt"></i> Month
+        </button>
+        <button type="button" class="btn btn-outline-primary btn-sm" data-filter="quarter">
+            <i class="fas fa-calendar-alt"></i> Quarter
+        </button>
+        <button type="button" class="btn btn-outline-primary btn-sm" data-filter="year">
+            <i class="fas fa-calendar-year"></i> Year
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-filter="custom">
+            <i class="fas fa-sliders-h"></i> Custom
+        </button>
+    </div>
+
     <!-- ===== STATS CARDS - GRID ON MOBILE ===== -->
-    <div class="row stats-row mb-4">
+    <div class="row stats-row mb-4 no-print">
         <div class="col-md-2 col-sm-6 mb-3">
             <div class="card stat-card">
                 <div class="card-body text-center">
@@ -358,56 +480,81 @@
     </div>
 
     <!-- Filters -->
-    <div class="card mb-4">
+    <div class="card mb-4 no-print">
         <div class="card-body">
-            <form method="get" class="row g-3 filters-row">
-                <div class="col-md-3">
-                    <div class="input-group">
-                        <input type="text" name="search" class="form-control" placeholder="Search PO # or Supplier..." value="{{ search_query }}">
-                        <button class="btn btn-outline-secondary" type="submit">
-                            <i class="fas fa-search"></i>
-                        </button>
+            <form method="get" class="row g-3 filters-row" id="filterForm">
+                <div class="filter-section">
+                    <div class="filter-grid">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" name="search" class="form-control" placeholder="Search PO # or Supplier..." value="{{ search_query }}" id="searchInput">
+                                <button class="btn btn-outline-secondary" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <select name="status" class="form-select" id="statusFilter">
+                                <option value="">All Status</option>
+                                <option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>Draft</option>
+                                <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
+                                <option value="ordered" {% if status_filter == 'ordered' %}selected{% endif %}>Ordered</option>
+                                <option value="received" {% if status_filter == 'received' %}selected{% endif %}>Received</option>
+                                <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <select name="supplier" class="form-select" id="supplierFilter">
+                                <option value="">All Suppliers</option>
+                                {% for supplier in suppliers %}
+                                    <option value="{{ supplier.id }}" {% if supplier_filter == supplier.id|stringformat:"s" %}selected{% endif %}>
+                                        {{ supplier.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="date" name="date_from" class="form-control" placeholder="Date From" value="{{ date_from }}" id="dateFrom">
+                        </div>
+                        <div class="form-group">
+                            <input type="date" name="date_to" class="form-control" placeholder="Date To" value="{{ date_to }}" id="dateTo">
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-2">
-                    <select name="status" class="form-select">
-                        <option value="">All Status</option>
-                        <option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>Draft</option>
-                        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
-                        <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
-                        <option value="ordered" {% if status_filter == 'ordered' %}selected{% endif %}>Ordered</option>
-                        <option value="received" {% if status_filter == 'received' %}selected{% endif %}>Received</option>
-                        <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <select name="supplier" class="form-select">
-                        <option value="">All Suppliers</option>
-                        {% for supplier in suppliers %}
-                            <option value="{{ supplier.id }}" {% if supplier_filter == supplier.id|stringformat:"s" %}selected{% endif %}>
-                                {{ supplier.name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <input type="date" name="date_from" class="form-control" placeholder="Date From" value="{{ date_from }}">
-                </div>
-                <div class="col-md-2">
-                    <input type="date" name="date_to" class="form-control" placeholder="Date To" value="{{ date_to }}">
-                </div>
-                <div class="col-md-1">
-                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter me-1"></i> Filter
+                    </button>
+                    <a href="{% url 'suppliers:purchase_order_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-undo me-1"></i> Reset
+                    </a>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Table -->
-    <div class="card">
+    <div class="card" id="printableContent">
         <div class="card-body p-0">
+            <!-- Print Header - Only visible when printing -->
+            <div class="print-header text-center py-3" style="display: none; border-bottom: 2px solid #333; margin-bottom: 15px;">
+                {% if tenant.logo %}
+                    <img src="{{ tenant.logo.url }}" alt="{{ tenant.name }}" style="max-height: 80px; margin-bottom: 10px;">
+                {% endif %}
+                <h2 class="mb-0">{{ tenant.company_name|default:tenant.name }}</h2>
+                <p class="mb-0">{{ tenant.company_address|default:'' }}</p>
+                <p class="mb-0">Tel: {{ tenant.company_phone|default:'' }} | Email: {{ tenant.company_email|default:'' }}</p>
+                <hr>
+                <h3>Purchase Orders Report</h3>
+                <p>Generated: {% now "Y-m-d H:i:s" %}</p>
+                {% if date_from or date_to %}
+                    <p>Period: {{ date_from|default:"Start" }} to {{ date_to|default:"End" }}</p>
+                {% endif %}
+            </div>
+
             <div class="table-responsive">
-                <table class="table table-hover mb-0">
+                <table class="table table-hover mb-0" id="poTable">
                     <thead class="bg-light">
                         <tr>
                             <th>PO #</th>
@@ -416,19 +563,23 @@
                             <th>Expected Delivery</th>
                             <th>Total</th>
                             <th>Status</th>
-                            <th>Actions</th>
+                            <th class="no-print">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for po in purchase_orders %}
                             <tr>
-                                <td><a href="{% url 'suppliers:purchase_order_detail' po.id %}" class="fw-semibold">{{ po.po_number }}</a></td>
+                                <td>
+                                    <a href="{% url 'suppliers:purchase_order_detail' po.id %}" class="fw-semibold">{{ po.po_number }}</a>
+                                    <!-- Individual Print Icon -->
+                                   
+                                </td>
                                 <td>{{ po.supplier.name }}</td>
                                 <td>{{ po.order_date|date:"Y-m-d" }}</td>
                                 <td>{{ po.expected_delivery_date|date:"Y-m-d" }}</td>
                                 <td>Ugx {{ po.total_amount|floatformat:2 }}</td>
                                 <td>
-                                    <span class="badge 
+                                    <span class="badge
                                         {% if po.status == 'received' %}bg-success
                                         {% elif po.status == 'approved' %}bg-info
                                         {% elif po.status == 'ordered' %}bg-primary
@@ -438,51 +589,41 @@
                                         {{ po.get_status_display }}
                                     </span>
                                 </td>
-                                <td>
+                                <td class="no-print">
                                     <div class="btn-group" role="group">
-                                        <!-- View Details - Always visible -->
-                                        <a href="{% url 'suppliers:purchase_order_detail' po.id %}" class="btn btn-sm btn-outline-info" title="View Details">
-                                            <i class="fas fa-eye"></i>
+                                        <a href="{% url 'suppliers:purchase_order_print' po.id %}" target="_blank" class="btn btn-sm btn-outline-info ms-1 no-print" title="Print this PO">
+                                            <i class="fas fa-print"></i>
                                         </a>
-                                        
-                                        <!-- Edit - Only for Draft or Pending -->
                                         {% if po.status == 'draft' or po.status == 'pending' %}
                                             <a href="{% url 'suppliers:purchase_order_edit' po.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                         {% endif %}
-                                        
-                                        <!-- Approve - Only for Pending AND user has permission -->
                                         {% if po.status == 'pending' %}
                                             {% if user.is_superuser or user.role == 'admin' or user.role == 'manager' %}
                                                 <button type="button" class="btn btn-sm btn-outline-success" onclick="showConfirmModal('approve', '{{ po.id }}', '{{ po.po_number }}')" title="Approve">
                                                     <i class="fas fa-check"></i>
                                                 </button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="showConfirmModal('reject', '{{ po.id }}', '{{ po.po_number }}')" title="Reject">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
                                             {% endif %}
                                         {% endif %}
-                                        
-                                        <!-- Submit for Approval - Only for Draft -->
                                         {% if po.status == 'draft' %}
                                             <button type="button" class="btn btn-sm btn-outline-warning" onclick="showConfirmModal('submit', '{{ po.id }}', '{{ po.po_number }}')" title="Submit for Approval">
                                                 <i class="fas fa-paper-plane"></i>
                                             </button>
                                         {% endif %}
-                                        
-                                        <!-- Mark as Ordered - Only for Approved -->
                                         {% if po.status == 'approved' %}
                                             <button type="button" class="btn btn-sm btn-outline-primary" onclick="showConfirmModal('order', '{{ po.id }}', '{{ po.po_number }}')" title="Mark as Ordered">
                                                 <i class="fas fa-truck"></i>
                                             </button>
                                         {% endif %}
-                                        
-                                        <!-- Mark as Received - Only for Ordered -->
                                         {% if po.status == 'ordered' %}
                                             <button type="button" class="btn btn-sm btn-outline-success" onclick="showConfirmModal('receive', '{{ po.id }}', '{{ po.po_number }}')" title="Mark as Received">
                                                 <i class="fas fa-boxes"></i>
                                             </button>
                                         {% endif %}
-                                        
-                                        <!-- Delete - Only for Draft or Pending -->
                                         {% if po.status == 'draft' or po.status == 'pending' %}
                                             <button type="button" class="btn btn-sm btn-outline-danger" onclick="showConfirmModal('delete', '{{ po.id }}', '{{ po.po_number }}')" title="Delete">
                                                 <i class="fas fa-trash"></i>
@@ -510,7 +651,7 @@
             </div>
         </div>
         {% if purchase_orders.has_other_pages %}
-            <div class="card-footer">
+            <div class="card-footer no-print">
                 <nav>
                     <ul class="pagination justify-content-end mb-0">
                         {% if purchase_orders.has_previous %}
@@ -547,7 +688,7 @@
             </div>
             <div class="modal-body text-center py-4">
                 <div class="mb-3">
-                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center" 
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center"
                          style="width: 80px; height: 80px; background: rgba(255, 193, 7, 0.1);">
                         <i class="fas fa-exclamation-triangle text-warning fa-3x"></i>
                     </div>
@@ -571,10 +712,261 @@
 <div style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterForm = document.getElementById('filterForm');
+    const dateFrom = document.getElementById('dateFrom');
+    const dateTo = document.getElementById('dateTo');
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const supplierFilter = document.getElementById('supplierFilter');
+    const quickFilterBtns = document.querySelectorAll('.quick-filters .btn');
+
+    // Function to set date range
+    function setDateRange(startDate, endDate) {
+        if (startDate) {
+            const year = startDate.getFullYear();
+            const month = String(startDate.getMonth() + 1).padStart(2, '0');
+            const day = String(startDate.getDate()).padStart(2, '0');
+            dateFrom.value = `${year}-${month}-${day}`;
+        }
+
+        if (endDate) {
+            const year = endDate.getFullYear();
+            const month = String(endDate.getMonth() + 1).padStart(2, '0');
+            const day = String(endDate.getDate()).padStart(2, '0');
+            dateTo.value = `${year}-${month}-${day}`;
+        }
+    }
+
+    // Quick filter button click handlers
+    quickFilterBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const filter = this.dataset.filter;
+            const today = new Date();
+            let startDate = null;
+            let endDate = new Date(today);
+
+            // Remove active class from all buttons
+            quickFilterBtns.forEach(b => b.classList.remove('active-filter'));
+            this.classList.add('active-filter');
+
+            switch(filter) {
+                case 'today':
+                    startDate = new Date(today);
+                    startDate.setHours(0, 0, 0, 0);
+                    endDate = new Date(today);
+                    endDate.setHours(23, 59, 59, 999);
+                    break;
+
+                case 'week':
+                    startDate = new Date(today);
+                    startDate.setDate(today.getDate() - today.getDay());
+                    startDate.setHours(0, 0, 0, 0);
+                    endDate = new Date(today);
+                    endDate.setDate(today.getDate() + (6 - today.getDay()));
+                    endDate.setHours(23, 59, 59, 999);
+                    break;
+
+                case 'month':
+                    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                    startDate.setHours(0, 0, 0, 0);
+                    endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                    endDate.setHours(23, 59, 59, 999);
+                    break;
+
+                case 'quarter':
+                    const quarter = Math.floor(today.getMonth() / 3);
+                    startDate = new Date(today.getFullYear(), quarter * 3, 1);
+                    startDate.setHours(0, 0, 0, 0);
+                    endDate = new Date(today.getFullYear(), (quarter + 1) * 3, 0);
+                    endDate.setHours(23, 59, 59, 999);
+                    break;
+
+                case 'year':
+                    startDate = new Date(today.getFullYear(), 0, 1);
+                    startDate.setHours(0, 0, 0, 0);
+                    endDate = new Date(today.getFullYear(), 11, 31);
+                    endDate.setHours(23, 59, 59, 999);
+                    break;
+
+                case 'custom':
+                    dateFrom.focus();
+                    return;
+            }
+
+            if (startDate && endDate) {
+                setDateRange(startDate, endDate);
+                filterForm.submit();
+            }
+        });
+    });
+
+    // Auto-submit on select changes
+    statusFilter.addEventListener('change', function() {
+        quickFilterBtns.forEach(b => b.classList.remove('active-filter'));
+        filterForm.submit();
+    });
+
+    supplierFilter.addEventListener('change', function() {
+        quickFilterBtns.forEach(b => b.classList.remove('active-filter'));
+        filterForm.submit();
+    });
+
+    // Auto-submit on search with debounce
+    let searchTimeout;
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            quickFilterBtns.forEach(b => b.classList.remove('active-filter'));
+            filterForm.submit();
+        }, 500);
+    });
+
+    // Auto-submit on date changes
+    document.querySelectorAll('input[type="date"]').forEach(el => {
+        el.addEventListener('change', function() {
+            quickFilterBtns.forEach(b => b.classList.remove('active-filter'));
+            filterForm.submit();
+        });
+    });
+
+    // Highlight active quick filter based on current date range
+    function checkActiveQuickFilter() {
+        const currentFrom = dateFrom.value;
+        const currentTo = dateTo.value;
+
+        if (!currentFrom || !currentTo) return;
+
+        const fromDate = new Date(currentFrom);
+        const toDate = new Date(currentTo);
+        const today = new Date();
+
+        quickFilterBtns.forEach(btn => {
+            const filter = btn.dataset.filter;
+            let matches = false;
+
+            switch(filter) {
+                case 'today':
+                    const todayStr = today.toDateString();
+                    matches = fromDate.toDateString() === todayStr && toDate.toDateString() === todayStr;
+                    break;
+
+                case 'week':
+                    const weekStart = new Date(today);
+                    weekStart.setDate(today.getDate() - today.getDay());
+                    weekStart.setHours(0, 0, 0, 0);
+                    const weekEnd = new Date(today);
+                    weekEnd.setDate(today.getDate() + (6 - today.getDay()));
+                    weekEnd.setHours(23, 59, 59, 999);
+                    matches = fromDate.toDateString() === weekStart.toDateString() &&
+                             toDate.toDateString() === weekEnd.toDateString();
+                    break;
+
+                case 'month':
+                    matches = fromDate.getMonth() === today.getMonth() &&
+                             fromDate.getFullYear() === today.getFullYear() &&
+                             toDate.getMonth() === today.getMonth() &&
+                             toDate.getFullYear() === today.getFullYear();
+                    break;
+
+                case 'quarter':
+                    const quarter = Math.floor(today.getMonth() / 3);
+                    const qStart = new Date(today.getFullYear(), quarter * 3, 1);
+                    const qEnd = new Date(today.getFullYear(), (quarter + 1) * 3, 0);
+                    matches = fromDate.toDateString() === qStart.toDateString() &&
+                             toDate.toDateString() === qEnd.toDateString();
+                    break;
+
+                case 'year':
+                    matches = fromDate.getFullYear() === today.getFullYear() &&
+                             fromDate.getMonth() === 0 &&
+                             fromDate.getDate() === 1 &&
+                             toDate.getFullYear() === today.getFullYear() &&
+                             toDate.getMonth() === 11 &&
+                             toDate.getDate() === 31;
+                    break;
+            }
+
+            if (matches) {
+                btn.classList.add('active-filter');
+            } else {
+                btn.classList.remove('active-filter');
+            }
+        });
+    }
+
+    checkActiveQuickFilter();
+});
+
+// ===== PRINT ALL PURCHASE ORDERS =====
+function printPurchaseOrders() {
+    // Show print header
+    var printHeaders = document.querySelectorAll('.print-header');
+    printHeaders.forEach(function(header) {
+        header.style.display = 'block';
+    });
+
+    // Hide no-print elements
+    var noPrintElements = document.querySelectorAll('.no-print');
+    noPrintElements.forEach(function(el) {
+        el.style.display = 'none';
+    });
+
+    // Hide individual print icons in the PO # column
+    var printIcons = document.querySelectorAll('#poTable tbody td:first-child .btn');
+    printIcons.forEach(function(icon) {
+        icon.style.display = 'none';
+    });
+
+    // Show table without action column
+    var table = document.getElementById('poTable');
+    if (table) {
+        var headers = table.querySelectorAll('thead th');
+        if (headers.length > 0) {
+            headers[headers.length - 1].style.display = 'none';
+        }
+        var rows = table.querySelectorAll('tbody tr');
+        rows.forEach(function(row) {
+            var cells = row.querySelectorAll('td');
+            if (cells.length > 0) {
+                cells[cells.length - 1].style.display = 'none';
+            }
+        });
+    }
+
+    window.print();
+
+    // Restore everything after print
+    setTimeout(function() {
+        printHeaders.forEach(function(header) {
+            header.style.display = 'none';
+        });
+        noPrintElements.forEach(function(el) {
+            el.style.display = '';
+        });
+        printIcons.forEach(function(icon) {
+            icon.style.display = '';
+        });
+        if (table) {
+            var headers = table.querySelectorAll('thead th');
+            if (headers.length > 0) {
+                headers[headers.length - 1].style.display = '';
+            }
+            var rows = table.querySelectorAll('tbody tr');
+            rows.forEach(function(row) {
+                var cells = row.querySelectorAll('td');
+                if (cells.length > 0) {
+                    cells[cells.length - 1].style.display = '';
+                }
+            });
+        }
+    }, 1000);
+}
+
 // ===== TOAST NOTIFICATION FUNCTION =====
 function showToast(message, type = 'success') {
     const container = document.querySelector('div[style*="position: fixed; top: 20px; right: 20px; z-index: 9999;"]');
-    
+
     const toastHTML = `
         <div class="toast toast-custom align-items-center border-0 mb-3 bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : type === 'warning' ? 'warning' : 'info'} text-white" role="alert" aria-live="assertive" aria-atomic="true" style="display:block;">
             <div class="d-flex">
@@ -586,7 +978,7 @@ function showToast(message, type = 'success') {
             </div>
         </div>
     `;
-    
+
     container.insertAdjacentHTML('beforeend', toastHTML);
     const toastElement = container.lastElementChild;
     const toast = new bootstrap.Toast(toastElement, {
@@ -594,7 +986,7 @@ function showToast(message, type = 'success') {
         delay: 5000
     });
     toast.show();
-    
+
     toastElement.addEventListener('hidden.bs.toast', function() {
         toastElement.remove();
     });
@@ -607,7 +999,7 @@ function showConfirmModal(action, poId, poNumber) {
     const modalMessage = document.getElementById('confirmModalMessage');
     const modalSubMessage = document.getElementById('confirmModalSubMessage');
     const confirmBtn = document.getElementById('confirmModalBtn');
-    
+
     const actionConfigs = {
         'approve': {
             title: '<i class="fas fa-check-circle text-success me-2"></i>Approve Purchase Order',
@@ -618,6 +1010,16 @@ function showConfirmModal(action, poId, poNumber) {
             btnText: 'Approve',
             successMessage: '✅ PO approved successfully!',
             status: 'approved'
+        },
+        'reject': {
+            title: '<i class="fas fa-times-circle text-danger me-2"></i>Reject Purchase Order',
+            message: `Are you sure you want to reject PO <strong>${poNumber}</strong>?`,
+            subMessage: 'This will mark the purchase order as cancelled. The creator will be notified.',
+            btnClass: 'btn-danger',
+            btnIcon: 'fa-times',
+            btnText: 'Reject',
+            successMessage: '❌ PO rejected successfully!',
+            status: 'cancelled'
         },
         'submit': {
             title: '<i class="fas fa-paper-plane text-warning me-2"></i>Submit for Approval',
@@ -660,22 +1062,20 @@ function showConfirmModal(action, poId, poNumber) {
             status: 'delete'
         }
     };
-    
+
     const config = actionConfigs[action];
     if (!config) return;
-    
+
     modalTitle.innerHTML = config.title;
     modalMessage.innerHTML = config.message;
     modalSubMessage.textContent = config.subMessage;
-    
+
     confirmBtn.className = `btn ${config.btnClass} px-4`;
     confirmBtn.innerHTML = `<i class="fas ${config.btnIcon} me-2"></i>${config.btnText}`;
-    
-    // Remove old event listeners
+
     const newConfirmBtn = confirmBtn.cloneNode(true);
     confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
-    
-    // Add new event listener
+
     newConfirmBtn.addEventListener('click', function() {
         modal.hide();
         if (config.status === 'delete') {
@@ -684,7 +1084,7 @@ function showConfirmModal(action, poId, poNumber) {
             updatePOStatus(poId, config.status, config.successMessage);
         }
     });
-    
+
     modal.show();
 }
 

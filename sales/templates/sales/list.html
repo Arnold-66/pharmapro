@@ -53,19 +53,36 @@
         }
         
         /* Page header */
-        .d-flex.justify-content-between.align-items-center.mb-4 {
+        .page-header {
             padding: 0 0.875rem !important;
             flex-direction: column !important;
             gap: 0.5rem !important;
             align-items: stretch !important;
         }
         
-        .d-flex.justify-content-between.align-items-center.mb-4 h1 {
+        .page-header h1 {
             font-size: 1.1rem !important;
         }
         
-        .d-flex.justify-content-between.align-items-center.mb-4 .btn {
+        .page-header .btn {
             width: 100% !important;
+        }
+        
+        /* Quick filter buttons styling */
+        .quick-filters {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 4px !important;
+            justify-content: center !important;
+            padding: 0 0.875rem !important;
+        }
+        
+        .quick-filters .btn {
+            flex: 1 1 auto !important;
+            min-width: 50px !important;
+            max-width: 70px !important;
+            font-size: 0.65rem !important;
+            padding: 0.2rem 0.3rem !important;
         }
         
         /* Filter form - stack everything */
@@ -82,6 +99,28 @@
         
         .input-group {
             width: 100% !important;
+        }
+        
+        /* Filter section grid */
+        .filter-section {
+            padding: 0.5rem 0.875rem !important;
+        }
+        
+        .filter-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 8px !important;
+        }
+        
+        .filter-grid .form-group {
+            margin-bottom: 0 !important;
+        }
+        
+        .filter-actions {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 8px !important;
+            padding: 0.875rem !important;
         }
         
         /* Table adjustments */
@@ -187,6 +226,12 @@
         .table-responsive {
             font-size: 0.75rem !important;
         }
+        
+        .filter-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr 1fr !important;
+            gap: 10px !important;
+        }
     }
     
     /* Desktop - normal spacing */
@@ -220,13 +265,29 @@
     .badge.bg-secondary {
         background-color: #6c757d !important;
     }
+    
+    /* Quick filter buttons styling */
+    .quick-filters .btn {
+        transition: all 0.2s ease;
+    }
+    
+    .quick-filters .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .quick-filters .btn.active-filter {
+        border-color: #0d6efd;
+        background-color: #0d6efd;
+        color: white;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid px-4">
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 page-header">
         <div>
             <h1 class="h3 mb-0 text-gray-800">Sales</h1>
             <p class="text-muted small d-none d-sm-block">
@@ -245,36 +306,64 @@
         </div>
     </div>
 
+    <!-- Quick Filter Buttons - Day/Month/Year -->
+    <div class="quick-filters mb-3">
+        <button type="button" class="btn btn-outline-primary btn-sm" data-filter="today">
+            <i class="fas fa-calendar-day"></i> Today
+        </button>
+        <button type="button" class="btn btn-outline-primary btn-sm" data-filter="week">
+            <i class="fas fa-calendar-week"></i> Week
+        </button>
+        <button type="button" class="btn btn-outline-primary btn-sm" data-filter="month">
+            <i class="fas fa-calendar-alt"></i> Month
+        </button>
+        <button type="button" class="btn btn-outline-primary btn-sm" data-filter="quarter">
+            <i class="fas fa-calendar-alt"></i> Quarter
+        </button>
+        <button type="button" class="btn btn-outline-primary btn-sm" data-filter="year">
+            <i class="fas fa-calendar-year"></i> Year
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-filter="custom">
+            <i class="fas fa-sliders-h"></i> Custom
+        </button>
+    </div>
+
     <!-- Filters -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <form method="get" class="row g-3">
-                <div class="col-md-3">
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent border-end-0">
-                            <i class="fas fa-search text-muted"></i>
-                        </span>
-                        <input type="text" class="form-control border-start-0" 
-                               name="search" placeholder="Search sales..." 
-                               value="{{ search_query }}">
+            <form method="get" class="row g-3" id="filterForm">
+                <div class="filter-section">
+                    <div class="filter-grid">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-end-0">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control border-start-0" 
+                                       name="search" placeholder="Search sales..." 
+                                       value="{{ search_query }}" id="searchInput">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <select class="form-select" name="status" id="statusFilter">
+                                <option value="">All Status</option>
+                                <option value="paid" {% if status_filter == 'paid' %}selected{% endif %}>Paid</option>
+                                <option value="partial" {% if status_filter == 'partial' %}selected{% endif %}>Partial</option>
+                                <option value="unpaid" {% if status_filter == 'unpaid' %}selected{% endif %}>Unpaid</option>
+                                <option value="refunded" {% if status_filter == 'refunded' %}selected{% endif %}>Refunded</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="date" class="form-control" name="date_from" id="dateFrom" 
+                                   placeholder="Date From" value="{{ date_from }}">
+                        </div>
+                        <div class="form-group">
+                            <input type="date" class="form-control" name="date_to" id="dateTo" 
+                                   placeholder="Date To" value="{{ date_to }}">
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-2">
-                    <select class="form-select" name="status">
-                        <option value="">All Status</option>
-                        <option value="paid" {% if status_filter == 'paid' %}selected{% endif %}>Paid</option>
-                        <option value="partial" {% if status_filter == 'partial' %}selected{% endif %}>Partial</option>
-                        <option value="unpaid" {% if status_filter == 'unpaid' %}selected{% endif %}>Unpaid</option>
-                        <option value="refunded" {% if status_filter == 'refunded' %}selected{% endif %}>Refunded</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <input type="date" class="form-control" name="date_from" placeholder="Date From" value="{{ date_from }}">
-                </div>
-                <div class="col-md-2">
-                    <input type="date" class="form-control" name="date_to" placeholder="Date To" value="{{ date_to }}">
-                </div>
-                <div class="col-md-3">
+                <div class="filter-actions">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-filter me-1"></i> Filter
                     </button>
@@ -349,7 +438,6 @@
                                 {% endif %}
                             </td>
                             {% endif %}
-                            <!-- apps/sales/templates/sales/list.html - Add Print Button in actions -->
                             <td class="text-end">
                                 <div class="btn-group btn-group-sm" role="group">
                                     <a href="{% url 'sales:sale_detail' sale.id %}" class="btn btn-outline-primary" title="View">
@@ -426,4 +514,190 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterForm = document.getElementById('filterForm');
+        const dateFrom = document.getElementById('dateFrom');
+        const dateTo = document.getElementById('dateTo');
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const quickFilterBtns = document.querySelectorAll('.quick-filters .btn');
+        
+        // Function to set date range
+        function setDateRange(startDate, endDate) {
+            if (startDate) {
+                const year = startDate.getFullYear();
+                const month = String(startDate.getMonth() + 1).padStart(2, '0');
+                const day = String(startDate.getDate()).padStart(2, '0');
+                dateFrom.value = `${year}-${month}-${day}`;
+            }
+            
+            if (endDate) {
+                const year = endDate.getFullYear();
+                const month = String(endDate.getMonth() + 1).padStart(2, '0');
+                const day = String(endDate.getDate()).padStart(2, '0');
+                dateTo.value = `${year}-${month}-${day}`;
+            }
+        }
+        
+        // Quick filter button click handlers
+        quickFilterBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const filter = this.dataset.filter;
+                const today = new Date();
+                let startDate = null;
+                let endDate = new Date(today);
+                
+                // Remove active class from all buttons
+                quickFilterBtns.forEach(b => b.classList.remove('active-filter'));
+                this.classList.add('active-filter');
+                
+                switch(filter) {
+                    case 'today':
+                        startDate = new Date(today);
+                        startDate.setHours(0, 0, 0, 0);
+                        endDate = new Date(today);
+                        endDate.setHours(23, 59, 59, 999);
+                        break;
+                        
+                    case 'week':
+                        startDate = new Date(today);
+                        startDate.setDate(today.getDate() - today.getDay());
+                        startDate.setHours(0, 0, 0, 0);
+                        endDate = new Date(today);
+                        endDate.setDate(today.getDate() + (6 - today.getDay()));
+                        endDate.setHours(23, 59, 59, 999);
+                        break;
+                        
+                    case 'month':
+                        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                        startDate.setHours(0, 0, 0, 0);
+                        endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                        endDate.setHours(23, 59, 59, 999);
+                        break;
+                        
+                    case 'quarter':
+                        const quarter = Math.floor(today.getMonth() / 3);
+                        startDate = new Date(today.getFullYear(), quarter * 3, 1);
+                        startDate.setHours(0, 0, 0, 0);
+                        endDate = new Date(today.getFullYear(), (quarter + 1) * 3, 0);
+                        endDate.setHours(23, 59, 59, 999);
+                        break;
+                        
+                    case 'year':
+                        startDate = new Date(today.getFullYear(), 0, 1);
+                        startDate.setHours(0, 0, 0, 0);
+                        endDate = new Date(today.getFullYear(), 11, 31);
+                        endDate.setHours(23, 59, 59, 999);
+                        break;
+                        
+                    case 'custom':
+                        // Just show the date inputs for custom selection
+                        dateFrom.focus();
+                        return;
+                }
+                
+                if (startDate && endDate) {
+                    setDateRange(startDate, endDate);
+                    // Submit the form
+                    filterForm.submit();
+                }
+            });
+        });
+        
+        // Auto-submit on select changes (status)
+        statusFilter.addEventListener('change', function() {
+            quickFilterBtns.forEach(b => b.classList.remove('active-filter'));
+            filterForm.submit();
+        });
+        
+        // Auto-submit on search with debounce
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                quickFilterBtns.forEach(b => b.classList.remove('active-filter'));
+                filterForm.submit();
+            }, 500);
+        });
+        
+        // Auto-submit on date changes
+        document.querySelectorAll('input[type="date"]').forEach(el => {
+            el.addEventListener('change', function() {
+                quickFilterBtns.forEach(b => b.classList.remove('active-filter'));
+                filterForm.submit();
+            });
+        });
+        
+        // Highlight active quick filter based on current date range
+        function checkActiveQuickFilter() {
+            const currentFrom = dateFrom.value;
+            const currentTo = dateTo.value;
+            
+            if (!currentFrom || !currentTo) return;
+            
+            const fromDate = new Date(currentFrom);
+            const toDate = new Date(currentTo);
+            const today = new Date();
+            
+            // Check if dates match any quick filter
+            quickFilterBtns.forEach(btn => {
+                const filter = btn.dataset.filter;
+                let matches = false;
+                
+                switch(filter) {
+                    case 'today':
+                        const todayStr = today.toDateString();
+                        matches = fromDate.toDateString() === todayStr && toDate.toDateString() === todayStr;
+                        break;
+                        
+                    case 'week':
+                        const weekStart = new Date(today);
+                        weekStart.setDate(today.getDate() - today.getDay());
+                        weekStart.setHours(0, 0, 0, 0);
+                        const weekEnd = new Date(today);
+                        weekEnd.setDate(today.getDate() + (6 - today.getDay()));
+                        weekEnd.setHours(23, 59, 59, 999);
+                        matches = fromDate.toDateString() === weekStart.toDateString() && 
+                                 toDate.toDateString() === weekEnd.toDateString();
+                        break;
+                        
+                    case 'month':
+                        matches = fromDate.getMonth() === today.getMonth() && 
+                                 fromDate.getFullYear() === today.getFullYear() &&
+                                 toDate.getMonth() === today.getMonth() &&
+                                 toDate.getFullYear() === today.getFullYear();
+                        break;
+                        
+                    case 'quarter':
+                        const quarter = Math.floor(today.getMonth() / 3);
+                        const qStart = new Date(today.getFullYear(), quarter * 3, 1);
+                        const qEnd = new Date(today.getFullYear(), (quarter + 1) * 3, 0);
+                        matches = fromDate.toDateString() === qStart.toDateString() && 
+                                 toDate.toDateString() === qEnd.toDateString();
+                        break;
+                        
+                    case 'year':
+                        matches = fromDate.getFullYear() === today.getFullYear() &&
+                                 fromDate.getMonth() === 0 &&
+                                 fromDate.getDate() === 1 &&
+                                 toDate.getFullYear() === today.getFullYear() &&
+                                 toDate.getMonth() === 11 &&
+                                 toDate.getDate() === 31;
+                        break;
+                }
+                
+                if (matches) {
+                    btn.classList.add('active-filter');
+                } else {
+                    btn.classList.remove('active-filter');
+                }
+            });
+        }
+        
+        // Check active filter on page load
+        checkActiveQuickFilter();
+    });
+</script>
 {% endblock %}

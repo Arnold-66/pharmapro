@@ -634,10 +634,10 @@
                         </small>
                     </div>
                     <div class="alert-actions">
-                        <button class="btn btn-sm btn-outline-success" 
-                                onclick="resolveAlert('{{ alert.id }}')" title="Mark as resolved">
-                            <i class="fas fa-check"></i> <span class="d-none d-sm-inline">Resolve</span>
-                        </button>
+                        <!--<button class="btn btn-sm btn-outline-success" -->
+                        <!--        onclick="resolveAlert('{{ alert.id }}')" title="Mark as resolved">-->
+                        <!--    <i class="fas fa-check"></i> <span class="d-none d-sm-inline">Resolve</span>-->
+                        <!--</button>-->
                         {% if not alert.is_read %}
                             <button class="btn btn-sm btn-outline-primary" 
                                     onclick="markAlertRead('{{ alert.id }}')" title="Mark as read">
