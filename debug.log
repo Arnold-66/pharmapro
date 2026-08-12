@@ -73,3 +73,4 @@ OSError: write error
 /home/opioarnold/pharma/accounts/views.py:907: UnorderedObjectListWarning: Pagination may yield inconsistent results with an unordered object_list: <class 'accounts.models.User'> QuerySet.
   paginator = Paginator(users, 10)
 OSError: write error
+OSError: write error
