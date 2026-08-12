@@ -151,7 +151,7 @@ def sale_create_view(request):
     try:
         settings_obj = TenantSettings.objects.get(tenant=tenant)
         tax_rate_from_settings = float(settings_obj.tax_rate)
-        print(f"=== TAX RATE FROM SETTINGS: {tax_rate_from_settings} ===")  # Debug
+        print(f"=== TAX RATE FROM SETTINGS: {tax_rate_from_settings} ===")
     except TenantSettings.DoesNotExist:
         tax_rate_from_settings = 18.00
         print("=== NO SETTINGS FOUND, USING DEFAULT 18 ===")
@@ -344,10 +344,18 @@ def sale_create_view(request):
 
     context = {
         'products': products,
-        'default_tax_rate': tax_rate_from_settings,  # Use the settings value
+        'default_tax_rate': tax_rate_from_settings,  # Pass the settings value as-is (including 0)
         'title': 'Create Sale - PharmaPro'
     }
     return render(request, 'sales/create.html', context)
+
+
+
+
+
+
+
+
 
 
 

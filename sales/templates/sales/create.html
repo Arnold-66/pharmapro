@@ -376,7 +376,7 @@
                                             </div>
                                             <div class="d-flex justify-content-between mb-2 align-items-center">
     <span>Tax Rate:</span>
-    <span id="taxRateDisplay">{{ default_tax_rate|default:0 }}%</span>
+    <span id="taxRateDisplay">{{ default_tax_rate }}%</span>
 </div>
                                             <div class="d-flex justify-content-between mb-2 align-items-center">
                                                 <span>Tax:</span>
@@ -443,7 +443,7 @@
                                         <div class="mb-3">
                                             <label for="taxRateInput" class="form-label">Tax Rate (%)</label>
                                             <input type="number" class="form-control" id="taxRateInput"
-                                                   value="{{ default_tax_rate|default:18 }}" min="0" max="100" step="0.5">
+       value="{{ default_tax_rate }}" min="0" max="100" step="0.5">
                                             <div class="form-text">Current tax: <span id="modalTaxAmount">Ugx 0.00</span></div>
                                         </div>
                                     </div>
@@ -464,7 +464,8 @@
                         </div>
 
                         <!-- Hidden fields -->
-                        <input type="hidden" name="tax_rate" id="taxRateHidden" value="{{ default_tax_rate|default:18 }}">
+<input type="hidden" name="tax_rate" id="taxRateHidden" value="{{ default_tax_rate }}">
+
 
                         <hr>
                         <div class="d-flex gap-2 justify-content-end flex-wrap">
@@ -487,15 +488,24 @@
 document.addEventListener('DOMContentLoaded', function() {
     let productUnitsCache = {};
     let productStockCache = {};
-    // Load tax rate from server (passed from view) - NO EDITING
-    let currentTaxRate = {{ default_tax_rate|default:18 }};
-    if (currentTaxRate === 0 || currentTaxRate === null || isNaN(currentTaxRate)) {
+
+    // Load tax rate from server - KEEP THE ACTUAL VALUE (including 0)
+    let currentTaxRate = {{ default_tax_rate }};
+
+    // CRITICAL FIX: Only use 18 as fallback if the value is undefined or null, NOT if it's 0
+    // The user specifically set it to 0, so we should respect that
+    if (currentTaxRate === null || currentTaxRate === undefined || currentTaxRate === '') {
         currentTaxRate = 18;
     }
-    console.log("Tax rate loaded from settings:", currentTaxRate);
+    // Convert to number and keep the actual value (including 0)
+    currentTaxRate = parseFloat(currentTaxRate);
+    if (isNaN(currentTaxRate)) {
+        currentTaxRate = 18;
+    }
 
-
     console.log("Tax rate loaded from settings:", currentTaxRate);
+    console.log("Tax rate type:", typeof currentTaxRate);
+
     let currentTaxAmount = 0;
     let searchTimeout = null;
     let isCalculating = false
