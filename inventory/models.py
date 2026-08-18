@@ -1,7 +1,10 @@
+# apps/inventory/models.py - Complete updated file
+
 from django.db import models
 from django.contrib.auth import get_user_model
 from tenants.models import Tenant
 import uuid
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -70,7 +73,7 @@ class SaleUnit(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='sale_units')
     name = models.CharField(max_length=50)
     abbreviation = models.CharField(max_length=10)
-    quantity_per_unit = models.DecimalField(max_digits=10, decimal_places=2, default=1)  # How many base units in this unit
+    quantity_per_unit = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     selling_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     purchase_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     is_default = models.BooleanField(default=False)
@@ -93,6 +96,8 @@ class Product(models.Model):
         ('inactive', 'Inactive'),
         ('out_of_stock', 'Out of Stock'),
         ('discontinued', 'Discontinued'),
+        ('expired', 'Expired'),
+        ('decommissioned', 'Decommissioned'),
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -104,7 +109,7 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='products')
     unit = models.ForeignKey(Unit, on_delete=models.SET_NULL, null=True, related_name='products')
     
-    # Stock information - STORED IN BASE UNIT (e.g., tablets)
+    # Stock information - STORED IN BASE UNIT
     quantity = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     min_quantity = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     max_quantity = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -157,6 +162,16 @@ class Product(models.Model):
     def is_out_of_stock(self):
         return self.quantity <= 0
     
+    def is_expired(self):
+        if self.expiry_date:
+            return self.expiry_date < timezone.now().date()
+        return False
+    
+    def days_until_expiry(self):
+        if self.expiry_date:
+            return (self.expiry_date - timezone.now().date()).days
+        return None
+    
     def get_sale_units(self):
         return self.sale_units.filter(is_active=True)
     
@@ -175,54 +190,11 @@ class Product(models.Model):
         return self.sale_units.filter(name__iexact=unit_name).first()
     
     def check_stock_for_unit(self, unit_name, quantity):
-        """Check if enough stock is available for a given unit and quantity"""
         sale_unit = self.get_unit_by_name(unit_name)
         if sale_unit:
             base_quantity_needed = quantity * sale_unit.quantity_per_unit
             return self.quantity >= base_quantity_needed
         return self.quantity >= quantity
-    
-    def get_available_in_units(self):
-        """Get available quantity in each sale unit with proper remainders"""
-        result = []
-        remaining = self.quantity
-        
-        # Sort units by quantity_per_unit (largest to smallest)
-        units = self.sale_units.filter(is_active=True).order_by('-quantity_per_unit')
-        
-        for unit in units:
-            if unit.quantity_per_unit > 0:
-                # Calculate how many full units can be made
-                available = int(remaining / unit.quantity_per_unit)
-                used = available * unit.quantity_per_unit
-                
-                result.append({
-                    'unit': unit,
-                    'available': available,
-                    'used_base_units': used,
-                    'remaining_after': remaining - used,
-                    'has_remainder': False,
-                    'is_last': False
-                })
-                
-                remaining -= used
-            else:
-                result.append({
-                    'unit': unit,
-                    'available': 0,
-                    'used_base_units': 0,
-                    'remaining_after': remaining,
-                    'has_remainder': False,
-                    'is_last': False
-                })
-        
-        # Mark the last item and check for remainder
-        if result:
-            result[-1]['is_last'] = True
-            if result[-1]['remaining_after'] > 0:
-                result[-1]['has_remainder'] = True
-        
-        return result
 
 
 class StockMovement(models.Model):
@@ -233,13 +205,19 @@ class StockMovement(models.Model):
         ('adjustment', 'Adjustment'),
         ('transfer', 'Transfer'),
         ('waste', 'Waste'),
+        ('damaged', 'Damaged Goods'),
+        ('stolen', 'Stolen Items'),
+        ('lost', 'Lost Items'),
+        ('add_stock', 'Add Stock'),
+        ('expired', 'Expired Goods'),
+        ('decommissioned', 'Decommissioned'),
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='stock_movements')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='stock_movements')
     movement_type = models.CharField(max_length=20, choices=MOVEMENT_TYPES)
-    quantity = models.DecimalField(max_digits=10, decimal_places=2)  # Always in base units
+    quantity = models.DecimalField(max_digits=10, decimal_places=2)
     previous_quantity = models.DecimalField(max_digits=10, decimal_places=2)
     new_quantity = models.DecimalField(max_digits=10, decimal_places=2)
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -248,6 +226,17 @@ class StockMovement(models.Model):
     notes = models.TextField(blank=True, null=True)
     sale_unit_name = models.CharField(max_length=50, blank=True, null=True)
     sale_quantity = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    
+    # NEW FIELDS
+    movement_subtype = models.CharField(max_length=50, blank=True, null=True)
+    damage_reason = models.CharField(max_length=200, blank=True, null=True)
+    is_approved = models.BooleanField(default=False)
+    approved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_movements')
+    approved_at = models.DateTimeField(null=True, blank=True)
+    value_loss = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    expiry_action = models.CharField(max_length=50, blank=True, null=True)
+    decommission_date = models.DateTimeField(null=True, blank=True)
+    
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='stock_movements')
     created_at = models.DateTimeField(auto_now_add=True)
     
@@ -257,6 +246,9 @@ class StockMovement(models.Model):
     
     def __str__(self):
         return f"{self.movement_type} - {self.product.name} - {self.quantity}"
+    
+    def get_movement_type_display(self):
+        return dict(self.MOVEMENT_TYPES).get(self.movement_type, self.movement_type)
 
 
 class InventoryAlert(models.Model):
@@ -264,6 +256,7 @@ class InventoryAlert(models.Model):
         ('low_stock', 'Low Stock'),
         ('out_of_stock', 'Out of Stock'),
         ('expiry', 'Expiry Soon'),
+        ('expired', 'Expired'),
         ('overstock', 'Overstock'),
     ]
     
@@ -285,6 +278,7 @@ class InventoryAlert(models.Model):
     read_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='read_alerts')
     created_at = models.DateTimeField(auto_now_add=True)
     resolved_at = models.DateTimeField(null=True, blank=True)
+    resolved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='resolved_alerts')
     
     class Meta:
         db_table = 'inventory_alerts'

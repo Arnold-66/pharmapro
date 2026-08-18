@@ -23,12 +23,23 @@ urlpatterns = [
     path('products/<uuid:product_id>/delete/', views.product_delete_view, name='product_delete'),
     path('products/<uuid:product_id>/stock/', views.product_stock_update_view, name='product_stock_update'),
     path('products/<uuid:product_id>/sale-units/', views.product_sale_units_api, name='product_sale_units_api'),
-
+    
+    # API endpoints
+    path('api/products/', views.product_search_api, name='product_search_api'),
+    path('api/expired-products/', views.get_expired_products_api, name='get_expired_products_api'),
+    
+    # Expired Products
+    path('expired-products/', views.expired_products_view, name='expired_products'),
+    path('expired-products/<uuid:product_id>/decommission/', views.decommission_expired_view, name='decommission_expired'),
+    
+    # Decommissioned Products
+    path('decommissioned-products/', views.decommissioned_products_view, name='decommissioned_products'),
+    
     # Stock Movements
     path('stock-movements/', views.stock_movement_view, name='stock_movements'),
     path('stock-movements/create/', views.stock_movement_create_view, name='stock_movement_create'),
     
-    # Alerts - Use int:alert_id since we changed to AutoField
+    # Alerts
     path('alerts/', views.alerts_view, name='alerts'),
     path('alerts/<int:alert_id>/mark-read/', views.mark_alert_read_view, name='mark_alert_read'),
     path('alerts/<int:alert_id>/resolve/', views.mark_alert_resolved_view, name='mark_alert_resolved'),

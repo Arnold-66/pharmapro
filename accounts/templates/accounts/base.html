@@ -559,39 +559,6 @@
             </li>
             {% endif %}
             
-            <!-- User Management - Only Admins -->
-            {% if user.role == 'admin' and not user.is_superuser %}
-            <li class="nav-item">
-                <a class="nav-link has-submenu {% if 'users' in request.path %}active{% endif %}" 
-                data-bs-toggle="collapse" href="#usersMenu" role="button" aria-expanded="false" aria-controls="usersMenu">
-                    <i class="fas fa-users"></i> User Management
-                </a>
-                <div class="collapse {% if 'users' in request.path %}show{% endif %}" id="usersMenu">
-                    <ul class="nav flex-column sub-menu">
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'user_list' %}active{% endif %}" 
-                            href="{% url 'accounts:user_list' %}">
-                                <i class="fas fa-list"></i> All Users
-                                <span class="badge bg-info ms-auto" id="onlineCount">0</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'online_users' %}active{% endif %}" 
-                            href="{% url 'accounts:online_users' %}">
-                                <i class="fas fa-circle text-success"></i> Online Users
-                                <span class="badge bg-success ms-auto" id="onlineUsersCount">0</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'user_create' %}active{% endif %}" 
-                            href="{% url 'accounts:user_create' %}">
-                                <i class="fas fa-user-plus"></i> Add User
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-            {% endif %}
             
             <!-- Inventory -->
             {% if user.role == 'admin' or user.role == 'manager' or user.role == 'viewer' %}
@@ -634,6 +601,21 @@
                                 <i class="fas fa-exchange-alt"></i> Stock Movements
                             </a>
                         </li>
+                        <!-- NEW: Expired Products Link -->
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'expired_products' %}active{% endif %}" 
+                                href="{% url 'inventory:expired_products' %}">
+                                    <i class="fas fa-skull text-danger"></i> Expired Products
+                                    <span class="badge bg-danger ms-auto" id="expiredBadge">0</span>
+                                </a>
+                            </li>
+                            <!-- NEW: Decommissioned Products Link -->
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'decommissioned_products' %}active{% endif %}" 
+                                href="{% url 'inventory:decommissioned_products' %}">
+                                    <i class="fas fa-check-double text-muted"></i> Decommissioned
+                                </a>
+                            </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'inventory:alerts' %}">
                                 <i class="fas fa-bell"></i> Alerts
@@ -788,6 +770,41 @@
                 </div>
             </li>
             {% endif %}
+
+            <!-- User Management - Only Admins -->
+            {% if user.role == 'admin' and not user.is_superuser %}
+            <li class="nav-item">
+                <a class="nav-link has-submenu {% if 'users' in request.path %}active{% endif %}" 
+                data-bs-toggle="collapse" href="#usersMenu" role="button" aria-expanded="false" aria-controls="usersMenu">
+                    <i class="fas fa-users"></i> User Management
+                </a>
+                <div class="collapse {% if 'users' in request.path %}show{% endif %}" id="usersMenu">
+                    <ul class="nav flex-column sub-menu">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'user_list' %}active{% endif %}" 
+                            href="{% url 'accounts:user_list' %}">
+                                <i class="fas fa-list"></i> All Users
+                                <span class="badge bg-info ms-auto" id="onlineCount">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'online_users' %}active{% endif %}" 
+                            href="{% url 'accounts:online_users' %}">
+                                <i class="fas fa-circle text-success"></i> Online Users
+                                <span class="badge bg-success ms-auto" id="onlineUsersCount">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'user_create' %}active{% endif %}" 
+                            href="{% url 'accounts:user_create' %}">
+                                <i class="fas fa-user-plus"></i> Add User
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            {% endif %}
+            
             
             <!-- Settings -->
             {% if user.role == 'admin' and not user.is_superuser %}

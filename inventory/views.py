@@ -884,9 +884,11 @@ def product_stock_update_view(request, product_id):
     return render(request, 'inventory/product_stock_update.html', context)
 
 
+# apps/inventory/views.py - Replace stock_movement_view
+
 @login_required
 def stock_movement_view(request):
-    """View stock movements - viewable by all authenticated users"""
+    """View stock movements with advanced filtering - viewable by all authenticated users"""
     if not user_can_view_inventory(request.user):
         return render(request, 'accounts/access_denied.html', {'title': 'Access Denied'})
 
@@ -897,26 +899,48 @@ def stock_movement_view(request):
 
     # Calculate totals from ALL movements (before filters)
     total_in = all_movements.filter(
-        movement_type__in=['purchase', 'return']
+        movement_type__in=['purchase', 'return', 'add_stock']
     ).aggregate(total=Sum('quantity'))['total'] or Decimal(0)
 
     total_out = all_movements.filter(
-        movement_type__in=['sale', 'waste']
+        movement_type__in=['sale', 'waste', 'damaged', 'stolen', 'lost']
     ).aggregate(total=Sum('quantity'))['total'] or Decimal(0)
 
     # Now apply filters for the displayed list
-    movements = all_movements.select_related('product', 'created_by').order_by('-created_at')
+    movements = all_movements.select_related('product', 'created_by', 'approved_by').order_by('-created_at')
 
-    # Filters
+    # Search filter (product name, SKU, reference)
+    search_query = request.GET.get('search', '')
+    if search_query:
+        movements = movements.filter(
+            Q(product__name__icontains=search_query) |
+            Q(product__sku__icontains=search_query) |
+            Q(product__barcode__icontains=search_query) |
+            Q(reference__icontains=search_query) |
+            Q(notes__icontains=search_query)
+        )
+
+    # Product filter
     product_filter = request.GET.get('product', '')
     if product_filter:
         movements = movements.filter(product_id=product_filter)
 
+    # Category filter (filter products by category)
+    category_filter = request.GET.get('category', '')
+    if category_filter:
+        movements = movements.filter(product__category_id=category_filter)
+
+    # Movement type filter
     movement_type_filter = request.GET.get('type', '')
     if movement_type_filter:
         movements = movements.filter(movement_type=movement_type_filter)
 
-    # ===== PERIOD FILTER (NEW) =====
+    # Movement subtype filter (for adjustments)
+    movement_subtype_filter = request.GET.get('subtype', '')
+    if movement_subtype_filter:
+        movements = movements.filter(movement_subtype=movement_subtype_filter)
+
+    # Period filter
     period_filter = request.GET.get('period', '')
     today = timezone.now().date()
 
@@ -926,11 +950,9 @@ def stock_movement_view(request):
         yesterday = today - datetime.timedelta(days=1)
         movements = movements.filter(created_at__date=yesterday)
     elif period_filter == 'this_week':
-        # Get Monday of current week
         start_of_week = today - datetime.timedelta(days=today.weekday())
         movements = movements.filter(created_at__date__gte=start_of_week)
     elif period_filter == 'last_week':
-        # Get Monday of last week
         start_of_last_week = today - datetime.timedelta(days=today.weekday() + 7)
         end_of_last_week = start_of_last_week + datetime.timedelta(days=6)
         movements = movements.filter(created_at__date__gte=start_of_last_week, created_at__date__lte=end_of_last_week)
@@ -938,7 +960,6 @@ def stock_movement_view(request):
         start_of_month = today.replace(day=1)
         movements = movements.filter(created_at__date__gte=start_of_month)
     elif period_filter == 'last_month':
-        # First day of last month
         first_day_current_month = today.replace(day=1)
         last_day_last_month = first_day_current_month - datetime.timedelta(days=1)
         first_day_last_month = last_day_last_month.replace(day=1)
@@ -960,7 +981,7 @@ def stock_movement_view(request):
         start_date = today - datetime.timedelta(days=90)
         movements = movements.filter(created_at__date__gte=start_date)
 
-    # Date range filter (still works alongside period filter)
+    # Date range filter
     date_from = request.GET.get('date_from', '')
     if date_from:
         try:
@@ -981,28 +1002,40 @@ def stock_movement_view(request):
     page_number = request.GET.get('page', 1)
     movements_page = paginator.get_page(page_number)
 
+    # Get all products and categories for filters
     products = Product.objects.filter(tenant=tenant)
+    categories = Category.objects.filter(tenant=tenant)
+    
+    # Get movement subtypes for filter
+    movement_subtypes = StockMovement.objects.filter(tenant=tenant).values_list('movement_subtype', flat=True).distinct().exclude(movement_subtype='')
 
     context = {
         'movements': movements_page,
         'products': products,
+        'categories': categories,
+        'movement_subtypes': movement_subtypes,
+        'search_query': search_query,
         'product_filter': product_filter,
+        'category_filter': category_filter,
         'movement_type_filter': movement_type_filter,
-        'period_filter': period_filter,  # NEW
+        'movement_subtype_filter': movement_subtype_filter,
+        'period_filter': period_filter,
         'date_from': date_from,
         'date_to': date_to,
         'total_in': total_in,
         'total_out': total_out,
+        'net_movement': total_in - total_out,
         'can_manage': user_can_manage_inventory(request.user),
         'title': 'Stock Movements - PharmaPro'
     }
     return render(request, 'inventory/stock_movements.html', context)
 
 
+# apps/inventory/views.py - Replace stock_movement_create_view
 
 @login_required
 def stock_movement_create_view(request):
-    """Create a stock movement manually - only admins and managers"""
+    """Create a stock movement with advanced options - only admins and managers"""
     if not user_can_manage_inventory(request.user):
         return render(request, 'accounts/access_denied.html', {'title': 'Access Denied'})
 
@@ -1015,6 +1048,10 @@ def stock_movement_create_view(request):
             quantity = Decimal(request.POST.get('quantity', 0) or 0)
             reference = request.POST.get('reference', '').strip()
             notes = request.POST.get('notes', '').strip()
+            unit_type = request.POST.get('unit_type', 'base')
+            movement_subtype = request.POST.get('movement_subtype', '')
+            damage_reason = request.POST.get('damage_reason', '')
+            value_loss = Decimal(request.POST.get('value_loss', 0) or 0)
 
             if not product_id:
                 messages.error(request, 'Please select a product.')
@@ -1026,41 +1063,88 @@ def stock_movement_create_view(request):
                 messages.error(request, 'Quantity must be greater than 0.')
                 return redirect('inventory:stock_movement_create')
 
-            previous_quantity = product.quantity
+            # Handle unit conversion
+            base_quantity = quantity
+            unit_name = 'base'
+            if unit_type != 'base':
+                sale_unit = product.sale_units.filter(id=unit_type).first()
+                if sale_unit:
+                    base_quantity = quantity * sale_unit.quantity_per_unit
+                    unit_name = sale_unit.name
+                else:
+                    messages.error(request, 'Invalid unit selected.')
+                    return redirect('inventory:stock_movement_create')
 
-            if movement_type == 'out' and product.quantity < quantity:
+            previous_quantity = product.quantity
+            
+            # Determine movement direction
+            is_increase = movement_type in ['purchase', 'return', 'add_stock']
+            is_decrease = movement_type in ['sale', 'waste', 'damaged', 'stolen', 'lost', 'adjustment']
+            
+            # For adjustment, movement type determines direction
+            if movement_type == 'adjustment':
+                # Use the movement_subtype to determine direction
+                if movement_subtype == 'increase':
+                    is_increase = True
+                    is_decrease = False
+                elif movement_subtype == 'decrease':
+                    is_increase = False
+                    is_decrease = True
+                else:
+                    messages.error(request, 'Please specify adjustment direction.')
+                    return redirect('inventory:stock_movement_create')
+
+            # Check stock availability for decreases
+            if is_decrease and product.quantity < base_quantity:
                 messages.error(
                     request,
-                    f'Insufficient stock. Available: {product.quantity}, Requested: {quantity}'
+                    f'Insufficient stock. Available: {product.quantity} base units, Requested: {base_quantity}'
                 )
                 return redirect('inventory:stock_movement_create')
 
-            if movement_type == 'in':
-                product.quantity += quantity
+            # Update product quantity
+            if is_increase:
+                product.quantity += base_quantity
             else:
-                product.quantity -= quantity
+                product.quantity -= base_quantity
 
             product.save()
 
-            StockMovement.objects.create(
+            # Calculate total price
+            if is_increase:
+                total_price = base_quantity * product.purchase_price
+            else:
+                total_price = base_quantity * product.selling_price
+                if value_loss > 0:
+                    total_price = value_loss
+
+            # Create stock movement
+            movement = StockMovement.objects.create(
                 tenant=tenant,
                 product=product,
                 movement_type=movement_type,
-                quantity=quantity,
+                quantity=base_quantity,
                 previous_quantity=previous_quantity,
                 new_quantity=product.quantity,
-                unit_price=product.purchase_price,
-                total_price=quantity * product.purchase_price,
+                unit_price=product.purchase_price if is_increase else product.selling_price,
+                total_price=total_price,
                 reference=reference or f'Manual {movement_type.upper()}',
                 notes=notes,
-                created_by=request.user
+                created_by=request.user,
+                sale_unit_name=unit_name,
+                sale_quantity=quantity,
+                movement_subtype=movement_subtype,
+                damage_reason=damage_reason if movement_type == 'damaged' else '',
+                value_loss=value_loss
             )
 
+            # Check for alerts
             check_product_alerts(product)
 
             messages.success(
                 request,
-                f'Stock movement recorded successfully. New quantity: {product.quantity}'
+                f'Stock movement recorded successfully. {quantity} {unit_name}(s) = {base_quantity} base units. '
+                f'New quantity: {product.quantity} base units'
             )
             return redirect('inventory:stock_movements')
 
@@ -1072,10 +1156,29 @@ def stock_movement_create_view(request):
 
         return redirect('inventory:stock_movement_create')
 
-    products = Product.objects.filter(tenant=tenant)
+    # GET request - show form
+    products = Product.objects.filter(tenant=tenant).select_related('category', 'unit')
+    categories = Category.objects.filter(tenant=tenant)
+    
+    # Get filter params for product search
+    search_query = request.GET.get('search', '')
+    category_filter = request.GET.get('category', '')
+    
+    if search_query:
+        products = products.filter(
+            Q(name__icontains=search_query) |
+            Q(sku__icontains=search_query) |
+            Q(barcode__icontains=search_query)
+        )
+    
+    if category_filter:
+        products = products.filter(category_id=category_filter)
 
     context = {
         'products': products,
+        'categories': categories,
+        'search_query': search_query,
+        'category_filter': category_filter,
         'can_manage': user_can_manage_inventory(request.user),
         'title': 'Create Stock Movement - PharmaPro'
     }
@@ -1596,3 +1699,348 @@ def product_sale_units_api(request, product_id):
     return JsonResponse({
         'units': list(units)
     })
+
+
+from django.http import JsonResponse
+from django.db.models import Q
+
+@login_required
+def product_search_api(request):
+    """API endpoint for product search with category filter"""
+    if not user_can_view_inventory(request.user):
+        return JsonResponse({'error': 'Permission denied'}, status=403)
+    
+    tenant = request.user.tenant
+    search_term = request.GET.get('search', '').strip()
+    category_id = request.GET.get('category', '')
+    
+    products = Product.objects.filter(tenant=tenant).select_related('category', 'unit')
+    
+    if search_term:
+        products = products.filter(
+            Q(name__icontains=search_term) |
+            Q(sku__icontains=search_term) |
+            Q(barcode__icontains=search_term)
+        )
+    
+    if category_id:
+        products = products.filter(category_id=category_id)
+    
+    products = products[:20]  # Limit results
+    
+    data = {
+        'products': [
+            {
+                'id': str(p.id),
+                'name': p.name,
+                'sku': p.sku,
+                'quantity': float(p.quantity),
+                'category_name': p.category.name if p.category else None,
+                'unit_name': p.unit.name if p.unit else None,
+            }
+            for p in products
+        ]
+    }
+    
+    return JsonResponse(data)
+
+
+# apps/inventory/views.py - Add these functions
+
+from django.utils import timezone
+import datetime
+
+# ==================== EXPIRY MANAGEMENT FUNCTIONS ====================
+
+def check_expired_products():
+    """Check for expired products and create alerts"""
+    today = timezone.now().date()
+    
+    expired_products = Product.objects.filter(
+        expiry_date__lt=today,
+        quantity__gt=0,
+        status__in=['active', 'out_of_stock']
+    )
+    
+    for product in expired_products:
+        alert, created = InventoryAlert.objects.get_or_create(
+            tenant=product.tenant,
+            product=product,
+            alert_type='expired',
+            is_resolved=False,
+            defaults={
+                'severity': 'critical',
+                'message': f'Product "{product.name}" has expired on {product.expiry_date}. Current stock: {product.quantity} units. Please decommission immediately.',
+                'is_read': False
+            }
+        )
+        
+        if created:
+            send_expired_notification(product)
+        
+        if product.status != 'expired':
+            product.status = 'expired'
+            product.save(update_fields=['status'])
+
+
+def send_expired_notification(product):
+    """Send notification for expired products"""
+    tenant = product.tenant
+    recipients = User.objects.filter(
+        tenant=tenant,
+        role__in=['admin', 'manager', 'supervisor'],
+        is_active=True
+    )
+    
+    title = f'⚠️ EXPIRED PRODUCT ALERT: {product.name}'
+    message = f'Product "{product.name}" has expired on {product.expiry_date}. Current stock: {product.quantity} units. Please decommission immediately.'
+    
+    for user in recipients:
+        Notification.create_notification(
+            tenant=tenant,
+            user=user,
+            title=title,
+            message=message,
+            notification_type='error',
+            category='inventory',
+            link=f'/inventory/products/{product.id}/',
+            link_text='View Product',
+            icon='fa-skull'
+        )
+    
+    Notification.create_global_notification(
+        tenant=tenant,
+        title=f'🚨 EXPIRED PRODUCT: {product.name}',
+        message=f'{product.name} expired on {product.expiry_date}. Stock: {product.quantity} units. Action required!',
+        notification_type='error',
+        category='inventory',
+        link=f'/inventory/products/{product.id}/',
+        link_text='View Product',
+        icon='fa-skull'
+    )
+
+# apps/inventory/views.py - Update expired_products_view and decommissioned_products_view
+
+@login_required
+def expired_products_view(request):
+    """View all expired products"""
+    if not user_can_view_inventory(request.user):
+        return render(request, 'accounts/access_denied.html', {'title': 'Access Denied'})
+    
+    tenant = request.user.tenant
+    today = timezone.now().date()
+    
+    expired_products = Product.objects.filter(
+        tenant=tenant,
+        expiry_date__lt=today,
+        quantity__gt=0
+    ).select_related('category', 'unit')
+    
+    search_query = request.GET.get('search', '')
+    if search_query:
+        expired_products = expired_products.filter(
+            Q(name__icontains=search_query) |
+            Q(sku__icontains=search_query) |
+            Q(batch_number__icontains=search_query)
+        )
+    
+    category_filter = request.GET.get('category', '')
+    if category_filter:
+        expired_products = expired_products.filter(category_id=category_filter)
+    
+    total_value = expired_products.aggregate(
+        total=Sum(F('quantity') * F('purchase_price'))
+    )['total'] or 0
+    
+    paginator = Paginator(expired_products, 20)
+    page_number = request.GET.get('page', 1)
+    products_page = paginator.get_page(page_number)
+    
+    # Add calculated value to each product
+    for product in products_page:
+        product.total_value = product.quantity * product.purchase_price
+    
+    categories = Category.objects.filter(tenant=tenant)
+    
+    context = {
+        'products': products_page,
+        'categories': categories,
+        'search_query': search_query,
+        'category_filter': category_filter,
+        'total_value': total_value,
+        'total_products': expired_products.count(),
+        'can_manage': user_can_manage_inventory(request.user),
+        'title': 'Expired Products - PharmaPro'
+    }
+    return render(request, 'inventory/expired_products.html', context)
+
+
+@login_required
+def decommissioned_products_view(request):
+    """View all decommissioned products"""
+    if not user_can_view_inventory(request.user):
+        return render(request, 'accounts/access_denied.html', {'title': 'Access Denied'})
+    
+    tenant = request.user.tenant
+    
+    decommissioned_products = Product.objects.filter(
+        tenant=tenant,
+        status='decommissioned'
+    ).select_related('category', 'unit')
+    
+    search_query = request.GET.get('search', '')
+    if search_query:
+        decommissioned_products = decommissioned_products.filter(
+            Q(name__icontains=search_query) |
+            Q(sku__icontains=search_query) |
+            Q(batch_number__icontains=search_query)
+        )
+    
+    category_filter = request.GET.get('category', '')
+    if category_filter:
+        decommissioned_products = decommissioned_products.filter(category_id=category_filter)
+    
+    paginator = Paginator(decommissioned_products, 20)
+    page_number = request.GET.get('page', 1)
+    products_page = paginator.get_page(page_number)
+    
+    # Add calculated value to each product
+    for product in products_page:
+        product.total_value = product.quantity * product.purchase_price
+    
+    categories = Category.objects.filter(tenant=tenant)
+    
+    context = {
+        'products': products_page,
+        'categories': categories,
+        'search_query': search_query,
+        'category_filter': category_filter,
+        'total_products': decommissioned_products.count(),
+        'can_manage': user_can_manage_inventory(request.user),
+        'title': 'Decommissioned Products - PharmaPro'
+    }
+    return render(request, 'inventory/decommissioned_products.html', context)
+
+@login_required
+def decommission_expired_view(request, product_id):
+    """Decommission expired products"""
+    if not user_can_manage_inventory(request.user):
+        return render(request, 'accounts/access_denied.html', {'title': 'Access Denied'})
+    
+    tenant = request.user.tenant
+    product = get_object_or_404(Product, id=product_id, tenant=tenant)
+    
+    if request.method == 'POST':
+        try:
+            quantity = Decimal(request.POST.get('quantity', 0) or 0)
+            notes = request.POST.get('notes', '').strip()
+            decommission_type = request.POST.get('decommission_type', 'waste')
+            
+            if quantity <= 0:
+                messages.error(request, 'Quantity must be greater than 0.')
+                return redirect('inventory:decommission_expired', product_id=product_id)
+            
+            if quantity > product.quantity:
+                messages.error(request, f'Cannot decommission more than available stock. Available: {product.quantity}')
+                return redirect('inventory:decommission_expired', product_id=product_id)
+            
+            previous_quantity = product.quantity
+            product.quantity -= quantity
+            product.save()
+            
+            # Create stock movement for decommission
+            StockMovement.objects.create(
+                tenant=tenant,
+                product=product,
+                movement_type='decommissioned',
+                quantity=quantity,
+                previous_quantity=previous_quantity,
+                new_quantity=product.quantity,
+                unit_price=product.purchase_price,
+                total_price=quantity * product.purchase_price,
+                reference=f'DECOMMISSION-{datetime.now().strftime("%Y%m%d%H%M%S")}',
+                notes=f'Decommissioned expired product. {notes}',
+                created_by=request.user,
+                value_loss=quantity * product.purchase_price,
+                decommission_date=timezone.now()
+            )
+            
+            # Mark alert as resolved
+            InventoryAlert.objects.filter(
+                tenant=tenant,
+                product=product,
+                alert_type='expired',
+                is_resolved=False
+            ).update(
+                is_resolved=True,
+                resolved_at=timezone.now(),
+                resolved_by=request.user
+            )
+            
+            # Update product status
+            if product.quantity == 0:
+                product.status = 'decommissioned'
+                product.save(update_fields=['status'])
+            else:
+                # Still has some stock, just mark as expired if not already
+                if product.status != 'expired':
+                    product.status = 'expired'
+                    product.save(update_fields=['status'])
+            
+            messages.success(
+                request,
+                f'Successfully decommissioned {quantity} units of "{product.name}".'
+            )
+            
+            if product.quantity == 0:
+                messages.info(request, f'All stock of "{product.name}" has been decommissioned.')
+            
+            return redirect('inventory:expired_products')
+            
+        except Exception as e:
+            messages.error(request, f'Error decommissioning product: {str(e)}')
+            logger.error(f"Decommission error: {str(e)}")
+        
+        return redirect('inventory:decommission_expired', product_id=product_id)
+    
+    context = {
+        'product': product,
+        'can_manage': user_can_manage_inventory(request.user),
+        'title': f'Decommission {product.name} - PharmaPro'
+    }
+    return render(request, 'inventory/decommission_expired.html', context)
+
+
+@login_required
+def get_expired_products_api(request):
+    """API endpoint to get expired products"""
+    if not user_can_view_inventory(request.user):
+        return JsonResponse({'error': 'Permission denied'}, status=403)
+    
+    tenant = request.user.tenant
+    today = timezone.now().date()
+    
+    expired_products = Product.objects.filter(
+        tenant=tenant,
+        expiry_date__lt=today,
+        quantity__gt=0
+    ).select_related('category', 'unit')
+    
+    data = {
+        'products': [
+            {
+                'id': str(p.id),
+                'name': p.name,
+                'sku': p.sku,
+                'quantity': float(p.quantity),
+                'unit_name': p.unit.name if p.unit else None,
+                'category_name': p.category.name if p.category else None,
+                'expiry_date': p.expiry_date.strftime('%Y-%m-%d') if p.expiry_date else None,
+                'purchase_price': float(p.purchase_price),
+            }
+            for p in expired_products
+        ],
+        'count': expired_products.count()
+    }
+    
+    return JsonResponse(data)

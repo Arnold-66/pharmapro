@@ -1,3 +1,4 @@
+<!-- templates/inventory/stock_movement_create.html -->
 {% extends 'accounts/base.html' %}
 {% load static %}
 
@@ -5,6 +6,14 @@
 
 {% block extra_css %}
 <style>
+    /* ===== FULL WIDTH RESET ===== */
+    .container-fluid.px-4 {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        max-width: 100% !important;
+    }
+    
+    /* ===== MOBILE FIRST (max-width: 768px) ===== */
     @media (max-width: 768px) {
         .container-fluid.px-4 {
             padding-left: 0 !important;
@@ -12,15 +21,15 @@
             max-width: 100% !important;
         }
         
-        .col-md-8.col-lg-6 {
-            max-width: 100% !important;
-            padding: 0 !important;
-        }
-        
         .row.justify-content-center {
             --bs-gutter-x: 0 !important;
             margin-right: 0 !important;
             margin-left: 0 !important;
+        }
+        
+        .col-md-10.col-lg-8 {
+            max-width: 100% !important;
+            padding: 0 !important;
         }
         
         .card {
@@ -69,7 +78,7 @@
             gap: 0.5rem !important;
         }
         
-        .alert-info {
+        .alert {
             font-size: 0.8rem !important;
             padding: 0.5rem !important;
         }
@@ -77,21 +86,113 @@
         textarea {
             font-size: 0.85rem !important;
         }
+        
+        /* Movement type grid on mobile */
+        #movementTypeGrid .col-4 {
+            flex: 0 0 33.333% !important;
+            max-width: 33.333% !important;
+            padding: 0.25rem !important;
+        }
+        
+        .movement-type-card {
+            padding: 0.35rem !important;
+            min-height: 60px !important;
+        }
+        
+        .movement-type-card i {
+            font-size: 1.2rem !important;
+        }
+        
+        .movement-type-card .label {
+            font-size: 0.55rem !important;
+        }
+        
+        .movement-type-card .sub-label {
+            font-size: 0.45rem !important;
+        }
+        
+        /* Unit options on mobile */
+        .unit-option {
+            font-size: 0.7rem !important;
+            padding: 0.2rem 0.4rem !important;
+        }
+        
+        /* Product search results on mobile */
+        #productSearchResults .list-group-item {
+            padding: 0.5rem 0.75rem !important;
+            font-size: 0.8rem !important;
+        }
+        
+        /* Selected product info on mobile */
+        #selectedProductInfo {
+            font-size: 0.8rem !important;
+        }
+        
+        /* Adjustment buttons on mobile */
+        #adjustmentSubtypeContainer .btn {
+            font-size: 0.7rem !important;
+            padding: 0.25rem 0.4rem !important;
+        }
+        
+        /* Page header on mobile */
+        .page-header {
+            padding: 0 0.875rem !important;
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+            align-items: stretch !important;
+        }
+        
+        .page-header h5 {
+            font-size: 0.9rem !important;
+        }
+        
+        /* Expired products table on mobile */
+        .expired-products-table td,
+        .expired-products-table th {
+            padding: 0.3rem 0.3rem !important;
+            font-size: 0.7rem !important;
+        }
+        
+        .expired-products-table .btn {
+            font-size: 0.6rem !important;
+            padding: 0.15rem 0.3rem !important;
+        }
     }
     
+    /* ===== TABLET (769px - 992px) ===== */
     @media (min-width: 769px) and (max-width: 992px) {
         .container-fluid.px-4 {
             padding-left: 0.5rem !important;
             padding-right: 0.5rem !important;
         }
-    }
-    
-    @media (min-width: 993px) {
-        .card {
-            border-radius: 10px !important;
+        
+        .col-md-10.col-lg-8 {
+            max-width: 100% !important;
+            padding: 0 0.5rem !important;
+        }
+        
+        .movement-type-card {
+            padding: 0.4rem !important;
+        }
+        
+        .movement-type-card i {
+            font-size: 1.3rem !important;
         }
     }
     
+    /* ===== DESKTOP (min-width: 993px) ===== */
+    @media (min-width: 993px) {
+        .card {
+            border-radius: 10px !important;
+            margin: 0 1rem !important;
+        }
+        
+        .movement-type-card {
+            padding: 0.75rem !important;
+        }
+    }
+    
+    /* ===== COMMON STYLES ===== */
     .card {
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
@@ -100,71 +201,511 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
     }
+    
+    /* ===== MOVEMENT TYPE CARDS ===== */
+    .movement-type-card {
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid #e9ecef;
+        padding: 0.5rem;
+        border-radius: 8px;
+        text-align: center;
+        background: #f8f9fa;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 70px;
+    }
+    
+    .movement-type-card:hover {
+        border-color: #0d6efd;
+        background: #f0f7ff;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(13, 110, 253, 0.15);
+    }
+    
+    .movement-type-card.selected {
+        border-color: #0d6efd;
+        background: #e7f1ff;
+        box-shadow: 0 2px 8px rgba(13, 110, 253, 0.2);
+    }
+    
+    .movement-type-card i {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .movement-type-card .label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        line-height: 1.1;
+    }
+    
+    .movement-type-card .sub-label {
+        font-size: 0.6rem;
+        color: #6c757d;
+        line-height: 1.1;
+    }
+    
+    /* ===== PRODUCT SEARCH ===== */
+    .search-wrapper {
+        position: relative;
+    }
+    
+    .product-search-result {
+        cursor: pointer;
+        transition: background 0.2s ease;
+        border-left: 3px solid transparent;
+    }
+    
+    .product-search-result:hover {
+        background: #e7f1ff;
+        border-left-color: #0d6efd;
+    }
+    
+    .product-search-result.active {
+        background: #0d6efd;
+        color: white;
+    }
+    
+    .product-search-result.active .text-muted {
+        color: rgba(255,255,255,0.7) !important;
+    }
+    
+    #productSearchResults {
+        max-height: 300px;
+        overflow-y: auto;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        position: absolute;
+        z-index: 1000;
+        width: 100%;
+        background: white;
+    }
+    
+    /* ===== UNIT DROPDOWN ===== */
+    .unit-option {
+        cursor: pointer;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+        border: 1px solid #dee2e6;
+        transition: all 0.2s ease;
+        background: white;
+        font-size: 0.8rem;
+        text-align: center;
+        flex: 1 1 auto;
+        min-width: 60px;
+    }
+    
+    .unit-option:hover {
+        border-color: #0d6efd;
+        background: #f8f9fa;
+        transform: translateY(-1px);
+    }
+    
+    .unit-option.active {
+        border-color: #0d6efd;
+        background: #e7f1ff;
+        box-shadow: 0 2px 4px rgba(13, 110, 253, 0.15);
+    }
+    
+    .unit-option .text-muted {
+        font-size: 0.6rem;
+    }
+    
+    /* ===== SELECTED PRODUCT INFO ===== */
+    #selectedProductInfo {
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #0d6efd;
+        animation: slideDown 0.3s ease;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* ===== EXPIRED PRODUCTS SECTION ===== */
+    #expiredProductsSection {
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+        overflow: hidden;
+    }
+    
+    #expiredProductsSection .table th {
+        background: #f1f1f1;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    #expiredProductsSection .table td {
+        font-size: 0.8rem;
+        vertical-align: middle;
+    }
+    
+    .expired-product-row {
+        transition: background 0.2s ease;
+        cursor: default;
+    }
+    
+    .expired-product-row:hover {
+        background: #fff5f5;
+    }
+    
+    .expired-product-row .decommission-btn {
+        transition: all 0.2s ease;
+    }
+    
+    .expired-product-row .decommission-btn:hover {
+        transform: scale(1.05);
+    }
+    
+    /* ===== ADJUSTMENT BUTTONS ===== */
+    #adjustmentSubtypeContainer .btn {
+        transition: all 0.3s ease;
+    }
+    
+    #adjustmentSubtypeContainer .btn.active {
+        transform: scale(1.02);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    
+    #adjustmentSubtypeContainer .btn-outline-success.active {
+        background: #d4edda;
+        border-color: #28a745;
+        color: #155724;
+    }
+    
+    #adjustmentSubtypeContainer .btn-outline-danger.active {
+        background: #f8d7da;
+        border-color: #dc3545;
+        color: #721c24;
+    }
+    
+    /* ===== ALERT STYLES ===== */
+    .alert {
+        border-radius: 8px;
+        border-left: 4px solid;
+    }
+    
+    .alert-success { border-left-color: #28a745; }
+    .alert-danger { border-left-color: #dc3545; }
+    .alert-warning { border-left-color: #ffc107; }
+    .alert-info { border-left-color: #17a2b8; }
+    .alert-primary { border-left-color: #0d6efd; }
+    
+    /* ===== FORM ELEMENTS ===== */
+    .form-control:focus, .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+    }
+    
+    .input-group-text {
+        background: #f8f9fa;
+        border-right: none;
+    }
+    
+    .input-group .form-control {
+        border-left: none;
+    }
+    
+    .input-group .form-control:focus {
+        border-left: none;
+        box-shadow: none;
+    }
+    
+    .input-group .btn-outline-secondary {
+        border-left: none;
+    }
+    
+    /* ===== RESPONSIVE FIXES ===== */
+    .row.g-2 > [class*="col-"] {
+        padding-left: 0.25rem;
+        padding-right: 0.25rem;
+    }
+    
+    /* Scrollbar styling */
+    #productSearchResults::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    #productSearchResults::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+    
+    #productSearchResults::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+    }
+    
+    #productSearchResults::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+    
+    /* ===== EXPIRY INDICATOR ===== */
+    .expiry-warning {
+        border-left: 4px solid #dc3545;
+        background: #fff5f5;
+    }
+    
+    .expiry-warning .badge {
+        font-size: 0.7rem;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid px-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3 page-header">
+        <h5 class="mb-0">
+            <i class="fas fa-exchange-alt text-primary me-2"></i>Create Stock Movement
+        </h5>
+        <a href="{% url 'inventory:stock_movements' %}" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> <span class="d-none d-sm-inline">Back to Movements</span>
+            <span class="d-inline d-sm-none">←</span>
+        </a>
+    </div>
+    
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
+        <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <h5 class="mb-0">
-                        <i class="fas fa-exchange-alt text-primary me-2"></i>Create Stock Movement
-                    </h5>
-                    <a href="{% url 'inventory:stock_movements' %}" class="btn btn-sm btn-outline-secondary">
-                        <i class="fas fa-arrow-left me-1"></i> <span class="d-none d-sm-inline">Back</span>
-                        <span class="d-inline d-sm-none">←</span>
-                    </a>
-                </div>
                 <div class="card-body">
                     <form method="post" id="movementForm">
                         {% csrf_token %}
                         
+                        <!-- Product Search Section -->
                         <div class="mb-3">
-                            <label for="product" class="form-label">Product <span class="text-danger">*</span></label>
-                            <select class="form-select" id="product" name="product" required>
-                                <option value="">Select Product</option>
-                                {% for product in products %}
-                                <option value="{{ product.id }}">
-                                    {{ product.name }} ({{ product.sku }}) - Stock: {{ product.quantity|floatformat:0 }}
-                                </option>
+                            <label class="form-label fw-bold">Search Product <span class="text-danger">*</span></label>
+                            <div class="search-wrapper">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                    <input type="text" class="form-control" id="productSearch" 
+                                           placeholder="Search by name, SKU, or barcode..."
+                                           autocomplete="off">
+                                    <button class="btn btn-outline-secondary" type="button" id="clearSearch">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div id="productSearchResults" class="list-group" style="display:none;">
+                                    <!-- Results will be populated here -->
+                                </div>
+                            </div>
+                            <div id="selectedProductInfo" style="display:none;" class="mt-2 p-2">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <div>
+                                        <strong id="selectedProductName" class="fs-6"></strong>
+                                        <br>
+                                        <small class="text-muted" id="selectedProductSku"></small>
+                                        <br>
+                                        <small class="text-muted">Stock: <span id="selectedProductStock" class="fw-bold">0</span> <span id="selectedProductUnit">units</span></small>
+                                        <br>
+                                        <small class="text-muted" id="selectedProductExpiry"></small>
+                                    </div>
+                                    <span class="badge bg-primary" id="selectedProductCategory"></span>
+                                </div>
+                                <div id="expiryWarning" style="display:none;" class="mt-2 p-1 expiry-warning rounded">
+                                    <small class="text-danger">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                        <span id="expiryWarningText"></span>
+                                    </small>
+                                </div>
+                            </div>
+                            <input type="hidden" name="product" id="selectedProductId" required>
+                        </div>
+                        
+                        <!-- Category Filter for Product Search -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Filter by Category</label>
+                            <select class="form-select" id="categoryFilter">
+                                <option value="">All Categories</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}">{{ category.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                         
+                        <hr class="my-3">
+                        
+                        <!-- Movement Type Selection -->
                         <div class="mb-3">
-                            <label for="movement_type" class="form-label">Movement Type <span class="text-danger">*</span></label>
-                            <select class="form-select" id="movement_type" name="movement_type" required>
-                                <option value="purchase">Purchase</option>
-                                <option value="sale">Sale</option>
-                                <option value="return">Return</option>
-                                <option value="adjustment">Adjustment</option>
-                                <option value="transfer">Transfer</option>
-                                <option value="waste">Waste</option>
+                            <label class="form-label fw-bold">Movement Type <span class="text-danger">*</span></label>
+                            <div class="row g-2" id="movementTypeGrid">
+                                <!-- Purchase -->
+                                <div class="col-4 col-md-2">
+                                    <div class="movement-type-card" data-type="purchase" data-direction="in">
+                                        <i class="fas fa-shopping-cart text-success"></i>
+                                        <div class="label">Purchase</div>
+                                        <div class="sub-label">+ Add</div>
+                                    </div>
+                                </div>
+                                <!-- Add Stock -->
+                                <div class="col-4 col-md-2">
+                                    <div class="movement-type-card" data-type="add_stock" data-direction="in">
+                                        <i class="fas fa-plus-circle text-primary"></i>
+                                        <div class="label">Add Stock</div>
+                                        <div class="sub-label">+ Manual</div>
+                                    </div>
+                                </div>
+                                <!-- Return -->
+                                <div class="col-4 col-md-2">
+                                    <div class="movement-type-card" data-type="return" data-direction="in">
+                                        <i class="fas fa-undo text-info"></i>
+                                        <div class="label">Return</div>
+                                        <div class="sub-label">+ Add</div>
+                                    </div>
+                                </div>
+                                <!-- Sale -->
+                                <div class="col-4 col-md-2">
+                                    <div class="movement-type-card" data-type="sale" data-direction="out">
+                                        <i class="fas fa-cash-register text-danger"></i>
+                                        <div class="label">Sale</div>
+                                        <div class="sub-label">- Remove</div>
+                                    </div>
+                                </div>
+                                <!-- Damaged -->
+                                <div class="col-4 col-md-2">
+                                    <div class="movement-type-card" data-type="damaged" data-direction="out">
+                                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                                        <div class="label">Damaged</div>
+                                        <div class="sub-label">- Remove</div>
+                                    </div>
+                                </div>
+                                <!-- Stolen -->
+                                <div class="col-4 col-md-2">
+                                    <div class="movement-type-card" data-type="stolen" data-direction="out">
+                                        <i class="fas fa-user-secret text-danger"></i>
+                                        <div class="label">Stolen</div>
+                                        <div class="sub-label">- Remove</div>
+                                    </div>
+                                </div>
+                                <!-- Lost -->
+                                <div class="col-4 col-md-2">
+                                    <div class="movement-type-card" data-type="lost" data-direction="out">
+                                        <i class="fas fa-search text-secondary"></i>
+                                        <div class="label">Lost</div>
+                                        <div class="sub-label">- Remove</div>
+                                    </div>
+                                </div>
+                                <!-- Waste -->
+                                <div class="col-4 col-md-2">
+                                    <div class="movement-type-card" data-type="waste" data-direction="out">
+                                        <i class="fas fa-trash text-secondary"></i>
+                                        <div class="label">Waste</div>
+                                        <div class="sub-label">- Remove</div>
+                                    </div>
+                                </div>
+                                <!-- Expired -->
+                                <div class="col-4 col-md-2">
+                                    <div class="movement-type-card" data-type="expired" data-direction="out">
+                                        <i class="fas fa-skull text-danger"></i>
+                                        <div class="label">Expired</div>
+                                        <div class="sub-label">- Decommission</div>
+                                    </div>
+                                </div>
+                                <!-- Adjustment -->
+                                <div class="col-4 col-md-2">
+                                    <div class="movement-type-card" data-type="adjustment" data-direction="both">
+                                        <i class="fas fa-sliders-h text-info"></i>
+                                        <div class="label">Adjustment</div>
+                                        <div class="sub-label">+/- Manual</div>
+                                    </div>
+                                </div>
+                                <!-- Transfer -->
+                                <div class="col-4 col-md-2">
+                                    <div class="movement-type-card" data-type="transfer" data-direction="both">
+                                        <i class="fas fa-exchange-alt text-primary"></i>
+                                        <div class="label">Transfer</div>
+                                        <div class="sub-label">↔ Move</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="movement_type" id="selectedMovementType" required>
+                            <input type="hidden" name="movement_subtype" id="movementSubtype">
+                        </div>
+                        
+                        <!-- Adjustment Subtype -->
+                        <div id="adjustmentSubtypeContainer" style="display:none;" class="mb-3">
+                            <label class="form-label fw-bold">Adjustment Direction</label>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <button type="button" class="btn btn-outline-success flex-fill" data-subtype="increase">
+                                    <i class="fas fa-plus me-1"></i> Increase Stock
+                                </button>
+                                <button type="button" class="btn btn-outline-danger flex-fill" data-subtype="decrease">
+                                    <i class="fas fa-minus me-1"></i> Decrease Stock
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Damage Reason -->
+                        <div id="damageReasonContainer" style="display:none;" class="mb-3">
+                            <label class="form-label fw-bold">Damage Reason</label>
+                            <select class="form-select" name="damage_reason" id="damageReason">
+                                <option value="">Select reason...</option>
+                                <option value="physical_damage">Physical Damage</option>
+                                <option value="expired">Expired Product</option>
+                                <option value="spillage">Spillage</option>
+                                <option value="incorrect_storage">Incorrect Storage</option>
+                                <option value="transit_damage">Transit Damage</option>
+                                <option value="other">Other</option>
                             </select>
                         </div>
                         
-                        <div class="mb-3">
-                            <label for="quantity" class="form-label">Quantity <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" id="quantity" name="quantity" 
-                                   placeholder="Enter quantity" required min="1" step="1">
-                            <div class="form-text" id="stockInfo">Enter the quantity for this movement.</div>
+                        <hr class="my-3">
+                        
+                        <!-- Quantity & Unit Selection -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="quantity" class="form-label fw-bold">Quantity <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" 
+                                       placeholder="Enter quantity" required min="0.01" step="0.01">
+                                <div class="form-text" id="stockInfo">Enter the quantity for this movement.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Unit</label>
+                                <select class="form-select" id="unitDropdown" name="unit_type">
+                                    <option value="base">Base Unit</option>
+                                    <!-- Units will be dynamically populated -->
+                                </select>
+                            </div>
                         </div>
                         
+                        <!-- Value Loss -->
                         <div class="mb-3">
-                            <label for="reference" class="form-label">Reference</label>
+                            <label for="value_loss" class="form-label fw-bold">Value Loss (if applicable)</label>
+                            <input type="number" class="form-control" id="value_loss" name="value_loss" 
+                                   placeholder="Enter monetary loss amount" step="0.01" min="0">
+                            <div class="form-text">For damaged, stolen, expired, or lost items - enter the estimated value loss.</div>
+                        </div>
+                        
+                        <!-- Reference -->
+                        <div class="mb-3">
+                            <label for="reference" class="form-label fw-bold">Reference</label>
                             <input type="text" class="form-control" id="reference" name="reference" 
                                    placeholder="e.g., PO-123, Invoice #456">
                         </div>
                         
+                        <!-- Notes -->
                         <div class="mb-3">
-                            <label for="notes" class="form-label">Notes</label>
+                            <label for="notes" class="form-label fw-bold">Notes</label>
                             <textarea class="form-control" id="notes" name="notes" rows="3" 
                                       placeholder="Additional notes about this movement"></textarea>
                         </div>
 
-                        <div class="alert alert-info">
+                        <!-- Movement Info Alert -->
+                        <div class="alert alert-info" id="movementInfo">
                             <i class="fas fa-info-circle me-2"></i>
                             <strong>Note:</strong> This will create a permanent record of this stock movement and update the product quantity.
                         </div>
@@ -183,58 +724,483 @@
             </div>
         </div>
     </div>
+    
+    <!-- Expired Products Section (shown when expired type is selected) -->
+    <div id="expiredProductsSection" class="mt-4" style="display:none;">
+        <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">
+                    <i class="fas fa-skull me-2"></i>Expired Products - Ready for Decommission
+                </h6>
+                <span class="badge bg-light text-danger" id="expiredCount">0</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 expired-products-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>SKU</th>
+                                <th>Stock</th>
+                                <th>Expiry Date</th>
+                                <th>Value</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expiredProductsList">
+                            <tr>
+                                <td colspan="6" class="text-center py-3 text-muted">
+                                    <i class="fas fa-spinner fa-spin me-2"></i> Loading expired products...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const productSelect = document.getElementById('product');
-        const movementTypeSelect = document.getElementById('movement_type');
-        const quantityInput = document.getElementById('quantity');
-        const stockInfo = document.getElementById('stockInfo');
+        // ===== PRODUCT SEARCH =====
+        const productSearch = document.getElementById('productSearch');
+        const productResults = document.getElementById('productSearchResults');
+        const selectedProductInfo = document.getElementById('selectedProductInfo');
+        const selectedProductName = document.getElementById('selectedProductName');
+        const selectedProductSku = document.getElementById('selectedProductSku');
+        const selectedProductStock = document.getElementById('selectedProductStock');
+        const selectedProductUnit = document.getElementById('selectedProductUnit');
+        const selectedProductCategory = document.getElementById('selectedProductCategory');
+        const selectedProductExpiry = document.getElementById('selectedProductExpiry');
+        const selectedProductId = document.getElementById('selectedProductId');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const clearSearch = document.getElementById('clearSearch');
+        const expiryWarning = document.getElementById('expiryWarning');
+        const expiryWarningText = document.getElementById('expiryWarningText');
+        const unitDropdown = document.getElementById('unitDropdown');
         
-        productSelect.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            if (selectedOption.value) {
-                const text = selectedOption.text;
-                const match = text.match(/Stock: (\d+)/);
-                if (match) {
-                    stockInfo.textContent = `Current stock: ${match[1]} units. Enter the quantity for this movement.`;
+        let searchTimeout = null;
+        let expiredProductsData = [];
+        
+        // ===== LOAD EXPIRED PRODUCTS =====
+        function loadExpiredProducts() {
+            fetch('/inventory/api/expired-products/')
+                .then(response => response.json())
+                .then(data => {
+                    expiredProductsData = data.products;
+                    renderExpiredProducts(expiredProductsData);
+                })
+                .catch(error => console.error('Error loading expired products:', error));
+        }
+        
+        function renderExpiredProducts(products) {
+            const tbody = document.getElementById('expiredProductsList');
+            const count = document.getElementById('expiredCount');
+            
+            count.textContent = products.length;
+            
+            if (products.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-3 text-success">
+                            <i class="fas fa-check-circle me-2"></i> No expired products found.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = products.map(product => `
+                <tr class="expired-product-row">
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <div class="fw-semibold">${product.name}</div>
+                                <div class="small text-muted">${product.category_name || 'Uncategorized'}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><small class="text-muted">${product.sku}</small></td>
+                    <td>
+                        <span class="fw-bold text-danger">${product.quantity}</span>
+                        <span class="text-muted">${product.unit_name || 'units'}</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-danger">${product.expiry_date}</span>
+                    </td>
+                    <td>Ugx ${(product.quantity * product.purchase_price).toFixed(0)}</td>
+                    <td>
+                        <a href="/inventory/expired-products/${product.id}/decommission/" 
+                           class="btn btn-danger btn-sm decommission-btn">
+                            <i class="fas fa-trash me-1"></i> Decommission
+                        </a>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // ===== LOAD PRODUCT UNITS =====
+        function loadProductUnits(productId) {
+            fetch(`/inventory/products/${productId}/sale-units/`)
+                .then(response => response.json())
+                .then(data => {
+                    unitDropdown.innerHTML = '<option value="base">Base Unit</option>';
+                    
+                    if (data.units) {
+                        data.units.forEach(unit => {
+                            const option = document.createElement('option');
+                            option.value = unit.id;
+                            option.textContent = `${unit.name} (${unit.abbreviation}) - ${unit.quantity_per_unit} base units`;
+                            option.dataset.quantity = unit.quantity_per_unit;
+                            unitDropdown.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading units:', error));
+        }
+        
+        // ===== PRODUCT SEARCH FUNCTIONS =====
+        function loadProducts() {
+            const categoryId = categoryFilter.value;
+            const searchTerm = productSearch.value.trim();
+            
+            if (searchTerm.length < 1) {
+                productResults.style.display = 'none';
+                return;
+            }
+            
+            fetch(`/inventory/api/products/?search=${encodeURIComponent(searchTerm)}&category=${categoryId}`)
+                .then(response => response.json())
+                .then(data => {
+                    renderSearchResults(data.products);
+                })
+                .catch(error => console.error('Error loading products:', error));
+        }
+        
+        function renderSearchResults(products) {
+            if (!products || products.length === 0) {
+                productResults.style.display = 'none';
+                return;
+            }
+            
+            productResults.style.display = 'block';
+            productResults.innerHTML = '';
+            
+            products.forEach(product => {
+                const item = document.createElement('a');
+                item.className = 'list-group-item list-group-item-action product-search-result';
+                
+                let expiryBadge = '';
+                if (product.expiry_date) {
+                    const daysUntil = product.days_until_expiry;
+                    if (daysUntil < 0) {
+                        expiryBadge = `<span class="badge bg-danger ms-2">EXPIRED</span>`;
+                    } else if (daysUntil <= 30) {
+                        expiryBadge = `<span class="badge bg-warning ms-2">${daysUntil} days</span>`;
+                    }
+                }
+                
+                item.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-1">
+                        <div>
+                            <strong>${product.name}</strong> ${expiryBadge}
+                            <br>
+                            <small class="text-muted">SKU: ${product.sku} | Stock: ${product.quantity} ${product.unit_name || 'units'}</small>
+                            ${product.expiry_date ? `<br><small class="text-muted">Expiry: ${product.expiry_date}</small>` : ''}
+                        </div>
+                        <span class="badge bg-secondary">${product.category_name || 'Uncategorized'}</span>
+                    </div>
+                `;
+                item.dataset.id = product.id;
+                item.dataset.name = product.name;
+                item.dataset.sku = product.sku;
+                item.dataset.quantity = product.quantity;
+                item.dataset.unit = product.unit_name || 'units';
+                item.dataset.category = product.category_name || 'Uncategorized';
+                item.dataset.expiry = product.expiry_date || null;
+                item.dataset.days_until_expiry = product.days_until_expiry || null;
+                
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    selectProduct(
+                        this.dataset.id, 
+                        this.dataset.name, 
+                        this.dataset.sku, 
+                        this.dataset.quantity, 
+                        this.dataset.unit,
+                        this.dataset.category,
+                        this.dataset.expiry,
+                        this.dataset.days_until_expiry
+                    );
+                });
+                
+                productResults.appendChild(item);
+            });
+        }
+        
+        function selectProduct(id, name, sku, quantity, unit, category, expiry, daysUntil) {
+            selectedProductId.value = id;
+            selectedProductName.textContent = name;
+            selectedProductSku.textContent = `SKU: ${sku}`;
+            selectedProductStock.textContent = quantity;
+            selectedProductUnit.textContent = unit;
+            selectedProductCategory.textContent = category;
+            selectedProductInfo.style.display = 'block';
+            productResults.style.display = 'none';
+            productSearch.value = name;
+            
+            // Show expiry info
+            if (expiry) {
+                const expiryDate = new Date(expiry);
+                const formattedDate = expiryDate.toLocaleDateString();
+                if (daysUntil < 0) {
+                    selectedProductExpiry.innerHTML = `<span class="text-danger"><i class="fas fa-skull me-1"></i>EXPIRED on ${formattedDate}</span>`;
+                    expiryWarning.style.display = 'block';
+                    expiryWarningText.textContent = 'This product has EXPIRED! Please decommission immediately.';
+                } else if (daysUntil <= 30) {
+                    selectedProductExpiry.innerHTML = `<span class="text-warning"><i class="fas fa-clock me-1"></i>Expires in ${daysUntil} days (${formattedDate})</span>`;
+                    expiryWarning.style.display = 'block';
+                    expiryWarningText.textContent = `This product expires in ${daysUntil} days. Consider using it soon.`;
+                } else {
+                    selectedProductExpiry.innerHTML = `<span class="text-muted">Expires: ${formattedDate}</span>`;
+                    expiryWarning.style.display = 'none';
                 }
             } else {
-                stockInfo.textContent = 'Enter the quantity for this movement.';
+                selectedProductExpiry.textContent = 'No expiry date';
+                expiryWarning.style.display = 'none';
             }
-        });
-        
-        movementTypeSelect.addEventListener('change', function() {
-            if (this.value === 'sale' || this.value === 'waste') {
-                stockInfo.textContent = '⚠️ This will reduce stock. Ensure you have enough quantity.';
-                stockInfo.className = 'form-text text-warning';
-            } else {
-                stockInfo.className = 'form-text';
-                stockInfo.textContent = 'This will increase stock.';
-            }
-        });
-        
-        document.getElementById('movementForm').addEventListener('submit', function(e) {
-            const product = productSelect.value;
-            const quantity = parseInt(quantityInput.value);
             
-            if (!product) {
+            loadProductUnits(id);
+            updateStockInfo(quantity);
+        }
+        
+        // ===== MOVEMENT TYPE SELECTION =====
+        const movementCards = document.querySelectorAll('.movement-type-card');
+        const selectedMovementType = document.getElementById('selectedMovementType');
+        const adjustmentContainer = document.getElementById('adjustmentSubtypeContainer');
+        const damageContainer = document.getElementById('damageReasonContainer');
+        const movementSubtype = document.getElementById('movementSubtype');
+        const expiredSection = document.getElementById('expiredProductsSection');
+        
+        movementCards.forEach(card => {
+            card.addEventListener('click', function() {
+                movementCards.forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                const type = this.dataset.type;
+                const direction = this.dataset.direction;
+                
+                selectedMovementType.value = type;
+                
+                // Show/hide expired products section
+                if (type === 'expired') {
+                    expiredSection.style.display = 'block';
+                    loadExpiredProducts();
+                } else {
+                    expiredSection.style.display = 'none';
+                }
+                
+                if (type === 'adjustment') {
+                    adjustmentContainer.style.display = 'block';
+                } else {
+                    adjustmentContainer.style.display = 'none';
+                    movementSubtype.value = '';
+                }
+                
+                if (type === 'damaged') {
+                    damageContainer.style.display = 'block';
+                } else {
+                    damageContainer.style.display = 'none';
+                    document.getElementById('damageReason').value = '';
+                }
+                
+                updateMovementInfo(type, direction);
+                updateStockInfo(document.getElementById('selectedProductStock').textContent);
+            });
+        });
+        
+        // Adjustment subtype buttons
+        document.querySelectorAll('#adjustmentSubtypeContainer .btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('#adjustmentSubtypeContainer .btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                movementSubtype.value = this.dataset.subtype;
+                updateMovementInfo('adjustment', this.dataset.subtype);
+            });
+        });
+        
+        // ===== UPDATE MOVEMENT INFO =====
+        function updateMovementInfo(type, direction) {
+            const info = document.getElementById('movementInfo');
+            const messages = {
+                'purchase': 'This will <strong>INCREASE</strong> stock. New stock will be added to inventory.',
+                'add_stock': 'This will <strong>INCREASE</strong> stock. Manual addition to inventory.',
+                'return': 'This will <strong>INCREASE</strong> stock. Returned items added back.',
+                'sale': 'This will <strong>DECREASE</strong> stock. Items sold to customers.',
+                'damaged': 'This will <strong>DECREASE</strong> stock. Damaged items removed from inventory.',
+                'stolen': 'This will <strong>DECREASE</strong> stock. Stolen items removed from inventory.',
+                'lost': 'This will <strong>DECREASE</strong> stock. Lost items removed from inventory.',
+                'waste': 'This will <strong>DECREASE</strong> stock. Waste items removed from inventory.',
+                'expired': 'This will <strong>DECREASE</strong> stock. Expired items will be decommissioned and removed.',
+                'adjustment': direction === 'increase' ? 
+                    'This will <strong>INCREASE</strong> stock. Manual adjustment up.' :
+                    'This will <strong>DECREASE</strong> stock. Manual adjustment down.',
+                'transfer': 'This will <strong>TRANSFER</strong> stock between locations.'
+            };
+            
+            const iconMap = {
+                'purchase': 'fa-shopping-cart',
+                'add_stock': 'fa-plus-circle',
+                'return': 'fa-undo',
+                'sale': 'fa-cash-register',
+                'damaged': 'fa-exclamation-triangle',
+                'stolen': 'fa-user-secret',
+                'lost': 'fa-search',
+                'waste': 'fa-trash',
+                'expired': 'fa-skull',
+                'adjustment': 'fa-sliders-h',
+                'transfer': 'fa-exchange-alt'
+            };
+            
+            const colorMap = {
+                'purchase': 'success',
+                'add_stock': 'primary',
+                'return': 'info',
+                'sale': 'danger',
+                'damaged': 'warning',
+                'stolen': 'danger',
+                'lost': 'secondary',
+                'waste': 'secondary',
+                'expired': 'danger',
+                'adjustment': 'info',
+                'transfer': 'primary'
+            };
+            
+            const msg = messages[type] || 'This will update the stock quantity.';
+            const icon = iconMap[type] || 'fa-info-circle';
+            const color = colorMap[type] || 'info';
+            
+            info.className = `alert alert-${color}`;
+            info.innerHTML = `
+                <i class="fas ${icon} me-2"></i>
+                <strong>Note:</strong> ${msg}
+            `;
+        }
+        
+        // ===== UPDATE STOCK INFO =====
+        function updateStockInfo(currentStock) {
+            const stockInfo = document.getElementById('stockInfo');
+            const quantityInput = document.getElementById('quantity');
+            const selectedType = document.getElementById('selectedMovementType').value;
+            
+            let unitText = 'base units';
+            if (unitDropdown.value !== 'base') {
+                const selectedOption = unitDropdown.options[unitDropdown.selectedIndex];
+                if (selectedOption) {
+                    unitText = selectedOption.textContent.split('(')[0].trim();
+                }
+            }
+            
+            const stock = parseFloat(currentStock) || 0;
+            const direction = getMovementDirection(selectedType);
+            
+            if (direction === 'out') {
+                stockInfo.innerHTML = `
+                    <i class="fas fa-exclamation-triangle text-warning me-1"></i>
+                    Current stock: <strong>${stock}</strong> ${unitText}. 
+                    This will <strong>DECREASE</strong> stock. Maximum: ${stock} ${unitText}.
+                `;
+                quantityInput.max = stock;
+                quantityInput.placeholder = `Max ${stock}`;
+            } else if (direction === 'in') {
+                stockInfo.innerHTML = `
+                    <i class="fas fa-check-circle text-success me-1"></i>
+                    Current stock: <strong>${stock}</strong> ${unitText}. 
+                    This will <strong>INCREASE</strong> stock.
+                `;
+                quantityInput.max = '';
+                quantityInput.placeholder = 'Enter quantity';
+            } else {
+                stockInfo.innerHTML = `
+                    Current stock: <strong>${stock}</strong> ${unitText}. 
+                    Enter the quantity for this movement.
+                `;
+                quantityInput.max = '';
+                quantityInput.placeholder = 'Enter quantity';
+            }
+        }
+        
+        function getMovementDirection(type) {
+            const card = document.querySelector(`.movement-type-card[data-type="${type}"]`);
+            return card ? card.dataset.direction : 'both';
+        }
+        
+        // ===== QUANTITY VALIDATION =====
+        document.getElementById('quantity').addEventListener('input', function() {
+            const val = parseFloat(this.value);
+            const max = parseFloat(this.max);
+            
+            if (max > 0 && val > max) {
+                this.value = max;
+                alert(`Maximum quantity available: ${max}`);
+            }
+        });
+        
+        // ===== UNIT DROPDOWN CHANGE =====
+        unitDropdown.addEventListener('change', function() {
+            updateStockInfo(document.getElementById('selectedProductStock').textContent);
+        });
+        
+        // ===== FORM SUBMISSION =====
+        document.getElementById('movementForm').addEventListener('submit', function(e) {
+            const productId = document.getElementById('selectedProductId').value;
+            const movementType = document.getElementById('selectedMovementType').value;
+            const quantity = document.getElementById('quantity').value;
+            
+            if (!productId) {
                 e.preventDefault();
                 alert('Please select a product.');
                 return false;
             }
             
-            if (!quantity || quantity < 1) {
+            if (!movementType) {
                 e.preventDefault();
-                alert('Please enter a valid quantity (minimum 1).');
+                alert('Please select a movement type.');
                 return false;
+            }
+            
+            if (!quantity || parseFloat(quantity) <= 0) {
+                e.preventDefault();
+                alert('Please enter a valid quantity (minimum 0.01).');
+                return false;
+            }
+            
+            if (movementType === 'adjustment') {
+                const subtype = document.getElementById('movementSubtype').value;
+                if (!subtype) {
+                    e.preventDefault();
+                    alert('Please select adjustment direction (Increase or Decrease).');
+                    return false;
+                }
+            }
+            
+            if (movementType === 'damaged') {
+                const reason = document.getElementById('damageReason').value;
+                if (!reason) {
+                    e.preventDefault();
+                    alert('Please select a damage reason.');
+                    return false;
+                }
             }
             
             const btn = document.getElementById('submitBtn');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Creating...';
             btn.disabled = true;
         });
+        
+        // ===== LOAD INITIAL PRODUCTS =====
+        setTimeout(loadProducts, 500);
     });
 </script>
 {% endblock %}

@@ -1,0 +1,154 @@
+<!-- templates/inventory/decommission_expired.html -->
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Decommission {{ product.name }} - PharmaPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    .container-fluid.px-4 {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        max-width: 100% !important;
+    }
+    
+    @media (max-width: 768px) {
+        .card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+        }
+        
+        .card-body {
+            padding: 0.75rem 0.875rem !important;
+        }
+        
+        .btn {
+            width: 100% !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .d-flex.gap-2.justify-content-end {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+    }
+    
+    .product-detail-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+    
+    .product-detail-card .label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        color: #6c757d;
+        letter-spacing: 0.5px;
+    }
+    
+    .product-detail-card .value {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h5 class="mb-0">
+                        <i class="fas fa-skull text-danger me-2"></i>Decommission Expired Product
+                    </h5>
+                    <a href="{% url 'inventory:expired_products' %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Back
+                    </a>
+                </div>
+                <div class="card-body">
+                    <!-- Product Details -->
+                    <div class="product-detail-card mb-4">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="d-flex align-items-center">
+                                    {% if product.image %}
+                                    <img src="{{ product.image.url }}" alt="{{ product.name }}" 
+                                         class="rounded me-3" width="60" height="60" style="object-fit: cover;">
+                                    {% endif %}
+                                    <div>
+                                        <h5 class="mb-0">{{ product.name }}</h5>
+                                        <small class="text-muted">SKU: {{ product.sku }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="label">Current Stock</div>
+                                <div class="value text-danger">{{ product.quantity|floatformat:0 }} {{ product.unit.abbreviation|default:'units' }}</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="label">Expiry Date</div>
+                                <div class="value text-danger">{{ product.expiry_date|date:'M d, Y' }}</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="label">Batch Number</div>
+                                <div class="value">{{ product.batch_number|default:'N/A' }}</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="label">Value per Unit</div>
+                                <div class="value">Ugx {{ product.purchase_price|floatformat:0 }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Warning:</strong> This product has expired on {{ product.expiry_date|date:'M d, Y' }}.
+                        Decommissioning will remove it from your inventory permanently.
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Quantity to Decommission <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" name="quantity" 
+                                   placeholder="Enter quantity" required 
+                                   min="1" max="{{ product.quantity|floatformat:0 }}" 
+                                   step="1" value="{{ product.quantity|floatformat:0 }}">
+                            <div class="form-text">Maximum: {{ product.quantity|floatformat:0 }} units</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Decommission Type</label>
+                            <select class="form-select" name="decommission_type">
+                                <option value="waste">Waste Disposal</option>
+                                <option value="return">Return to Supplier</option>
+                                <option value="donation">Donation</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Notes</label>
+                            <textarea class="form-control" name="notes" rows="3" 
+                                      placeholder="Additional notes about decommissioning"></textarea>
+                        </div>
+                        
+                        <hr>
+                        <div class="d-flex gap-2 justify-content-end flex-wrap">
+                            <a href="{% url 'inventory:expired_products' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-1"></i> Decommission Product
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

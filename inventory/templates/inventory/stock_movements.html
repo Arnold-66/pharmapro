@@ -1,3 +1,4 @@
+<!-- templates/inventory/stock_movements.html -->
 {% extends 'accounts/base.html' %}
 {% load static %}
 
@@ -195,6 +196,11 @@
             gap: 8px !important;
             padding: 0.875rem !important;
         }
+        
+        /* Search bar on mobile */
+        .search-bar {
+            width: 100% !important;
+        }
     }
     
     @media (min-width: 769px) and (max-width: 992px) {
@@ -253,6 +259,23 @@
         background-color: #0d6efd;
         color: white;
     }
+    
+    /* Movement type badge colors */
+    .badge-movement {
+        font-weight: 500;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .badge-movement.purchase { background: #d4edda; color: #155724; }
+    .badge-movement.sale { background: #f8d7da; color: #721c24; }
+    .badge-movement.return { background: #fff3cd; color: #856404; }
+    .badge-movement.adjustment { background: #d1ecf1; color: #0c5460; }
+    .badge-movement.transfer { background: #cce5ff; color: #004085; }
+    .badge-movement.waste { background: #e2e3e5; color: #383d41; }
+    .badge-movement.damaged { background: #fce4ec; color: #c62828; }
+    .badge-movement.stolen { background: #fbe9e7; color: #bf360c; }
+    .badge-movement.lost { background: #f3e5f5; color: #6a1b9a; }
+    .badge-movement.add_stock { background: #e8f5e9; color: #1b5e20; }
 </style>
 {% endblock %}
 
@@ -267,26 +290,23 @@
         <div>
             <a href="{% url 'inventory:stock_movement_create' %}" class="btn btn-primary">
                 <i class="fas fa-plus me-1"></i> <span class="d-none d-sm-inline">Add Movement</span>
-                <span class="d-inline d-sm-none">Movement</span>
+                <span class="d-inline d-sm-none">+</span>
             </a>
         </div>
     </div>
 
-    <!-- Quick Filter Buttons - Day/Month/Year -->
+    <!-- Quick Filter Buttons -->
     <div class="quick-filters mb-3">
         <button type="button" class="btn btn-outline-primary btn-sm" data-filter="today">
             <i class="fas fa-calendar-day"></i> Today
         </button>
-        <button type="button" class="btn btn-outline-primary btn-sm" data-filter="week">
+        <button type="button" class="btn btn-outline-primary btn-sm" data-filter="this_week">
             <i class="fas fa-calendar-week"></i> Week
         </button>
-        <button type="button" class="btn btn-outline-primary btn-sm" data-filter="month">
+        <button type="button" class="btn btn-outline-primary btn-sm" data-filter="this_month">
             <i class="fas fa-calendar-alt"></i> Month
         </button>
-        <button type="button" class="btn btn-outline-primary btn-sm" data-filter="quarter">
-            <i class="fas fa-calendar-alt"></i> Quarter
-        </button>
-        <button type="button" class="btn btn-outline-primary btn-sm" data-filter="year">
+        <button type="button" class="btn btn-outline-primary btn-sm" data-filter="this_year">
             <i class="fas fa-calendar-year"></i> Year
         </button>
         <button type="button" class="btn btn-outline-secondary btn-sm" data-filter="custom">
@@ -301,6 +321,12 @@
                 <div class="filter-section">
                     <div class="filter-grid">
                         <div class="form-group">
+                            <label class="form-label">Search</label>
+                            <input type="text" class="form-control" name="search" 
+                                   placeholder="Product, SKU, Reference..." 
+                                   value="{{ search_query }}">
+                        </div>
+                        <div class="form-group">
                             <label class="form-label">Product</label>
                             <select class="form-select" name="product">
                                 <option value="">All Products</option>
@@ -312,15 +338,30 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" name="category">
+                                <option value="">All Categories</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}" {% if category_filter == category.id|stringformat:'s' %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label class="form-label">Type</label>
                             <select class="form-select" name="type">
                                 <option value="">All Types</option>
                                 <option value="purchase" {% if movement_type_filter == 'purchase' %}selected{% endif %}>Purchase</option>
+                                <option value="add_stock" {% if movement_type_filter == 'add_stock' %}selected{% endif %}>Add Stock</option>
                                 <option value="sale" {% if movement_type_filter == 'sale' %}selected{% endif %}>Sale</option>
                                 <option value="return" {% if movement_type_filter == 'return' %}selected{% endif %}>Return</option>
                                 <option value="adjustment" {% if movement_type_filter == 'adjustment' %}selected{% endif %}>Adjustment</option>
                                 <option value="transfer" {% if movement_type_filter == 'transfer' %}selected{% endif %}>Transfer</option>
                                 <option value="waste" {% if movement_type_filter == 'waste' %}selected{% endif %}>Waste</option>
+                                <option value="damaged" {% if movement_type_filter == 'damaged' %}selected{% endif %}>Damaged</option>
+                                <option value="stolen" {% if movement_type_filter == 'stolen' %}selected{% endif %}>Stolen</option>
+                                <option value="lost" {% if movement_type_filter == 'lost' %}selected{% endif %}>Lost</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -347,7 +388,7 @@
 
     <!-- Summary Cards -->
     <div class="row g-4 mb-4">
-        <div class="col-md-4">
+        <div class="col-md-3 col-sm-6">
             <div class="card shadow-sm">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
@@ -362,7 +403,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3 col-sm-6">
             <div class="card shadow-sm">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
@@ -377,7 +418,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3 col-sm-6">
             <div class="card shadow-sm">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
@@ -386,7 +427,24 @@
                         </div>
                         <div>
                             <h6 class="text-muted mb-1">Net Movement</h6>
-                            <h3 class="mb-0">{{ net_movement|floatformat:0 }}</h3>
+                            <h3 class="mb-0 {% if net_movement >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                {{ net_movement|floatformat:0 }}
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-warning bg-opacity-10 rounded p-3 me-3">
+                            <i class="fas fa-clipboard-list text-warning fa-2x"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Total Movements</h6>
+                            <h3 class="mb-0">{{ movements.paginator.count }}</h3>
                         </div>
                     </div>
                 </div>
@@ -423,18 +481,29 @@
                                     <div>
                                         <div class="fw-semibold">{{ movement.product.name|truncatechars:12 }}</div>
                                         <div class="small text-muted d-none d-sm-block">{{ movement.product.sku }}</div>
+                                        {% if movement.movement_subtype %}
+                                        <span class="badge bg-light text-muted small">{{ movement.movement_subtype }}</span>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </td>
                             <td>
-                                <span class="badge bg-{% if movement.movement_type == 'purchase' %}success{% elif movement.movement_type == 'sale' %}danger{% elif movement.movement_type == 'return' %}warning{% elif movement.movement_type == 'adjustment' %}info{% elif movement.movement_type == 'transfer' %}primary{% else %}secondary{% endif %}">
-                                    {{ movement.get_movement_type_display|slice:":6" }}
+                                <span class="badge badge-movement {{ movement.movement_type }}">
+                                    {{ movement.get_movement_type_display }}
                                 </span>
+                                {% if movement.damage_reason %}
+                                <br>
+                                <small class="text-muted">{{ movement.damage_reason }}</small>
+                                {% endif %}
                             </td>
                             <td>
-                                <span class="{% if movement.movement_type == 'purchase' or movement.movement_type == 'return' %}text-success{% else %}text-danger{% endif %} fw-bold">
-                                    {% if movement.movement_type == 'purchase' or movement.movement_type == 'return' %}+{% else %}-{% endif %}{{ movement.quantity|floatformat:0 }}
+                                <span class="{% if movement.movement_type in 'purchase,return,add_stock' %}text-success{% else %}text-danger{% endif %} fw-bold">
+                                    {% if movement.movement_type in 'purchase,return,add_stock' %}+{% else %}-{% endif %}{{ movement.quantity|floatformat:0 }}
                                 </span>
+                                {% if movement.sale_quantity %}
+                                <br>
+                                <small class="text-muted">{{ movement.sale_quantity }} {{ movement.sale_unit_name|default:'units' }}</small>
+                                {% endif %}
                             </td>
                             <td class="d-none d-sm-table-cell">{{ movement.previous_quantity|floatformat:0 }}</td>
                             <td class="d-none d-md-table-cell">{{ movement.new_quantity|floatformat:0 }}</td>
@@ -477,7 +546,7 @@
             <ul class="pagination pagination-sm mb-0">
                 {% if movements.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ movements.previous_page_number }}{% if product_filter %}&product={{ product_filter }}{% endif %}{% if movement_type_filter %}&type={{ movement_type_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+                    <a class="page-link" href="?page={{ movements.previous_page_number }}{% if product_filter %}&product={{ product_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if movement_type_filter %}&type={{ movement_type_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
                         <i class="fas fa-chevron-left"></i>
                     </a>
                 </li>
@@ -494,7 +563,7 @@
                     </li>
                     {% elif i > movements.number|add:'-3' and i < movements.number|add:'3' %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ i }}{% if product_filter %}&product={{ product_filter }}{% endif %}{% if movement_type_filter %}&type={{ movement_type_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+                        <a class="page-link" href="?page={{ i }}{% if product_filter %}&product={{ product_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if movement_type_filter %}&type={{ movement_type_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
                             {{ i }}
                         </a>
                     </li>
@@ -503,7 +572,7 @@
 
                 {% if movements.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ movements.next_page_number }}{% if product_filter %}&product={{ product_filter }}{% endif %}{% if movement_type_filter %}&type={{ movement_type_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+                    <a class="page-link" href="?page={{ movements.next_page_number }}{% if product_filter %}&product={{ product_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if movement_type_filter %}&type={{ movement_type_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
                         <i class="fas fa-chevron-right"></i>
                     </a>
                 </li>
@@ -562,7 +631,7 @@
                         endDate.setHours(23, 59, 59, 999);
                         break;
                         
-                    case 'week':
+                    case 'this_week':
                         startDate = new Date(today);
                         startDate.setDate(today.getDate() - today.getDay());
                         startDate.setHours(0, 0, 0, 0);
@@ -571,22 +640,14 @@
                         endDate.setHours(23, 59, 59, 999);
                         break;
                         
-                    case 'month':
+                    case 'this_month':
                         startDate = new Date(today.getFullYear(), today.getMonth(), 1);
                         startDate.setHours(0, 0, 0, 0);
                         endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
                         endDate.setHours(23, 59, 59, 999);
                         break;
                         
-                    case 'quarter':
-                        const quarter = Math.floor(today.getMonth() / 3);
-                        startDate = new Date(today.getFullYear(), quarter * 3, 1);
-                        startDate.setHours(0, 0, 0, 0);
-                        endDate = new Date(today.getFullYear(), (quarter + 1) * 3, 0);
-                        endDate.setHours(23, 59, 59, 999);
-                        break;
-                        
-                    case 'year':
+                    case 'this_year':
                         startDate = new Date(today.getFullYear(), 0, 1);
                         startDate.setHours(0, 0, 0, 0);
                         endDate = new Date(today.getFullYear(), 11, 31);
@@ -594,23 +655,20 @@
                         break;
                         
                     case 'custom':
-                        // Just show the date inputs for custom selection
                         dateFrom.focus();
                         return;
                 }
                 
                 if (startDate && endDate) {
                     setDateRange(startDate, endDate);
-                    // Submit the form
                     filterForm.submit();
                 }
             });
         });
         
-        // Auto-submit on select changes (product and type)
-        document.querySelectorAll('select[name="product"], select[name="type"]').forEach(el => {
+        // Auto-submit on select changes
+        document.querySelectorAll('select[name="product"], select[name="category"], select[name="type"]').forEach(el => {
             el.addEventListener('change', function() {
-                // Remove quick filter active state when using select filters
                 quickFilterBtns.forEach(b => b.classList.remove('active-filter'));
                 filterForm.submit();
             });
@@ -624,6 +682,16 @@
             });
         });
         
+        // Debounced search input
+        let searchTimeout = null;
+        document.querySelector('input[name="search"]').addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                quickFilterBtns.forEach(b => b.classList.remove('active-filter'));
+                filterForm.submit();
+            }, 500);
+        });
+        
         // Highlight active quick filter based on current date range
         function checkActiveQuickFilter() {
             const currentFrom = dateFrom.value;
@@ -635,7 +703,6 @@
             const toDate = new Date(currentTo);
             const today = new Date();
             
-            // Check if dates match any quick filter
             quickFilterBtns.forEach(btn => {
                 const filter = btn.dataset.filter;
                 let matches = false;
@@ -646,7 +713,7 @@
                         matches = fromDate.toDateString() === todayStr && toDate.toDateString() === todayStr;
                         break;
                         
-                    case 'week':
+                    case 'this_week':
                         const weekStart = new Date(today);
                         weekStart.setDate(today.getDate() - today.getDay());
                         weekStart.setHours(0, 0, 0, 0);
@@ -657,22 +724,14 @@
                                  toDate.toDateString() === weekEnd.toDateString();
                         break;
                         
-                    case 'month':
+                    case 'this_month':
                         matches = fromDate.getMonth() === today.getMonth() && 
                                  fromDate.getFullYear() === today.getFullYear() &&
                                  toDate.getMonth() === today.getMonth() &&
                                  toDate.getFullYear() === today.getFullYear();
                         break;
                         
-                    case 'quarter':
-                        const quarter = Math.floor(today.getMonth() / 3);
-                        const qStart = new Date(today.getFullYear(), quarter * 3, 1);
-                        const qEnd = new Date(today.getFullYear(), (quarter + 1) * 3, 0);
-                        matches = fromDate.toDateString() === qStart.toDateString() && 
-                                 toDate.toDateString() === qEnd.toDateString();
-                        break;
-                        
-                    case 'year':
+                    case 'this_year':
                         matches = fromDate.getFullYear() === today.getFullYear() &&
                                  fromDate.getMonth() === 0 &&
                                  fromDate.getDate() === 1 &&
@@ -690,7 +749,6 @@
             });
         }
         
-        // Check active filter on page load
         checkActiveQuickFilter();
     });
 </script>
